@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* =============================================================================
+   Design Tokens
+   Source of truth: docs/08-design-system.md
+   ============================================================================= */
+
 :root {
   /* Primary */
   --color-primary: #157347;
@@ -16,11 +21,15 @@
   --color-text-secondary: #475467;
   --color-text-muted: #98A2B3;
 
-  /* Status */
+  /* Status: Active */
   --color-status-active: #157347;
   --color-status-active-bg: #E6F4EC;
+
+  /* Status: Draft */
   --color-status-draft: #475467;
   --color-status-draft-bg: #F2F4F7;
+
+  /* Status: Attention (paused/warning) */
   --color-status-attention: #B54708;
   --color-status-attention-bg: #FEF0C7;
 
@@ -31,32 +40,60 @@
   --color-chart-4: #667085;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
-  --shadow-md: 0 4px 8px rgba(16, 24, 40, 0.08);
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-modal: 0 4px 12px rgba(16, 24, 40, 0.1);
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-full: 9999px;
+
+  /* Spacing (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
 }
 
+/* Tailwind v4 theme extension */
 @theme inline {
   --color-primary: var(--color-primary);
   --color-primary-hover: var(--color-primary-hover);
   --color-primary-tint: var(--color-primary-tint);
+  --color-surface: var(--color-surface);
+  --color-border: var(--color-border);
   --font-sans: var(--font-inter);
 }
+
+/* =============================================================================
+   Base Styles
+   ============================================================================= */
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  background: var(--color-page-bg);
-  color: var(--color-text-primary);
-  font-family: var(--font-inter), system-ui, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
+html {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Typography utilities */
+body {
+  background-color: var(--color-page-bg);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* =============================================================================
+   Typography Classes
+   ============================================================================= */
+
 .text-page-title {
   font-size: 28px;
   font-weight: 600;
@@ -101,6 +138,14 @@ body {
   color: var(--color-text-secondary);
 }
 
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
 .text-kpi {
   font-size: 32px;
   font-weight: 600;
@@ -117,29 +162,22 @@ body {
   color: var(--color-text-primary);
 }
 
-/* Card component */
-.card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
-}
+/* =============================================================================
+   Component: Button
+   ============================================================================= */
 
-/* Button components */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
   font-size: 14px;
   font-weight: 500;
   line-height: 1.4;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 150ms ease;
-  border: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
   outline: none;
 }
 
@@ -154,91 +192,219 @@ body {
 }
 
 .btn-primary {
-  background: var(--color-primary);
-  color: white;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
+  background-color: var(--color-primary-hover);
 }
 
 .btn-secondary {
-  background: var(--color-surface);
+  background-color: var(--color-surface);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--color-page-bg);
+  background-color: var(--color-page-bg);
 }
 
-/* Status badges */
+/* =============================================================================
+   Component: Badge
+   ============================================================================= */
+
 .badge {
   display: inline-flex;
   align-items: center;
   padding: 2px 10px;
   font-size: 12px;
   font-weight: 500;
-  border-radius: 9999px;
+  line-height: 1.4;
+  border-radius: var(--radius-full);
+  text-transform: capitalize;
 }
 
 .badge-active {
-  background: var(--color-status-active-bg);
+  background-color: var(--color-status-active-bg);
   color: var(--color-status-active);
 }
 
 .badge-draft {
-  background: var(--color-status-draft-bg);
+  background-color: var(--color-status-draft-bg);
   color: var(--color-status-draft);
 }
 
+.badge-paused,
 .badge-attention {
-  background: var(--color-status-attention-bg);
-  color: var(--color-status-attention);
-}
-
-.badge-paused {
-  background: var(--color-status-attention-bg);
+  background-color: var(--color-status-attention-bg);
   color: var(--color-status-attention);
 }
 
 .badge-expired {
-  background: var(--color-status-draft-bg);
+  background-color: var(--color-status-draft-bg);
   color: var(--color-text-muted);
 }
 
-/* Table styles */
-.table-header {
+/* =============================================================================
+   Component: Card
+   ============================================================================= */
+
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-card);
+}
+
+.card-no-padding {
+  padding: 0;
+}
+
+/* =============================================================================
+   Component: Table
+   ============================================================================= */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table-header {
+  background-color: var(--color-page-bg);
+}
+
+.data-table-th {
+  padding: var(--space-3) var(--space-4);
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
-  padding: 12px 16px;
   text-align: left;
   border-bottom: 1px solid var(--color-border);
 }
 
-.table-cell {
-  padding: 16px;
+.data-table-row {
+  transition: background-color 150ms ease;
+}
+
+.data-table-row:hover {
+  background-color: var(--color-page-bg);
+}
+
+.data-table-td {
+  padding: var(--space-4);
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-primary);
+  vertical-align: middle;
 }
 
-.table-row:hover {
-  background: var(--color-page-bg);
+/* =============================================================================
+   Component: Page Header
+   ============================================================================= */
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
 }
 
-/* Form elements */
+.page-header-content {
+  flex: 1;
+}
+
+.page-header-description {
+  margin-top: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.page-header-actions {
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   Component: Empty State
+   ============================================================================= */
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+}
+
+.empty-state-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.empty-state-description {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.empty-state-action {
+  margin-top: var(--space-4);
+}
+
+/* =============================================================================
+   Component: Sidebar
+   ============================================================================= */
+
+.sidebar {
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px var(--space-3);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  transition: all 150ms ease;
+  text-decoration: none;
+}
+
+.sidebar-nav-item:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-page-bg);
+}
+
+.sidebar-nav-item-active {
+  color: var(--color-primary);
+  background-color: var(--color-primary-tint);
+}
+
+.sidebar-nav-item-active:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-tint);
+}
+
+/* =============================================================================
+   Component: Form Inputs
+   ============================================================================= */
+
 .input {
   width: 100%;
   padding: 10px 14px;
   font-size: 14px;
   line-height: 1.4;
   color: var(--color-text-primary);
-  background: var(--color-surface);
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
@@ -261,56 +427,16 @@ body {
   padding-right: 40px;
 }
 
-/* Sidebar styles */
-.sidebar {
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
-}
+/* =============================================================================
+   Utility: Chip/Tag
+   ============================================================================= */
 
-.sidebar-link {
-  display: flex;
+.chip {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 2px var(--space-2);
+  font-size: 12px;
+  background-color: var(--color-page-bg);
   color: var(--color-text-secondary);
-  border-radius: 6px;
-  transition: all 150ms ease;
-}
-
-.sidebar-link:hover {
-  color: var(--color-text-primary);
-  background: var(--color-page-bg);
-}
-
-.sidebar-link-active {
-  color: var(--color-primary);
-  background: var(--color-primary-tint);
-}
-
-.sidebar-link-active:hover {
-  color: var(--color-primary);
-  background: var(--color-primary-tint);
-}
-
-/* Empty state */
-.empty-state {
-  text-align: center;
-  padding: 48px 24px;
-  color: var(--color-text-muted);
-}
-
-.empty-state-title {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  margin-bottom: 8px;
-}
-
-.empty-state-description {
-  font-size: 14px;
-  color: var(--color-text-muted);
-  max-width: 320px;
-  margin: 0 auto;
+  border-radius: var(--radius-sm);
 }
