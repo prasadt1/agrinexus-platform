@@ -66,6 +66,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
         adviceSent: s.adviceSent,
         nudgesSent: s.nudgesSent,
         nudgesCompleted: s.nudgesCompleted,
+        nudgesExpired: s.nudgesExpired,
         followThroughRate: s.followThroughRate,
         byCrop: s.byCrop,
       })),
