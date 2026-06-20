@@ -55,4 +55,9 @@ export {
   enrollFarmer,
   getMembership,
   bulkEnrollFarmers,
+  listCohortMembers,
+  getMemberStats,
 } from './membership';
+
+// Re-export MemberStats type
+export type { MemberStats } from './types';

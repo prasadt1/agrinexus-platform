@@ -1,17 +1,67 @@
 /**
  * Cohort Members API Routes
  *
+ * GET  /api/cohorts/[id]/members - List members with stats
  * POST /api/cohorts/[id]/members - Enroll farmers to cohort
  *
- * Tenant-scoped: verifies cohort belongs to calling tenant before enrollment.
+ * Tenant-scoped: verifies cohort belongs to calling tenant.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthContext, AuthError } from '@/lib/api/auth';
-import { getCohort, bulkEnrollFarmers } from '@/lib/entities';
+import { getCohort, bulkEnrollFarmers, getMemberStats } from '@/lib/entities';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
+}
+
+// =============================================================================
+// GET /api/cohorts/[id]/members - List Members with Stats
+// =============================================================================
+
+export async function GET(request: NextRequest, context: RouteContext) {
+  try {
+    const { tenantId } = await getAuthContext(request);
+    const { id: cohortId } = await context.params;
+
+    // Verify cohort belongs to this tenant
+    const cohort = await getCohort(tenantId, cohortId);
+    if (!cohort) {
+      return NextResponse.json(
+        { error: 'Cohort not found' },
+        { status: 404 }
+      );
+    }
+
+    // Get member stats
+    const members = await getMemberStats(cohortId);
+
+    return NextResponse.json({
+      cohortId,
+      memberCount: members.length,
+      members: members.map((m) => ({
+        phone: m.phone,
+        enrolledAt: m.enrolledAt,
+        nudgesSent: m.nudgesSent,
+        nudgesCompleted: m.nudgesCompleted,
+        nudgesExpired: m.nudgesExpired,
+        responseRate: m.responseRate,
+      })),
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode }
+      );
+    }
+
+    console.error('Error fetching members:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }
 
 // =============================================================================
