@@ -21,6 +21,7 @@ export const KEY_PREFIXES = {
   COHORT: 'COHORT#',
   LICENSE: 'LICENSE#',
   SUMMARY: 'SUMMARY#',
+  PHONE: 'PHONE#',        // Cohort membership by phone
   LOCATION: 'LOCATION#',  // GSI1 - validated: existing code uses LOCATION#, not DISTRICT#
   STATUS_ACTIVE: 'STATUS#active',  // GSI2 - distinct from NUDGE namespace
 } as const;
@@ -202,6 +203,7 @@ export interface CropOutcome {
   adviceSent: number;
   nudgesSent: number;
   nudgesCompleted: number;
+  nudgesExpired: number;
   followThroughRate: number;
 }
 
@@ -219,6 +221,7 @@ export interface OutcomeSummaryItem {
   adviceSent: number;
   nudgesSent: number;
   nudgesCompleted: number;
+  nudgesExpired: number;  // Separate bucket: farmer didn't respond before T+72h
   followThroughRate: number;
 
   // Breakdown
@@ -226,6 +229,22 @@ export interface OutcomeSummaryItem {
 
   // Timestamps
   lastUpdatedAt: string;
+}
+
+// =============================================================================
+// Cohort Membership Entity (Platform-side phone → cohort mapping)
+// =============================================================================
+
+export interface CohortMembershipItem {
+  // Keys
+  PK: `PHONE#${string}`;
+  SK: 'MEMBERSHIP';
+
+  // Attributes
+  phone: string;
+  tenantId: string;
+  cohortId: string;
+  enrolledAt: string;
 }
 
 // =============================================================================
@@ -291,7 +310,15 @@ export interface OutcomeSummary {
   adviceSent: number;
   nudgesSent: number;
   nudgesCompleted: number;
+  nudgesExpired: number;
   followThroughRate: number;
   byCrop: Record<string, CropOutcome>;
   lastUpdatedAt: string;
+}
+
+export interface CohortMembership {
+  phone: string;
+  tenantId: string;
+  cohortId: string;
+  enrolledAt: string;
 }
