@@ -2,6 +2,19 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import {
+  PageHeader,
+  Card,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+  Badge,
+  Button,
+  EmptyState,
+} from "@/app/components";
 
 const TENANT_ID = "demo-tenant-001";
 
@@ -82,20 +95,18 @@ export default function CohortsPage() {
 
   return (
     <div className="p-8">
-      <header className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-page-title">Cohorts</h1>
-          <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
-            Manage farmer cohorts by district
-          </p>
-        </div>
-        <button onClick={() => setShowCreateForm(true)} className="btn btn-primary">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          New Cohort
-        </button>
-      </header>
+      <PageHeader
+        title="Cohorts"
+        description="Manage farmer cohorts by district"
+        actions={
+          <Button onClick={() => setShowCreateForm(true)}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            New Cohort
+          </Button>
+        }
+      />
 
       {showCreateForm && (
         <CreateCohortForm
@@ -107,40 +118,38 @@ export default function CohortsPage() {
         />
       )}
 
-      <div className="card p-0 overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr style={{ background: "var(--color-page-bg)" }}>
-              <th className="table-header">District</th>
-              <th className="table-header">Crops</th>
-              <th className="table-header">Languages</th>
-              <th className="table-header">Status</th>
-              <th className="table-header">Outcomes</th>
-              <th className="table-header text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Card noPadding className="overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>District</TableHead>
+              <TableHead>Crops</TableHead>
+              <TableHead>Languages</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Outcomes</TableHead>
+              <TableHead align="right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {loading ? (
               <tr>
-                <td colSpan={6} className="table-cell text-center py-12" style={{ color: "var(--color-text-muted)" }}>
+                <TableCell colSpan={6} className="text-center py-12 text-muted">
                   Loading cohorts...
-                </td>
+                </TableCell>
               </tr>
             ) : cohorts.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-12">
-                  <div className="empty-state">
-                    <p className="empty-state-title">No cohorts yet</p>
-                    <p className="empty-state-description">
-                      Create your first cohort to start onboarding farmers and sending advisories.
-                    </p>
-                  </div>
+                  <EmptyState
+                    title="No cohorts yet"
+                    description="Create your first cohort to start onboarding farmers and sending advisories."
+                  />
                 </td>
               </tr>
             ) : (
               cohorts.map((cohort) => (
-                <tr key={cohort.cohortId} className="table-row">
-                  <td className="table-cell">
+                <TableRow key={cohort.cohortId}>
+                  <TableCell>
                     <Link
                       href={`/dashboard/cohorts/${cohort.cohortId}`}
                       className="font-medium hover:underline"
@@ -148,57 +157,49 @@ export default function CohortsPage() {
                     >
                       {cohort.district}
                     </Link>
-                    <p className="text-xs mt-0.5 font-mono" style={{ color: "var(--color-text-muted)" }}>
+                    <p className="text-xs mt-0.5 font-mono text-muted">
                       {cohort.cohortId.slice(0, 8)}
                     </p>
-                  </td>
-                  <td className="table-cell">
+                  </TableCell>
+                  <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {cohort.crops.map((crop) => (
-                        <span
-                          key={crop}
-                          className="text-xs px-2 py-0.5 rounded"
-                          style={{ background: "var(--color-page-bg)", color: "var(--color-text-secondary)" }}
-                        >
+                        <span key={crop} className="chip">
                           {crop}
                         </span>
                       ))}
                     </div>
-                  </td>
-                  <td className="table-cell" style={{ color: "var(--color-text-secondary)" }}>
+                  </TableCell>
+                  <TableCell className="text-secondary">
                     {cohort.languages.map((l) => l.toUpperCase()).join(", ")}
-                  </td>
-                  <td className="table-cell">
-                    <span className={`badge badge-${cohort.status}`}>
-                      {cohort.status}
-                    </span>
-                  </td>
-                  <td className="table-cell">
+                  </TableCell>
+                  <TableCell>
+                    <Badge status={cohort.status} />
+                  </TableCell>
+                  <TableCell>
                     {cohort.outcomes ? (
                       <div>
                         <span className="font-medium" style={{ color: "var(--color-status-active)" }}>
                           {(cohort.outcomes.followThroughRate * 100).toFixed(0)}%
                         </span>
-                        <span className="ml-1" style={{ color: "var(--color-text-muted)" }}>
-                          follow-through
-                        </span>
-                        <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                        <span className="ml-1 text-muted">follow-through</span>
+                        <p className="text-xs text-muted">
                           {cohort.outcomes.nudgesCompleted}/{cohort.outcomes.nudgesSent} advisories
                         </p>
                       </div>
                     ) : (
-                      <span style={{ color: "var(--color-text-muted)" }}>—</span>
+                      <span className="text-muted">—</span>
                     )}
-                  </td>
-                  <td className="table-cell text-right">
+                  </TableCell>
+                  <TableCell align="right">
                     {cohort.status === "draft" && (
-                      <button
+                      <Button
                         onClick={() => activateCohort(cohort.cohortId)}
                         disabled={activatingId === cohort.cohortId}
-                        className="btn btn-primary text-sm py-1.5"
+                        className="text-sm py-1.5"
                       >
                         {activatingId === cohort.cohortId ? "Activating..." : "Activate"}
-                      </button>
+                      </Button>
                     )}
                     {cohort.status === "active" && (
                       <Link
@@ -208,13 +209,13 @@ export default function CohortsPage() {
                         View
                       </Link>
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }
@@ -288,12 +289,15 @@ function CreateCohortForm({
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div
-        className="rounded-xl w-full max-w-lg overflow-hidden"
-        style={{ background: "var(--color-surface)", boxShadow: "var(--shadow-md)" }}
+        className="rounded-lg w-full max-w-lg overflow-hidden"
+        style={{
+          background: "var(--color-surface)",
+          boxShadow: "var(--shadow-modal)",
+        }}
       >
         <div
-          className="px-6 py-5 flex items-center justify-between border-b"
-          style={{ borderColor: "var(--color-border)" }}
+          className="px-6 py-5 flex items-center justify-between"
+          style={{ borderBottom: "1px solid var(--color-border)" }}
         >
           <h2 className="text-section">Create Cohort</h2>
           <button
@@ -374,12 +378,12 @@ function CreateCohortForm({
           )}
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn btn-secondary flex-1">
+            <Button type="button" onClick={onClose} variant="secondary" className="flex-1">
               Cancel
-            </button>
-            <button type="submit" disabled={submitting} className="btn btn-primary flex-1">
+            </Button>
+            <Button type="submit" disabled={submitting} className="flex-1">
               {submitting ? "Creating..." : "Create Cohort"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
