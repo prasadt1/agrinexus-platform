@@ -44,6 +44,7 @@ export {
   listCohortSummaries,
   getLatestCohortSummary,
   getDashboardSummaries,
+  getAllTenantSummaries,
   getCurrentPeriod,
   upsertCohortSummary,
   recalculateFollowThroughRate,
