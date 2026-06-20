@@ -45,4 +45,14 @@ export {
   getLatestCohortSummary,
   getDashboardSummaries,
   getCurrentPeriod,
+  upsertCohortSummary,
+  recalculateFollowThroughRate,
+  type SummaryIncrement,
 } from './summary';
+
+// Membership operations
+export {
+  enrollFarmer,
+  getMembership,
+  bulkEnrollFarmers,
+} from './membership';
