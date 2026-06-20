@@ -82,7 +82,7 @@ export default function CohortDetailPage({
       });
       if (res.ok) {
         const data = await res.json();
-        setCohort(data);
+        setCohort(data.cohort);
       } else {
         setError("Cohort not found");
       }
@@ -144,7 +144,7 @@ export default function CohortDetailPage({
               <span className={`badge badge-${cohort.status}`}>{cohort.status}</span>
             </div>
             <p style={{ color: "var(--color-text-secondary)" }}>
-              {cohort.crops.join(", ")} • {cohort.languages.map(l => l.toUpperCase()).join(", ")}
+              {(cohort.crops || []).join(", ")} • {(cohort.languages || []).map(l => l.toUpperCase()).join(", ")}
             </p>
           </div>
           <div className="text-right">

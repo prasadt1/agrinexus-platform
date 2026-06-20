@@ -94,7 +94,7 @@ export default function CohortsPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="py-10 px-8">
       <PageHeader
         title="Cohorts"
         description="Manage farmer cohorts by district"

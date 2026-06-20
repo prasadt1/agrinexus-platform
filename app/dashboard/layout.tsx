@@ -129,8 +129,8 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto">
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>{children}</div>
+      <main className="flex-1 overflow-auto" style={{ background: "var(--color-page-bg)" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>{children}</div>
       </main>
     </div>
   );
