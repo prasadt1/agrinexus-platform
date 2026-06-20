@@ -26,6 +26,16 @@
       "Resource": [
         "arn:aws:dynamodb:us-east-1:043624892076:table/agrinexus-data"
       ]
+    },
+    {
+      "Sid": "StepFunctionsDemoTrigger",
+      "Effect": "Allow",
+      "Action": [
+        "states:StartExecution"
+      ],
+      "Resource": [
+        "arn:aws:states:us-east-1:043624892076:stateMachine:agrinexus-nudge-workflow-dev"
+      ]
     }
   ]
 }
