@@ -15,6 +15,7 @@ import {
   TABLE_NAME,
   GetCommand,
   QueryCommand,
+  UpdateCommand,
 } from '@/lib/dynamo';
 import {
   KEY_PREFIXES,
@@ -49,11 +50,12 @@ function toOutcomeSummary(item: OutcomeSummaryItem): OutcomeSummary {
   return {
     cohortId: item.cohortId,
     period: item.period,
-    adviceSent: item.adviceSent,
-    nudgesSent: item.nudgesSent,
-    nudgesCompleted: item.nudgesCompleted,
-    followThroughRate: item.followThroughRate,
-    byCrop: item.byCrop,
+    adviceSent: item.adviceSent || 0,
+    nudgesSent: item.nudgesSent || 0,
+    nudgesCompleted: item.nudgesCompleted || 0,
+    nudgesExpired: item.nudgesExpired || 0,
+    followThroughRate: item.followThroughRate || 0,
+    byCrop: item.byCrop || {},
     lastUpdatedAt: item.lastUpdatedAt,
   };
 }
@@ -171,4 +173,115 @@ export async function getDashboardSummaries(
 
   await Promise.all(promises);
   return results;
+}
+
+// =============================================================================
+// Access Pattern: Upsert Cohort Summary (Atomic Counters)
+// UpdateItem with ADD for idempotent counter increments
+// Used by OutcomesAggregator Lambda
+// =============================================================================
+
+export type SummaryIncrement = {
+  nudgesSent?: number;
+  nudgesCompleted?: number;
+  nudgesExpired?: number;
+  adviceSent?: number;
+};
+
+export async function upsertCohortSummary(
+  tenantId: string,
+  cohortId: string,
+  period: string,
+  increments: SummaryIncrement
+): Promise<void> {
+  const now = new Date().toISOString();
+
+  // Build SET and ADD expressions dynamically
+  const updateParts: string[] = [];
+  const addParts: string[] = [];
+  const exprAttrNames: Record<string, string> = {};
+  const exprAttrValues: Record<string, unknown> = {};
+
+  // Always set metadata
+  updateParts.push('tenantId = :tenantId');
+  updateParts.push('cohortId = :cohortId');
+  updateParts.push('#period = :period');
+  updateParts.push('lastUpdatedAt = :now');
+
+  exprAttrNames['#period'] = 'period';
+  exprAttrValues[':tenantId'] = tenantId;
+  exprAttrValues[':cohortId'] = cohortId;
+  exprAttrValues[':period'] = period;
+  exprAttrValues[':now'] = now;
+
+  // Add counter increments
+  if (increments.nudgesSent) {
+    addParts.push('nudgesSent :nudgesSent');
+    exprAttrValues[':nudgesSent'] = increments.nudgesSent;
+  }
+  if (increments.nudgesCompleted) {
+    addParts.push('nudgesCompleted :nudgesCompleted');
+    exprAttrValues[':nudgesCompleted'] = increments.nudgesCompleted;
+  }
+  if (increments.nudgesExpired) {
+    addParts.push('nudgesExpired :nudgesExpired');
+    exprAttrValues[':nudgesExpired'] = increments.nudgesExpired;
+  }
+  if (increments.adviceSent) {
+    addParts.push('adviceSent :adviceSent');
+    exprAttrValues[':adviceSent'] = increments.adviceSent;
+  }
+
+  // Build final expression
+  let updateExpression = 'SET ' + updateParts.join(', ');
+  if (addParts.length > 0) {
+    updateExpression += ' ADD ' + addParts.join(', ');
+  }
+
+  await docClient.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: {
+        PK: buildTenantPK(tenantId),
+        SK: buildSummarySK(cohortId, period),
+      },
+      UpdateExpression: updateExpression,
+      ExpressionAttributeNames: exprAttrNames,
+      ExpressionAttributeValues: exprAttrValues,
+    })
+  );
+}
+
+// =============================================================================
+// Access Pattern: Recalculate Follow-Through Rate
+// Called after incrementing counters to update the derived rate
+// =============================================================================
+
+export async function recalculateFollowThroughRate(
+  tenantId: string,
+  cohortId: string,
+  period: string
+): Promise<void> {
+  // First, get current counters
+  const summary = await getCohortSummary(tenantId, cohortId, period);
+  if (!summary) return;
+
+  const total = summary.nudgesSent || 0;
+  const completed = summary.nudgesCompleted || 0;
+  const rate = total > 0 ? completed / total : 0;
+
+  // Update the rate
+  await docClient.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: {
+        PK: buildTenantPK(tenantId),
+        SK: buildSummarySK(cohortId, period),
+      },
+      UpdateExpression: 'SET followThroughRate = :rate',
+      ExpressionAttributeValues: {
+        ':rate': rate,
+      },
+    })
+  );
 }
