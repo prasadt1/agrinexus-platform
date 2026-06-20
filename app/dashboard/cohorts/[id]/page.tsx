@@ -30,6 +30,7 @@ type Summary = {
   adviceSent: number;
   nudgesSent: number;
   nudgesCompleted: number;
+  nudgesExpired: number;
   followThroughRate: number;
 };
 
@@ -73,6 +74,8 @@ export default function CohortDetailPage({
   // Aggregate stats from summaries
   const totalNudgesSent = summaries.reduce((sum, s) => sum + (s.nudgesSent || 0), 0);
   const totalNudgesCompleted = summaries.reduce((sum, s) => sum + (s.nudgesCompleted || 0), 0);
+  const totalNudgesExpired = summaries.reduce((sum, s) => sum + (s.nudgesExpired || 0), 0);
+  const totalPending = totalNudgesSent - totalNudgesCompleted - totalNudgesExpired;
   const overallResponseRate = totalNudgesSent > 0 ? totalNudgesCompleted / totalNudgesSent : 0;
 
   // For demo: estimate farmers reached (in production this would come from API)
@@ -182,44 +185,63 @@ export default function CohortDetailPage({
         />
       </section>
 
-      {/* Outcomes Chart Section */}
+      {/* Response Breakdown Chart */}
       <section className="mb-8">
         <Card>
           <h2 className="text-card-title mb-6">Response Breakdown</h2>
           {hasOutcomes ? (
             <div className="flex items-center gap-8">
               <div className="flex-1">
-                {/* Stacked bar chart */}
+                {/* Three-bucket stacked bar: Done | Pending | Expired */}
                 <div className="mb-4">
                   <div
                     className="h-10 rounded-lg overflow-hidden flex"
                     style={{ background: "var(--color-page-bg)" }}
                   >
+                    {/* Done (green) */}
                     <div
                       className="h-full transition-all duration-500"
                       style={{
-                        width: `${overallResponseRate * 100}%`,
+                        width: `${(totalNudgesCompleted / totalNudgesSent) * 100}%`,
                         background: "var(--color-chart-1)",
                       }}
                     />
+                    {/* Pending (teal) */}
                     <div
                       className="h-full transition-all duration-500"
                       style={{
-                        width: `${(1 - overallResponseRate) * 100}%`,
+                        width: `${(Math.max(0, totalPending) / totalNudgesSent) * 100}%`,
+                        background: "var(--color-chart-2)",
+                      }}
+                    />
+                    {/* Expired (amber) */}
+                    <div
+                      className="h-full transition-all duration-500"
+                      style={{
+                        width: `${(totalNudgesExpired / totalNudgesSent) * 100}%`,
                         background: "var(--color-chart-3)",
                       }}
                     />
                   </div>
                 </div>
                 {/* Legend */}
-                <div className="flex gap-8">
+                <div className="flex gap-6 flex-wrap">
                   <div className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded"
                       style={{ background: "var(--color-chart-1)" }}
                     />
                     <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                      Acted on ({totalNudgesCompleted})
+                      Done ({totalNudgesCompleted})
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded"
+                      style={{ background: "var(--color-chart-2)" }}
+                    />
+                    <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                      Pending ({Math.max(0, totalPending)})
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -228,7 +250,7 @@ export default function CohortDetailPage({
                       style={{ background: "var(--color-chart-3)" }}
                     />
                     <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                      Pending ({totalNudgesSent - totalNudgesCompleted})
+                      Expired ({totalNudgesExpired})
                     </span>
                   </div>
                 </div>
@@ -258,6 +280,16 @@ export default function CohortDetailPage({
           )}
         </Card>
       </section>
+
+      {/* Response Over Time Chart */}
+      {hasOutcomes && summaries.length > 1 && (
+        <section className="mb-8">
+          <Card>
+            <h2 className="text-card-title mb-6">Response Rate Over Time</h2>
+            <ResponseTrendChart summaries={summaries} />
+          </Card>
+        </section>
+      )}
 
       {/* Audit List Section */}
       <section className="mb-8">
@@ -371,6 +403,88 @@ function KPICard({
 }
 
 // =============================================================================
+// Response Trend Chart (Simple SVG bar chart)
+// =============================================================================
+
+function ResponseTrendChart({ summaries }: { summaries: Summary[] }) {
+  // Sort by period ascending
+  const sorted = [...summaries].sort((a, b) => a.period.localeCompare(b.period));
+  const maxRate = Math.max(...sorted.map((s) => s.followThroughRate || 0), 0.01);
+
+  const chartHeight = 120;
+  const barWidth = 40;
+  const gap = 16;
+  const chartWidth = sorted.length * (barWidth + gap);
+
+  return (
+    <div className="overflow-x-auto">
+      <svg
+        width={Math.max(chartWidth, 200)}
+        height={chartHeight + 40}
+        className="mx-auto"
+      >
+        {sorted.map((summary, idx) => {
+          const rate = summary.followThroughRate || 0;
+          const barHeight = (rate / maxRate) * chartHeight;
+          const x = idx * (barWidth + gap) + gap / 2;
+          const y = chartHeight - barHeight;
+
+          // Parse period for label
+          const [year, month] = summary.period.split("-");
+          const monthLabel = new Date(+year, +month - 1).toLocaleDateString("en-US", {
+            month: "short",
+          });
+
+          return (
+            <g key={summary.period}>
+              {/* Bar */}
+              <rect
+                x={x}
+                y={y}
+                width={barWidth}
+                height={barHeight}
+                rx={4}
+                fill="var(--color-chart-1)"
+              />
+              {/* Rate label above bar */}
+              <text
+                x={x + barWidth / 2}
+                y={y - 6}
+                textAnchor="middle"
+                fontSize={12}
+                fontWeight={500}
+                fill="var(--color-text-primary)"
+              >
+                {Math.round(rate * 100)}%
+              </text>
+              {/* Month label below */}
+              <text
+                x={x + barWidth / 2}
+                y={chartHeight + 20}
+                textAnchor="middle"
+                fontSize={11}
+                fill="var(--color-text-muted)"
+              >
+                {monthLabel}
+              </text>
+            </g>
+          );
+        })}
+        {/* Baseline */}
+        <line
+          x1={0}
+          y1={chartHeight}
+          x2={chartWidth}
+          y2={chartHeight}
+          stroke="var(--color-border)"
+          strokeWidth={1}
+        />
+      </svg>
+    </div>
+  );
+}
+
+// =============================================================================
 // Audit Row Component
 // =============================================================================
 
@@ -378,6 +492,8 @@ function AuditRow({ summary }: { summary: Summary }) {
   const responseRate = summary.nudgesSent > 0
     ? summary.nudgesCompleted / summary.nudgesSent
     : 0;
+  const expired = summary.nudgesExpired || 0;
+  const pending = Math.max(0, summary.nudgesSent - summary.nudgesCompleted - expired);
 
   // Parse period (e.g., "2026-06" → "June 2026")
   const periodLabel = summary.period
@@ -412,7 +528,7 @@ function AuditRow({ summary }: { summary: Summary }) {
         <div>
           <p className="font-medium">{periodLabel}</p>
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-            {summary.nudgesSent} advisories sent
+            {summary.nudgesSent} sent · {summary.nudgesCompleted} done · {pending} pending · {expired} expired
           </p>
         </div>
       </div>
@@ -421,7 +537,7 @@ function AuditRow({ summary }: { summary: Summary }) {
           {Math.round(responseRate * 100)}%
         </p>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          {summary.nudgesCompleted} acted on
+          response rate
         </p>
       </div>
     </div>
