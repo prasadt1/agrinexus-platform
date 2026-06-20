@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
+import { Card, Badge, Button, EmptyState } from "@/app/components";
 
 const TENANT_ID = "demo-tenant-001";
 
@@ -17,13 +18,19 @@ type Cohort = {
   activatedAt?: string;
 };
 
-type NudgeRecord = {
-  id: string;
-  activity: string;
+type License = {
+  plan: string;
   status: string;
-  message: string;
-  createdAt: string;
-  completedAt?: string;
+  currentPeriodEnd: string;
+  isDemo: boolean;
+} | null;
+
+type Summary = {
+  period: string;
+  adviceSent: number;
+  nudgesSent: number;
+  nudgesCompleted: number;
+  followThroughRate: number;
 };
 
 export default function CohortDetailPage({
@@ -33,43 +40,10 @@ export default function CohortDetailPage({
 }) {
   const { id } = use(params);
   const [cohort, setCohort] = useState<Cohort | null>(null);
+  const [license, setLicense] = useState<License>(null);
+  const [summaries, setSummaries] = useState<Summary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // Mock data for demo - in production, this would come from API
-  const [stats] = useState({
-    farmersReached: 47,
-    nudgesSent: 128,
-    responseRate: 0.72,
-    doneCount: 92,
-    notYetCount: 36,
-  });
-
-  const [recentNudges] = useState<NudgeRecord[]>([
-    {
-      id: "1",
-      activity: "spray",
-      status: "COMPLETED",
-      message: "Weather favorable for spraying. Wind 8.5 km/h.",
-      createdAt: "2026-06-20T16:34:25Z",
-      completedAt: "2026-06-20T17:15:00Z",
-    },
-    {
-      id: "2",
-      activity: "spray",
-      status: "SENT",
-      message: "Weather favorable for spraying. Wind 6.2 km/h.",
-      createdAt: "2026-06-19T09:15:00Z",
-    },
-    {
-      id: "3",
-      activity: "spray",
-      status: "COMPLETED",
-      message: "Weather favorable for spraying. Wind 7.8 km/h.",
-      createdAt: "2026-06-18T08:30:00Z",
-      completedAt: "2026-06-18T10:45:00Z",
-    },
-  ]);
 
   useEffect(() => {
     fetchCohort();
@@ -83,6 +57,8 @@ export default function CohortDetailPage({
       if (res.ok) {
         const data = await res.json();
         setCohort(data.cohort);
+        setLicense(data.license);
+        setSummaries(data.summaries || []);
       } else {
         setError("Cohort not found");
       }
@@ -94,12 +70,25 @@ export default function CohortDetailPage({
     }
   }
 
+  // Aggregate stats from summaries
+  const totalNudgesSent = summaries.reduce((sum, s) => sum + (s.nudgesSent || 0), 0);
+  const totalNudgesCompleted = summaries.reduce((sum, s) => sum + (s.nudgesCompleted || 0), 0);
+  const overallResponseRate = totalNudgesSent > 0 ? totalNudgesCompleted / totalNudgesSent : 0;
+
+  // For demo: estimate farmers reached (in production this would come from API)
+  const farmersReached = summaries.length > 0 ? Math.ceil(totalNudgesSent / 3) : 0;
+
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="py-10 px-8">
         <div className="animate-pulse">
           <div className="h-8 w-48 rounded" style={{ background: "var(--color-border)" }} />
-          <div className="h-4 w-32 mt-2 rounded" style={{ background: "var(--color-border)" }} />
+          <div className="h-4 w-64 mt-3 rounded" style={{ background: "var(--color-border)" }} />
+          <div className="grid grid-cols-3 gap-6 mt-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-24 rounded-lg" style={{ background: "var(--color-border)" }} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -107,26 +96,35 @@ export default function CohortDetailPage({
 
   if (error || !cohort) {
     return (
-      <div className="p-8">
-        <div className="card">
-          <div className="empty-state">
-            <p className="empty-state-title">{error || "Cohort not found"}</p>
-            <Link href="/dashboard/cohorts" className="btn btn-secondary mt-4">
-              Back to Cohorts
-            </Link>
-          </div>
-        </div>
+      <div className="py-10 px-8">
+        <Card>
+          <EmptyState
+            title={error || "Cohort not found"}
+            description="The cohort you're looking for doesn't exist or you don't have access to it."
+            action={
+              <Link href="/dashboard/cohorts">
+                <Button variant="secondary">Back to Cohorts</Button>
+              </Link>
+            }
+          />
+        </Card>
       </div>
     );
   }
 
+  const hasOutcomes = summaries.length > 0 && totalNudgesSent > 0;
+
   return (
-    <div className="p-8">
+    <div className="py-10 px-8">
       {/* Breadcrumb */}
       <nav className="mb-6">
         <ol className="flex items-center gap-2 text-sm">
           <li>
-            <Link href="/dashboard/cohorts" style={{ color: "var(--color-text-muted)" }} className="hover:underline">
+            <Link
+              href="/dashboard/cohorts"
+              className="hover:underline"
+              style={{ color: "var(--color-text-muted)" }}
+            >
               Cohorts
             </Link>
           </li>
@@ -141,198 +139,291 @@ export default function CohortDetailPage({
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-page-title">{cohort.district}</h1>
-              <span className={`badge badge-${cohort.status}`}>{cohort.status}</span>
+              <Badge status={cohort.status} />
             </div>
             <p style={{ color: "var(--color-text-secondary)" }}>
-              {(cohort.crops || []).join(", ")} • {(cohort.languages || []).map(l => l.toUpperCase()).join(", ")}
+              {(cohort.crops || []).join(", ")} • {(cohort.languages || []).map((l) => l.toUpperCase()).join(", ")}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-label">Tenant</p>
-            <p className="font-medium">{TENANT_ID}</p>
+            <p className="text-label">Partner</p>
+            <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>
+              {TENANT_ID.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()).replace(/\d+/g, "").trim()}
+            </p>
+            {license && (
+              <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
+                {license.plan} plan {license.isDemo && "(demo)"}
+              </p>
+            )}
           </div>
         </div>
       </header>
 
-      {/* KPI Cards */}
-      {cohort.status === "active" ? (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <KPICard
-              label="Farmers Reached"
-              value={stats.farmersReached}
-              format="number"
-            />
-            <KPICard
-              label="Advisories Sent"
-              value={stats.nudgesSent}
-              format="number"
-            />
-            <KPICard
-              label="Response Rate"
-              value={stats.responseRate}
-              format="percent"
-              highlight
-            />
-          </div>
+      {/* KPI Cards - Always show, with zeros when no data */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <KPICard
+          label="Farmers Reached"
+          value={farmersReached}
+          format="number"
+          empty={!hasOutcomes}
+        />
+        <KPICard
+          label="Advisories Sent"
+          value={totalNudgesSent}
+          format="number"
+          empty={!hasOutcomes}
+        />
+        <KPICard
+          label="Response Rate"
+          value={overallResponseRate}
+          format="percent"
+          highlight
+          empty={!hasOutcomes}
+        />
+      </section>
 
-          {/* Response Chart */}
-          <section className="card mb-8">
-            <h2 className="text-card-title mb-6">Response Breakdown</h2>
+      {/* Outcomes Chart Section */}
+      <section className="mb-8">
+        <Card>
+          <h2 className="text-card-title mb-6">Response Breakdown</h2>
+          {hasOutcomes ? (
             <div className="flex items-center gap-8">
               <div className="flex-1">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="flex-1 h-8 rounded-lg overflow-hidden flex" style={{ background: "var(--color-page-bg)" }}>
+                {/* Stacked bar chart */}
+                <div className="mb-4">
+                  <div
+                    className="h-10 rounded-lg overflow-hidden flex"
+                    style={{ background: "var(--color-page-bg)" }}
+                  >
                     <div
-                      className="h-full transition-all"
+                      className="h-full transition-all duration-500"
                       style={{
-                        width: `${(stats.doneCount / (stats.doneCount + stats.notYetCount)) * 100}%`,
+                        width: `${overallResponseRate * 100}%`,
                         background: "var(--color-chart-1)",
                       }}
                     />
                     <div
-                      className="h-full transition-all"
+                      className="h-full transition-all duration-500"
                       style={{
-                        width: `${(stats.notYetCount / (stats.doneCount + stats.notYetCount)) * 100}%`,
+                        width: `${(1 - overallResponseRate) * 100}%`,
                         background: "var(--color-chart-3)",
                       }}
                     />
                   </div>
                 </div>
-                <div className="flex gap-6">
+                {/* Legend */}
+                <div className="flex gap-8">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded" style={{ background: "var(--color-chart-1)" }} />
+                    <div
+                      className="w-3 h-3 rounded"
+                      style={{ background: "var(--color-chart-1)" }}
+                    />
                     <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                      Done ({stats.doneCount})
+                      Acted on ({totalNudgesCompleted})
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded" style={{ background: "var(--color-chart-3)" }} />
+                    <div
+                      className="w-3 h-3 rounded"
+                      style={{ background: "var(--color-chart-3)" }}
+                    />
                     <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                      Not Yet ({stats.notYetCount})
+                      Pending ({totalNudgesSent - totalNudgesCompleted})
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="text-center px-6 border-l" style={{ borderColor: "var(--color-border)" }}>
+              {/* Big number */}
+              <div
+                className="text-center px-8 border-l"
+                style={{ borderColor: "var(--color-border)" }}
+              >
                 <p className="text-kpi" style={{ color: "var(--color-primary)" }}>
-                  {Math.round(stats.responseRate * 100)}%
+                  {Math.round(overallResponseRate * 100)}%
                 </p>
-                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>Response Rate</p>
+                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  Response Rate
+                </p>
               </div>
             </div>
-          </section>
+          ) : (
+            <EmptyState
+              title="No outcomes yet"
+              description={
+                cohort.status === "draft"
+                  ? "Activate this cohort to start sending advisories."
+                  : "Advisories will appear here once farmers start receiving them."
+              }
+            />
+          )}
+        </Card>
+      </section>
 
-          {/* Recent Activity */}
-          <section className="card">
-            <h2 className="text-card-title mb-6">Recent Advisories</h2>
-            <div className="space-y-4">
-              {recentNudges.map((nudge) => (
-                <div
-                  key={nudge.id}
-                  className="flex items-start gap-4 p-4 rounded-lg"
-                  style={{ background: "var(--color-page-bg)" }}
-                >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{
-                      background: nudge.status === "COMPLETED" ? "var(--color-status-active-bg)" : "var(--color-status-draft-bg)",
-                      color: nudge.status === "COMPLETED" ? "var(--color-status-active)" : "var(--color-status-draft)",
-                    }}
-                  >
-                    {nudge.status === "COMPLETED" ? (
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium capitalize">{nudge.activity} Advisory</span>
-                      <span className={`badge badge-${nudge.status === "COMPLETED" ? "active" : "draft"}`}>
-                        {nudge.status === "COMPLETED" ? "Acted on" : "Pending"}
-                      </span>
-                    </div>
-                    <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                      {nudge.message}
-                    </p>
-                    <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
-                      Sent {new Date(nudge.createdAt).toLocaleString()}
-                      {nudge.completedAt && (
-                        <> • Completed {new Date(nudge.completedAt).toLocaleString()}</>
-                      )}
-                    </p>
-                  </div>
-                </div>
+      {/* Audit List Section */}
+      <section className="mb-8">
+        <Card>
+          <h2 className="text-card-title mb-6">Advisory History</h2>
+          {hasOutcomes && summaries.length > 0 ? (
+            <div className="space-y-3">
+              {summaries.map((summary, idx) => (
+                <AuditRow key={summary.period || idx} summary={summary} />
               ))}
             </div>
-          </section>
-        </>
-      ) : (
-        <div className="card">
-          <div className="empty-state">
-            <p className="empty-state-title">No outcomes yet</p>
-            <p className="empty-state-description">
-              Activate this cohort to start sending advisories and tracking farmer engagement.
-            </p>
-          </div>
-        </div>
-      )}
+          ) : (
+            <EmptyState
+              title="No advisories sent"
+              description={
+                cohort.status === "draft"
+                  ? "Activate this cohort to begin sending weather-based advisories to farmers."
+                  : "Advisory records will appear here as they are sent."
+              }
+            />
+          )}
+        </Card>
+      </section>
 
       {/* Cohort Details */}
-      <section className="card mt-8">
-        <h2 className="text-card-title mb-4">Cohort Details</h2>
-        <dl className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div>
-            <dt className="text-label">Cohort ID</dt>
-            <dd className="mt-1 font-mono text-sm">{cohort.cohortId}</dd>
-          </div>
-          <div>
-            <dt className="text-label">Coordinates</dt>
-            <dd className="mt-1 text-sm">{cohort.lat.toFixed(4)}, {cohort.lon.toFixed(4)}</dd>
-          </div>
-          <div>
-            <dt className="text-label">Created</dt>
-            <dd className="mt-1 text-sm">{new Date(cohort.createdAt).toLocaleDateString()}</dd>
-          </div>
-          <div>
-            <dt className="text-label">Activated</dt>
-            <dd className="mt-1 text-sm">
-              {cohort.activatedAt ? new Date(cohort.activatedAt).toLocaleDateString() : "—"}
-            </dd>
-          </div>
-        </dl>
+      <section>
+        <Card>
+          <h2 className="text-card-title mb-6">Cohort Configuration</h2>
+          <dl className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+              <dt className="text-label">Cohort ID</dt>
+              <dd className="mt-1 font-mono text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                {cohort.cohortId.slice(0, 8)}…
+              </dd>
+            </div>
+            <div>
+              <dt className="text-label">Location</dt>
+              <dd className="mt-1 text-sm">
+                {cohort.lat?.toFixed(2)}°N, {cohort.lon?.toFixed(2)}°E
+              </dd>
+            </div>
+            <div>
+              <dt className="text-label">Created</dt>
+              <dd className="mt-1 text-sm">
+                {new Date(cohort.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-label">Activated</dt>
+              <dd className="mt-1 text-sm">
+                {cohort.activatedAt
+                  ? new Date(cohort.activatedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : "—"}
+              </dd>
+            </div>
+          </dl>
+        </Card>
       </section>
     </div>
   );
 }
+
+// =============================================================================
+// KPI Card Component
+// =============================================================================
 
 function KPICard({
   label,
   value,
   format,
   highlight,
+  empty,
 }: {
   label: string;
   value: number;
   format: "number" | "percent";
   highlight?: boolean;
+  empty?: boolean;
 }) {
-  const displayValue = format === "percent" ? `${Math.round(value * 100)}%` : value.toLocaleString();
+  const displayValue = empty
+    ? "—"
+    : format === "percent"
+    ? `${Math.round(value * 100)}%`
+    : value.toLocaleString();
 
   return (
-    <div className="card">
+    <Card>
       <p className="text-label mb-2">{label}</p>
       <p
         className="text-kpi"
-        style={{ color: highlight ? "var(--color-primary)" : "var(--color-text-primary)" }}
+        style={{
+          color: empty
+            ? "var(--color-text-muted)"
+            : highlight
+            ? "var(--color-primary)"
+            : "var(--color-text-primary)",
+        }}
       >
         {displayValue}
       </p>
+    </Card>
+  );
+}
+
+// =============================================================================
+// Audit Row Component
+// =============================================================================
+
+function AuditRow({ summary }: { summary: Summary }) {
+  const responseRate = summary.nudgesSent > 0
+    ? summary.nudgesCompleted / summary.nudgesSent
+    : 0;
+
+  // Parse period (e.g., "2026-06" → "June 2026")
+  const periodLabel = summary.period
+    ? new Date(summary.period + "-01").toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      })
+    : "Unknown period";
+
+  return (
+    <div
+      className="flex items-center justify-between p-4 rounded-lg"
+      style={{ background: "var(--color-page-bg)" }}
+    >
+      <div className="flex items-center gap-4">
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{
+            background: "var(--color-primary-tint)",
+            color: "var(--color-primary)",
+          }}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </div>
+        <div>
+          <p className="font-medium">{periodLabel}</p>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+            {summary.nudgesSent} advisories sent
+          </p>
+        </div>
+      </div>
+      <div className="text-right">
+        <p className="font-medium" style={{ color: "var(--color-primary)" }}>
+          {Math.round(responseRate * 100)}%
+        </p>
+        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+          {summary.nudgesCompleted} acted on
+        </p>
+      </div>
     </div>
   );
 }
