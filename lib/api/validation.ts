@@ -29,8 +29,9 @@ export const cohortFeaturesSchema = z.object({
 
 export const createCohortSchema = z.object({
   district: z.string().min(1).max(100),
-  lat: z.number().min(-90).max(90),
-  lon: z.number().min(-180).max(180),
+  // lat/lon optional - will be looked up from district if not provided
+  lat: z.number().min(-90).max(90).optional(),
+  lon: z.number().min(-180).max(180).optional(),
   crops: z.array(z.string().min(1).max(50)).min(1).max(10),
   languages: z.array(z.string().length(2)).min(1).max(5), // ISO 639-1 codes
   nudgeRules: nudgeRulesSchema.optional(),

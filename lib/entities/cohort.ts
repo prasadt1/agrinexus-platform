@@ -182,6 +182,7 @@ export async function activateCohort(
         ':now': now,
         ':gsi2pk': KEY_PREFIXES.STATUS_ACTIVE,
         ':gsi2sk': buildCohortSK(cohortId),
+        ':tenantId': tenantId,
       },
       // Ensure the cohort exists and belongs to this tenant
       ConditionExpression: 'attribute_exists(PK) AND tenantId = :tenantId',
