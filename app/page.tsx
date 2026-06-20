@@ -1,65 +1,174 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+
+type HealthCheckResult = {
+  status: "healthy" | "degraded" | "error";
+  message: string;
+  timestamp: string;
+  total_duration_ms: number;
+  checks: {
+    env_configured: boolean;
+    table_name: string;
+    write: { success: boolean; duration_ms?: number; error?: string };
+    read: {
+      success: boolean;
+      duration_ms?: number;
+      data_matches?: boolean;
+      error?: string;
+    };
+    cleanup: { success: boolean; duration_ms?: number; error?: string };
+  };
+  error?: { name: string; message: string };
+};
 
 export default function Home() {
+  const [result, setResult] = useState<HealthCheckResult | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const runHealthcheck = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/healthcheck");
+      const data = await res.json();
+      setResult(data);
+    } catch (err) {
+      setResult({
+        status: "error",
+        message: err instanceof Error ? err.message : "Request failed",
+        timestamp: new Date().toISOString(),
+        total_duration_ms: 0,
+        checks: {
+          env_configured: false,
+          table_name: "",
+          write: { success: false },
+          read: { success: false },
+          cleanup: { success: false },
+        },
+      });
+    }
+    setLoading(false);
+  };
+
+  const statusColor = {
+    healthy: "bg-green-500",
+    degraded: "bg-yellow-500",
+    error: "bg-red-500",
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-8">
+      <div className="max-w-2xl mx-auto">
+        <header className="mb-12">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            AgriNexus Platform
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-zinc-400">
+            Multi-tenant B2B control plane for agricultural advisory services
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        </header>
+
+        <section className="bg-zinc-900 rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">DynamoDB Integration</h2>
+          <p className="text-zinc-400 mb-6">
+            Test the connection to DynamoDB by running a write → read → delete
+            cycle.
+          </p>
+
+          <button
+            onClick={runHealthcheck}
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
+            {loading ? "Running..." : "Run Healthcheck"}
+          </button>
+        </section>
+
+        {result && (
+          <section className="bg-zinc-900 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div
+                className={`w-3 h-3 rounded-full ${statusColor[result.status]}`}
+              />
+              <h3 className="text-lg font-semibold capitalize">
+                {result.status}
+              </h3>
+              <span className="text-zinc-500 text-sm ml-auto">
+                {result.total_duration_ms}ms
+              </span>
+            </div>
+
+            <p className="text-zinc-300 mb-6">{result.message}</p>
+
+            <div className="space-y-3">
+              <CheckRow
+                label="Environment Configured"
+                success={result.checks.env_configured}
+              />
+              {result.checks.table_name && (
+                <div className="text-sm text-zinc-500 pl-6 -mt-2">
+                  Table: {result.checks.table_name}
+                </div>
+              )}
+              <CheckRow
+                label="Write Test Item"
+                success={result.checks.write.success}
+                duration={result.checks.write.duration_ms}
+              />
+              <CheckRow
+                label="Read Test Item"
+                success={result.checks.read.success}
+                duration={result.checks.read.duration_ms}
+              />
+              <CheckRow
+                label="Cleanup (Delete)"
+                success={result.checks.cleanup.success}
+                duration={result.checks.cleanup.duration_ms}
+              />
+            </div>
+
+            {result.error && (
+              <div className="mt-6 p-4 bg-red-950 border border-red-900 rounded-lg">
+                <p className="text-red-400 font-mono text-sm">
+                  {result.error.name}: {result.error.message}
+                </p>
+              </div>
+            )}
+
+            <div className="mt-6 text-xs text-zinc-600">
+              {result.timestamp}
+            </div>
+          </section>
+        )}
+
+        <footer className="mt-12 text-center text-zinc-600 text-sm">
+          <a href="/api/healthcheck" className="hover:text-zinc-400">
+            GET /api/healthcheck
           </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+function CheckRow({
+  label,
+  success,
+  duration,
+}: {
+  label: string;
+  success: boolean;
+  duration?: number;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className={success ? "text-green-400" : "text-red-400"}>
+        {success ? "✓" : "✗"}
+      </span>
+      <span className="text-zinc-300">{label}</span>
+      {duration !== undefined && (
+        <span className="text-zinc-600 text-sm ml-auto">{duration}ms</span>
+      )}
     </div>
   );
 }
