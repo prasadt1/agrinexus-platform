@@ -240,11 +240,30 @@ export interface CohortMembershipItem {
   PK: `PHONE#${string}`;
   SK: 'MEMBERSHIP';
 
+  // GSI1: Query members by cohort
+  GSI1PK: `COHORT#${string}`;
+  GSI1SK: `MEMBER#${string}`;
+
   // Attributes
   phone: string;
   tenantId: string;
   cohortId: string;
   enrolledAt: string;
+}
+
+// =============================================================================
+// Member Stats (computed from NUDGE# records)
+// =============================================================================
+
+export interface MemberStats {
+  phone: string;
+  tenantId: string;
+  cohortId: string;
+  enrolledAt: string;
+  nudgesSent: number;
+  nudgesCompleted: number;
+  nudgesExpired: number;
+  responseRate: number;  // nudgesCompleted / nudgesSent
 }
 
 // =============================================================================

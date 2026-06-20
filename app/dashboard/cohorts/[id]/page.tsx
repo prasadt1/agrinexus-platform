@@ -34,6 +34,15 @@ type Summary = {
   followThroughRate: number;
 };
 
+type Member = {
+  phone: string;
+  enrolledAt: string;
+  nudgesSent: number;
+  nudgesCompleted: number;
+  nudgesExpired: number;
+  responseRate: number;
+};
+
 export default function CohortDetailPage({
   params,
 }: {
@@ -43,11 +52,14 @@ export default function CohortDetailPage({
   const [cohort, setCohort] = useState<Cohort | null>(null);
   const [license, setLicense] = useState<License>(null);
   const [summaries, setSummaries] = useState<Summary[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [membersLoading, setMembersLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     fetchCohort();
+    fetchMembers();
   }, [id]);
 
   async function fetchCohort() {
@@ -68,6 +80,22 @@ export default function CohortDetailPage({
       setError("Failed to load cohort");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchMembers() {
+    try {
+      const res = await fetch(`/api/cohorts/${id}/members`, {
+        headers: { "X-Tenant-ID": TENANT_ID },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMembers(data.members || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch members:", err);
+    } finally {
+      setMembersLoading(false);
     }
   }
 
@@ -314,6 +342,52 @@ export default function CohortDetailPage({
         </Card>
       </section>
 
+      {/* Farmers Section */}
+      <section className="mb-8">
+        <Card>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-card-title">Enrolled Farmers</h2>
+            <span
+              className="text-sm px-2 py-1 rounded"
+              style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
+            >
+              {members.length} farmers
+            </span>
+          </div>
+          {membersLoading ? (
+            <div className="animate-pulse space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-12 rounded" style={{ background: "var(--color-border)" }} />
+              ))}
+            </div>
+          ) : members.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
+                    <th className="text-left py-3 px-4 text-label font-medium">Phone</th>
+                    <th className="text-center py-3 px-4 text-label font-medium">Nudges</th>
+                    <th className="text-center py-3 px-4 text-label font-medium">Completed</th>
+                    <th className="text-center py-3 px-4 text-label font-medium">Expired</th>
+                    <th className="text-right py-3 px-4 text-label font-medium">Response Rate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members.map((member) => (
+                    <MemberRow key={member.phone} member={member} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState
+              title="No farmers enrolled"
+              description="Farmers will appear here once they are enrolled in this cohort."
+            />
+          )}
+        </Card>
+      </section>
+
       {/* Cohort Details */}
       <section>
         <Card>
@@ -541,5 +615,83 @@ function AuditRow({ summary }: { summary: Summary }) {
         </p>
       </div>
     </div>
+  );
+}
+
+// =============================================================================
+// Member Row Component
+// =============================================================================
+
+function MemberRow({ member }: { member: Member }) {
+  // Responsiveness indicator
+  const getResponsivenessColor = (rate: number) => {
+    if (rate >= 0.7) return "var(--color-success)";
+    if (rate >= 0.4) return "var(--color-warning)";
+    return "var(--color-text-muted)";
+  };
+
+  const getResponsivenessLabel = (rate: number) => {
+    if (rate >= 0.7) return "High";
+    if (rate >= 0.4) return "Medium";
+    if (rate > 0) return "Low";
+    return "No data";
+  };
+
+  // Format phone for display (mask middle digits)
+  const maskedPhone = member.phone.length > 6
+    ? `${member.phone.slice(0, 3)}***${member.phone.slice(-3)}`
+    : member.phone;
+
+  return (
+    <tr
+      className="hover:bg-opacity-50 transition-colors"
+      style={{ borderBottom: "1px solid var(--color-border)" }}
+    >
+      <td className="py-3 px-4">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium"
+            style={{
+              background: "var(--color-primary-tint)",
+              color: "var(--color-primary)",
+            }}
+          >
+            {member.phone.slice(-2)}
+          </div>
+          <span className="font-mono text-sm">{maskedPhone}</span>
+        </div>
+      </td>
+      <td className="py-3 px-4 text-center">
+        <span style={{ color: "var(--color-text-secondary)" }}>
+          {member.nudgesSent}
+        </span>
+      </td>
+      <td className="py-3 px-4 text-center">
+        <span style={{ color: "var(--color-success)" }}>
+          {member.nudgesCompleted}
+        </span>
+      </td>
+      <td className="py-3 px-4 text-center">
+        <span style={{ color: "var(--color-text-muted)" }}>
+          {member.nudgesExpired}
+        </span>
+      </td>
+      <td className="py-3 px-4 text-right">
+        <div className="flex items-center justify-end gap-2">
+          <span
+            className="text-xs px-2 py-0.5 rounded-full"
+            style={{
+              background: `${getResponsivenessColor(member.responseRate)}20`,
+              color: getResponsivenessColor(member.responseRate),
+            }}
+          >
+            {getResponsivenessLabel(member.responseRate)}
+          </span>
+          <span className="font-medium" style={{ color: getResponsivenessColor(member.responseRate) }}>
+            {member.nudgesSent > 0 ? `${Math.round(member.responseRate * 100)}%` : "—"}
+          </span>
+        </div>
+      </td>
+    </tr>
   );
 }
