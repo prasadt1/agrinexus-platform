@@ -86,9 +86,9 @@ export default function DashboardPage() {
   return (
     <div className="p-8">
       <header className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <p className="text-zinc-400 mt-1">
-          Monitor your cohorts and trigger advisory nudges
+        <h1 className="text-page-title">Overview</h1>
+        <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
+          Monitor cohort performance and send advisories
         </p>
       </header>
 
@@ -113,22 +113,19 @@ export default function DashboardPage() {
       </div>
 
       {/* Trigger Poller Section */}
-      <section className="bg-zinc-900 rounded-xl p-6 mb-8 border border-zinc-800">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-white mb-2">
-              Weather Poller
-            </h2>
-            <p className="text-zinc-400 text-sm max-w-xl">
-              Manually trigger the weather check for all active cohorts. If
-              conditions are favorable (wind &lt; 10 km/h, no rain), nudges will
-              be sent to farmers in those districts.
+      <section className="card mb-8">
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex-1">
+            <h2 className="text-card-title mb-2">Weather Check</h2>
+            <p style={{ color: "var(--color-text-secondary)" }}>
+              Run a weather check for all active cohorts. If conditions are favorable
+              (wind &lt; 10 km/h, no rain), advisories will be sent to farmers.
             </p>
           </div>
           <button
             onClick={triggerPoller}
             disabled={triggerLoading || activeCohorts.length === 0}
-            className="bg-green-600 hover:bg-green-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
+            className="btn btn-primary"
           >
             {triggerLoading ? (
               <>
@@ -137,70 +134,83 @@ export default function DashboardPage() {
               </>
             ) : (
               <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Trigger Poller
+                Run Weather Check
               </>
             )}
           </button>
         </div>
 
         {activeCohorts.length === 0 && !loading && (
-          <div className="mt-4 p-4 bg-zinc-800 rounded-lg">
-            <p className="text-zinc-400 text-sm">
+          <div
+            className="mt-6 p-4 rounded-lg"
+            style={{ background: "var(--color-page-bg)" }}
+          >
+            <p style={{ color: "var(--color-text-secondary)" }}>
               No active cohorts.{" "}
-              <Link href="/dashboard/cohorts" className="text-green-400 hover:underline">
+              <Link
+                href="/dashboard/cohorts"
+                className="font-medium"
+                style={{ color: "var(--color-primary)" }}
+              >
                 Create and activate a cohort
               </Link>{" "}
-              to trigger nudges.
+              to start sending advisories.
             </p>
           </div>
         )}
 
         {triggerResult && (
           <div className="mt-6 space-y-4">
-            <div className="flex items-center gap-4">
-              <span className="text-zinc-400">Cohorts checked:</span>
-              <span className="text-white font-medium">
-                {triggerResult.cohorts_checked}
-              </span>
-              <span className="text-zinc-400 ml-4">Nudges triggered:</span>
-              <span className={`font-medium ${triggerResult.nudges_triggered > 0 ? "text-green-400" : "text-zinc-500"}`}>
-                {triggerResult.nudges_triggered}
-              </span>
+            <div className="flex items-center gap-6 text-sm">
+              <div>
+                <span style={{ color: "var(--color-text-secondary)" }}>Cohorts checked: </span>
+                <span className="font-medium">{triggerResult.cohorts_checked}</span>
+              </div>
+              <div>
+                <span style={{ color: "var(--color-text-secondary)" }}>Advisories triggered: </span>
+                <span
+                  className="font-medium"
+                  style={{ color: triggerResult.nudges_triggered > 0 ? "var(--color-status-active)" : "var(--color-text-muted)" }}
+                >
+                  {triggerResult.nudges_triggered}
+                </span>
+              </div>
             </div>
 
             {triggerResult.results.map((r) => (
               <div
                 key={r.cohortId}
-                className="p-4 bg-zinc-800 rounded-lg border border-zinc-700"
+                className="p-4 rounded-lg border"
+                style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white font-medium">{r.district}</span>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-medium">{r.district}</span>
                   {r.triggered ? (
-                    <span className="text-green-400 text-sm flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <span className="badge badge-active flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      Nudge triggered
+                      Sent
                     </span>
                   ) : (
-                    <span className="text-zinc-500 text-sm">Not triggered</span>
+                    <span className="badge badge-draft">Not sent</span>
                   )}
                 </div>
-                <div className="flex gap-6 text-sm">
-                  <span className="text-zinc-400">
-                    Wind: <span className="text-zinc-300">{r.weather.wind_speed.toFixed(1)} km/h</span>
+                <div className="flex gap-6 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                  <span>
+                    Wind: <span style={{ color: "var(--color-text-primary)" }}>{r.weather.wind_speed.toFixed(1)} km/h</span>
                   </span>
-                  <span className="text-zinc-400">
-                    Rain: <span className="text-zinc-300">{r.weather.rain} mm</span>
+                  <span>
+                    Rain: <span style={{ color: "var(--color-text-primary)" }}>{r.weather.rain} mm</span>
                   </span>
-                  <span className={r.weather.favorable ? "text-green-400" : "text-amber-400"}>
+                  <span style={{ color: r.weather.favorable ? "var(--color-status-active)" : "var(--color-status-attention)" }}>
                     {r.weather.favorable ? "Favorable" : "Unfavorable"}
                   </span>
                   {r.weather.mock && (
-                    <span className="text-zinc-600">(mock data)</span>
+                    <span style={{ color: "var(--color-text-muted)" }}>(simulated)</span>
                   )}
                 </div>
               </div>
@@ -210,47 +220,55 @@ export default function DashboardPage() {
       </section>
 
       {/* Active Cohorts Quick View */}
-      <section className="bg-zinc-900 rounded-xl border border-zinc-800">
-        <div className="p-6 border-b border-zinc-800 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Active Cohorts</h2>
+      <section className="card">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-card-title">Active Cohorts</h2>
           <Link
             href="/dashboard/cohorts"
-            className="text-sm text-zinc-400 hover:text-white transition-colors"
+            className="text-sm font-medium"
+            style={{ color: "var(--color-text-secondary)" }}
           >
             View all →
           </Link>
         </div>
-        <div className="divide-y divide-zinc-800">
-          {loading ? (
-            <div className="p-6 text-center text-zinc-500">Loading...</div>
-          ) : activeCohorts.length === 0 ? (
-            <div className="p-6 text-center text-zinc-500">
-              No active cohorts yet
-            </div>
-          ) : (
-            activeCohorts.slice(0, 5).map((cohort) => (
-              <div
+
+        {loading ? (
+          <div className="empty-state">
+            <p style={{ color: "var(--color-text-muted)" }}>Loading...</p>
+          </div>
+        ) : activeCohorts.length === 0 ? (
+          <div className="empty-state">
+            <p className="empty-state-title">No active cohorts</p>
+            <p className="empty-state-description">
+              Activate a cohort to start monitoring farmer engagement and sending advisories.
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y" style={{ borderColor: "var(--color-border)" }}>
+            {activeCohorts.slice(0, 5).map((cohort) => (
+              <Link
                 key={cohort.cohortId}
-                className="p-4 flex items-center justify-between hover:bg-zinc-800/50"
+                href={`/dashboard/cohorts/${cohort.cohortId}`}
+                className="flex items-center justify-between py-4 -mx-6 px-6 transition-colors table-row"
               >
                 <div>
-                  <p className="text-white font-medium">{cohort.district}</p>
-                  <p className="text-zinc-500 text-sm">
+                  <p className="font-medium">{cohort.district}</p>
+                  <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
                     {cohort.crops.join(", ")}
                   </p>
                 </div>
                 <div className="text-right">
-                  <StatusBadge status={cohort.status} />
+                  <span className="badge badge-active">Active</span>
                   {cohort.activatedAt && (
-                    <p className="text-zinc-600 text-xs mt-1">
+                    <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
                       Since {new Date(cohort.activatedAt).toLocaleDateString()}
                     </p>
                   )}
                 </div>
-              </div>
-            ))
-          )}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
@@ -268,12 +286,18 @@ function StatCard({
   loading?: boolean;
 }) {
   return (
-    <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
-      <p className="text-zinc-400 text-sm mb-2">{label}</p>
+    <div className="card">
+      <p className="text-label mb-2">{label}</p>
       {loading ? (
-        <div className="h-9 w-16 bg-zinc-800 rounded animate-pulse" />
+        <div
+          className="h-9 w-16 rounded animate-pulse"
+          style={{ background: "var(--color-page-bg)" }}
+        />
       ) : (
-        <p className={`text-3xl font-bold ${highlight ? "text-green-400" : "text-white"}`}>
+        <p
+          className="text-kpi"
+          style={{ color: highlight ? "var(--color-primary)" : "var(--color-text-primary)" }}
+        >
           {value}
         </p>
       )}
@@ -281,23 +305,9 @@ function StatCard({
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    active: "bg-green-500/20 text-green-400",
-    draft: "bg-zinc-700 text-zinc-400",
-    paused: "bg-amber-500/20 text-amber-400",
-    expired: "bg-red-500/20 text-red-400",
-  };
-  return (
-    <span className={`text-xs px-2 py-1 rounded-full ${styles[status] || styles.draft}`}>
-      {status}
-    </span>
-  );
-}
-
 function Spinner() {
   return (
-    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
     </svg>
