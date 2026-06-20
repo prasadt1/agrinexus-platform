@@ -1,0 +1,31 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DynamoDBControlPlaneReads",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Query",
+        "dynamodb:BatchGetItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:us-east-1:043624892076:table/agrinexus-data",
+        "arn:aws:dynamodb:us-east-1:043624892076:table/agrinexus-data/index/GSI1",
+        "arn:aws:dynamodb:us-east-1:043624892076:table/agrinexus-data/index/GSI2"
+      ]
+    },
+    {
+      "Sid": "DynamoDBControlPlaneWrites",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:us-east-1:043624892076:table/agrinexus-data"
+      ]
+    }
+  ]
+}
