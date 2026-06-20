@@ -1,0 +1,71 @@
+/**
+ * Demo Activation API
+ *
+ * POST /api/cohorts/[id]/demo-activate - Activate without Stripe (for judges)
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { getAuthContext, AuthError } from '@/lib/api/auth';
+import {
+  getCohort,
+  activateCohort,
+  createDemoLicense,
+} from '@/lib/entities';
+
+interface RouteContext {
+  params: Promise<{ id: string }>;
+}
+
+export async function POST(request: NextRequest, context: RouteContext) {
+  try {
+    const { tenantId } = await getAuthContext(request);
+    const { id: cohortId } = await context.params;
+
+    // Verify cohort exists and belongs to this tenant
+    const existing = await getCohort(tenantId, cohortId);
+    if (!existing) {
+      return NextResponse.json(
+        { error: 'Cohort not found' },
+        { status: 404 }
+      );
+    }
+
+    if (existing.status === 'active') {
+      return NextResponse.json(
+        { error: 'Cohort is already active' },
+        { status: 400 }
+      );
+    }
+
+    // Create demo license (no Stripe)
+    const license = await createDemoLicense(tenantId, cohortId, 'growth');
+
+    // Activate the cohort (sets GSI2PK/GSI2SK for WeatherPoller)
+    const cohort = await activateCohort(tenantId, cohortId);
+
+    return NextResponse.json({
+      cohortId: cohort.cohortId,
+      status: cohort.status,
+      activatedAt: cohort.activatedAt,
+      license: {
+        plan: license.plan,
+        isDemo: license.isDemo,
+        periodEnd: license.currentPeriodEnd,
+      },
+      message: 'Cohort activated in demo mode (no billing)',
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode }
+      );
+    }
+
+    console.error('Error demo-activating cohort:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

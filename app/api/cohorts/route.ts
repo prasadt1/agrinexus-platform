@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ulid } from 'ulid';
 import { getAuthContext, AuthError } from '@/lib/api/auth';
 import { createCohortSchema, validateBody } from '@/lib/api/validation';
+import { getDistrictCoords, getSupportedDistricts } from '@/lib/districts';
 import {
   createCohort,
   listCohorts,
@@ -41,6 +42,25 @@ export async function POST(request: NextRequest) {
 
     const input = validation.data;
 
+    // Resolve coordinates: use provided values or look up from district
+    let lat = input.lat;
+    let lon = input.lon;
+
+    if (lat === undefined || lon === undefined) {
+      const coords = getDistrictCoords(input.district);
+      if (!coords) {
+        return NextResponse.json(
+          {
+            error: `Unsupported district: "${input.district}". Provide lat/lon or use a supported district.`,
+            supportedDistricts: getSupportedDistricts(),
+          },
+          { status: 400 }
+        );
+      }
+      lat = coords.lat;
+      lon = coords.lon;
+    }
+
     // Generate cohort ID
     const cohortId = ulid();
 
@@ -59,8 +79,8 @@ export async function POST(request: NextRequest) {
     const cohort = await createCohort(tenantId, {
       cohortId,
       district: input.district,
-      lat: input.lat,
-      lon: input.lon,
+      lat,
+      lon,
       crops: input.crops,
       languages: input.languages,
       nudgeRules,
