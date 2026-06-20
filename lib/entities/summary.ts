@@ -176,6 +176,29 @@ export async function getDashboardSummaries(
 }
 
 // =============================================================================
+// Access Pattern: Get All Tenant Summaries (for Overview aggregation)
+// Query: PK = TENANT#<tenantId> AND begins_with(SK, 'SUMMARY#')
+// =============================================================================
+
+export async function getAllTenantSummaries(
+  tenantId: string
+): Promise<OutcomeSummary[]> {
+  const response = await docClient.send(
+    new QueryCommand({
+      TableName: TABLE_NAME,
+      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+      ExpressionAttributeValues: {
+        ':pk': buildTenantPK(tenantId),
+        ':sk': KEY_PREFIXES.SUMMARY,
+      },
+    })
+  );
+
+  const items = (response.Items || []) as OutcomeSummaryItem[];
+  return items.map(toOutcomeSummary);
+}
+
+// =============================================================================
 // Access Pattern: Upsert Cohort Summary (Atomic Counters)
 // UpdateItem with ADD for idempotent counter increments
 // Used by OutcomesAggregator Lambda
