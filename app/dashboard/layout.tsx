@@ -1,12 +1,22 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+const TENANT_ID = "demo-tenant-001"; // In production: from auth context
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: "grid" },
   { href: "/dashboard/cohorts", label: "Cohorts", icon: "users" },
 ];
+
+type TenantInfo = {
+  tenantId: string;
+  name: string;
+  type: string;
+  plan: string;
+};
 
 function NavIcon({ name }: { name: string }) {
   const icons: Record<string, React.ReactNode> = {
@@ -59,6 +69,31 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [tenant, setTenant] = useState<TenantInfo | null>(null);
+
+  useEffect(() => {
+    // Fetch tenant info on mount
+    fetch("/api/overview", {
+      headers: { "X-Tenant-ID": TENANT_ID },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.tenant) {
+          setTenant(data.tenant);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  // Get initials from tenant name
+  const initials = tenant?.name
+    ? tenant.name
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "??";
 
   return (
     <div className="min-h-screen flex">
@@ -96,6 +131,7 @@ export default function DashboardLayout({
           </ul>
         </nav>
 
+        {/* Tenant Identity Footer */}
         <div
           className="p-4"
           style={{ borderTop: "1px solid var(--color-border)" }}
@@ -108,20 +144,20 @@ export default function DashboardLayout({
                 color: "var(--color-primary)",
               }}
             >
-              DT
+              {initials}
             </div>
             <div className="flex-1 min-w-0">
               <p
                 className="text-sm font-medium truncate"
                 style={{ color: "var(--color-text-primary)" }}
               >
-                Demo Tenant
+                {tenant?.name || "Loading..."}
               </p>
               <p
                 className="text-xs truncate"
                 style={{ color: "var(--color-text-muted)" }}
               >
-                demo-tenant-001
+                {tenant?.plan || ""} plan
               </p>
             </div>
           </div>

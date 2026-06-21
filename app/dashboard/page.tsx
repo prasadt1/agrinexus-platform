@@ -7,6 +7,12 @@ import { Card, Badge, EmptyState } from "@/app/components";
 const TENANT_ID = "demo-tenant-001";
 
 type OverviewData = {
+  tenant: {
+    tenantId: string;
+    name: string;
+    type: string;
+    plan: string;
+  } | null;
   totals: {
     farmers: number;
     cohorts: number;
@@ -52,6 +58,7 @@ export default function OverviewPage() {
     }
   }
 
+  const tenant = data?.tenant;
   const totals = data?.totals;
   const cohorts = data?.cohorts || [];
   const activeCohorts = cohorts.filter((c) => c.status === "active");
@@ -59,12 +66,30 @@ export default function OverviewPage() {
 
   return (
     <div className="py-10 px-8">
-      {/* Header */}
+      {/* Header with Tenant Identity */}
       <header className="mb-8">
-        <h1 className="text-page-title">Overview</h1>
-        <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
-          Aggregate performance across all cohorts
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-page-title">Overview</h1>
+            <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
+              Aggregate performance across all cohorts
+            </p>
+          </div>
+          {tenant && (
+            <div
+              className="text-right px-4 py-3 rounded-lg"
+              style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+            >
+              <p className="text-label">Viewing as</p>
+              <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                {tenant.name}
+              </p>
+              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                {tenant.plan} plan
+              </p>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Primary KPI Cards */}
