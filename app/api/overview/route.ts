@@ -16,14 +16,16 @@ import {
   listCohorts,
   getAllTenantSummaries,
   listCohortMembers,
+  getTenant,
 } from '@/lib/entities';
 
 export async function GET(request: NextRequest) {
   try {
     const { tenantId } = await getAuthContext(request);
 
-    // Fetch cohorts and summaries in parallel
-    const [cohorts, summaries] = await Promise.all([
+    // Fetch tenant, cohorts, and summaries in parallel
+    const [tenant, cohorts, summaries] = await Promise.all([
+      getTenant(tenantId),
       listCohorts(tenantId),
       getAllTenantSummaries(tenantId),
     ]);
@@ -80,6 +82,14 @@ export async function GET(request: NextRequest) {
     cohortBreakdown.sort((a, b) => b.responseRate - a.responseRate);
 
     return NextResponse.json({
+      tenant: tenant
+        ? {
+            tenantId: tenant.tenantId,
+            name: tenant.name,
+            type: tenant.type,
+            plan: tenant.plan,
+          }
+        : null,
       totals: {
         farmers: totalFarmers,
         cohorts: cohorts.length,
