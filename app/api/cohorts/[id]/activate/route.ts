@@ -1,24 +1,28 @@
 /**
- * Cohort Activation API
+ * Cohort Activation API (Stripe-gated)
  *
- * POST /api/cohorts/[id]/activate - Activate a cohort (sets GSI2 keys for WeatherPoller)
- * POST /api/cohorts/[id]/demo-activate - Demo activation (bypasses Stripe for judges)
+ * POST /api/cohorts/[id]/activate - Create Stripe Checkout session
+ *
+ * Flow:
+ * 1. POST creates Checkout session, returns checkoutUrl
+ * 2. User completes payment on Stripe
+ * 3. Stripe redirects to /dashboard/cohorts/[id]?activated=true
+ * 4. Webhook (or success callback) activates the cohort
+ *
+ * Demo path (/demo-activate) bypasses Stripe for judges.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthContext, AuthError } from '@/lib/api/auth';
-import {
-  getCohort,
-  activateCohort,
-  createDemoLicense,
-} from '@/lib/entities';
+import { getCohort } from '@/lib/entities';
+import { stripe, STRIPE_PRICE_ID, APP_URL } from '@/lib/stripe';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
 // =============================================================================
-// POST /api/cohorts/[id]/activate - Activate Cohort
+// POST /api/cohorts/[id]/activate - Create Stripe Checkout Session
 // =============================================================================
 
 export async function POST(request: NextRequest, context: RouteContext) {
@@ -42,26 +46,40 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    // Check for demo-activate path (for judges)
-    const url = new URL(request.url);
-    const isDemo = url.pathname.endsWith('/demo-activate');
-
-    if (isDemo) {
-      // Create demo license and activate
-      await createDemoLicense(tenantId, cohortId, 'growth');
+    // Check if Stripe is configured
+    if (!stripe || !STRIPE_PRICE_ID) {
+      return NextResponse.json(
+        {
+          error: 'Stripe not configured',
+          hint: 'Set STRIPE_SECRET_KEY and STRIPE_PRICE_ID in .env.local',
+        },
+        { status: 503 }
+      );
     }
-    // TODO: For real activation, verify Stripe payment first
 
-    // Activate the cohort (sets GSI2PK/GSI2SK for WeatherPoller)
-    const cohort = await activateCohort(tenantId, cohortId);
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: STRIPE_PRICE_ID,
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        tenantId,
+        cohortId,
+        district: existing.district,
+      },
+      success_url: `${APP_URL}/api/cohorts/${cohortId}/activate/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${APP_URL}/dashboard/cohorts/${cohortId}?canceled=true`,
+    });
 
     return NextResponse.json({
-      cohortId: cohort.cohortId,
-      status: cohort.status,
-      activatedAt: cohort.activatedAt,
-      message: isDemo
-        ? 'Cohort activated (demo mode)'
-        : 'Cohort activated',
+      checkoutUrl: session.url,
+      sessionId: session.id,
+      message: 'Redirect to Stripe Checkout to complete activation',
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -71,9 +89,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    console.error('Error activating cohort:', error);
+    console.error('Error creating checkout session:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to create checkout session' },
       { status: 500 }
     );
   }
