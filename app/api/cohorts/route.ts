@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ulid } from 'ulid';
-import { getAuthContext, AuthError } from '@/lib/api/auth';
+import { getAuthContext, AuthError, requireAdmin } from '@/lib/api/auth';
 import { createCohortSchema, validateBody } from '@/lib/api/validation';
 import { getDistrictCoords, getSupportedDistricts } from '@/lib/districts';
 import {
@@ -24,9 +24,9 @@ import {
 export async function POST(request: NextRequest) {
   try {
     // Authenticate and get tenant context
-    const { tenantId } = await getAuthContext(request);
-
-    // Parse and validate request body
+    const ctx = await getAuthContext(request);
+    requireAdmin(ctx);
+    const { tenantId } = ctx;
     const body = await request.json();
     const validation = validateBody(createCohortSchema, body);
 

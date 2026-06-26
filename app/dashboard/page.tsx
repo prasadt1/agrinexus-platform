@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Card, Badge, EmptyState } from "@/app/components";
-
-const TENANT_ID = "demo-tenant-001";
+import { Card, Badge, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term } from "@/app/components";
+import { useAuth } from "@/lib/context/AuthProvider";
 
 type OverviewData = {
   tenant: {
@@ -35,18 +34,16 @@ type OverviewData = {
 };
 
 export default function OverviewPage() {
+  const { tenantId, tenantName, authHeaders } = useAuth();
   const [data, setData] = useState<OverviewData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
 
-  useEffect(() => {
-    fetchOverview();
-  }, []);
-
-  async function fetchOverview() {
+  const fetchOverview = useCallback(async () => {
+    if (!tenantId) return;
+    setLoading(true);
     try {
-      const res = await fetch("/api/overview", {
-        headers: { "X-Tenant-ID": TENANT_ID },
-      });
+      const res = await fetch("/api/overview", { headers: authHeaders() });
       if (res.ok) {
         const json = await res.json();
         setData(json);
@@ -56,7 +53,11 @@ export default function OverviewPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [tenantId, authHeaders]);
+
+  useEffect(() => {
+    fetchOverview();
+  }, [fetchOverview]);
 
   const tenant = data?.tenant;
   const totals = data?.totals;
@@ -66,14 +67,27 @@ export default function OverviewPage() {
 
   return (
     <div className="py-10 px-8">
+      <AdvisoryLoopHero />
+
       {/* Header with Tenant Identity */}
       <header className="mb-8">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-page-title">Overview</h1>
             <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
-              Aggregate performance across all cohorts
+              <Term term="aggregate">Aggregate</Term> performance across all{" "}
+              <Term term="cohort">cohorts</Term>
             </p>
+            <button
+              onClick={() => setShowHowItWorks(true)}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium"
+              style={{ color: "var(--color-primary)" }}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              How it works
+            </button>
           </div>
           {tenant && (
             <div
@@ -82,7 +96,7 @@ export default function OverviewPage() {
             >
               <p className="text-label">Viewing as</p>
               <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                {tenant.name}
+                {tenant.name || tenantName}
               </p>
               <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                 {tenant.plan} plan
@@ -91,6 +105,27 @@ export default function OverviewPage() {
           )}
         </div>
       </header>
+
+      {showHowItWorks && (
+        <div className="modal-overlay" onClick={() => setShowHowItWorks(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 pt-5 pb-3">
+              <h2 className="text-section">How AgriNexus works</h2>
+              <button
+                onClick={() => setShowHowItWorks(false)}
+                aria-label="Close"
+                className="text-2xl leading-none"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="px-6 pb-6">
+              <HowItWorks />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Primary KPI Cards */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -145,7 +180,10 @@ export default function OverviewPage() {
       {!loading && totals && totals.nudgesSent > 0 && (
         <section className="mb-8">
           <Card>
-            <h2 className="text-card-title mb-6">Response Breakdown</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-card-title">Response Breakdown</h2>
+              <LineageBadge />
+            </div>
             <div className="flex items-center gap-8">
               <div className="flex-1">
                 {/* Stacked bar */}
@@ -385,7 +423,7 @@ function KPICard({
     : value.toLocaleString();
 
   return (
-    <Card>
+    <Card className={highlight ? "card-kpi" : ""}>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-label mb-2">{label}</p>
@@ -466,11 +504,37 @@ function CohortRow({
         <p className="font-medium" style={{ color: "var(--color-primary)" }}>
           {Math.round(cohort.responseRate * 100)}%
         </p>
+        <MiniSparkline rate={cohort.responseRate} />
         <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
           {cohort.nudgesCompleted}/{cohort.nudgesSent} responded
         </p>
       </div>
     </Link>
+  );
+}
+
+// =============================================================================
+// Mini Sparkline
+// =============================================================================
+
+function MiniSparkline({ rate }: { rate: number }) {
+  const w = 48;
+  const h = 16;
+  const filled = Math.round(rate * 4);
+  return (
+    <svg width={w} height={h} className="mx-auto my-1" aria-hidden>
+      {[0, 1, 2, 3].map((i) => (
+        <rect
+          key={i}
+          x={i * 12 + 2}
+          y={h - 4 - (i < filled ? 8 : 4)}
+          width={8}
+          height={i < filled ? 12 : 6}
+          rx={2}
+          fill={i < filled ? "var(--color-chart-1)" : "var(--color-border)"}
+        />
+      ))}
+    </svg>
   );
 }
 

@@ -20,6 +20,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthContext, AuthError } from '@/lib/api/auth';
 import { listActiveCohorts, type ActiveCohortProjection } from '@/lib/entities';
+import { getWeatherApiKey } from '@/lib/secrets';
 import {
   SFNClient,
   StartExecutionCommand,
@@ -56,7 +57,7 @@ async function fetchWeather(
   lat: number,
   lon: number
 ): Promise<WeatherData> {
-  const apiKey = process.env.WEATHER_API_KEY;
+  const apiKey = await getWeatherApiKey();
 
   // If no API key, return mock favorable conditions
   if (!apiKey) {
