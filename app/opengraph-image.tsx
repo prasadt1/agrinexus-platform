@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-export const alt = 'AgriNexus Platform';
+export const alt = 'Outturn by AgriNexus';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -30,11 +30,13 @@ export default async function Image() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 22, marginBottom: 30 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={logoSrc} width={96} height={96} alt="" />
-          <div style={{ fontSize: 46, fontWeight: 700 }}>AgriNexus Platform</div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: 46, fontWeight: 700 }}>Outturn</div>
+            <div style={{ fontSize: 20, opacity: 0.72, marginTop: 2 }}>by AgriNexus</div>
+          </div>
         </div>
         <div style={{ fontSize: 30, opacity: 0.92, maxWidth: 860, lineHeight: 1.35 }}>
-          The B2B control plane for agricultural advisory — provision cohorts, prove
-          farmer follow-through.
+          Proof of what your advisory program produced. Powered by AgriNexus AI.
         </div>
         <div style={{ fontSize: 18, marginTop: 34, opacity: 0.72 }}>
           Vercel + Amazon DynamoDB · H0 Hackathon

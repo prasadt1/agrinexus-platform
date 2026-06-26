@@ -110,7 +110,7 @@ export default function OverviewPage() {
         <div className="modal-overlay" onClick={() => setShowHowItWorks(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-6 pt-5 pb-3">
-              <h2 className="text-section">How AgriNexus works</h2>
+              <h2 className="text-section">How Outturn works</h2>
               <button
                 onClick={() => setShowHowItWorks(false)}
                 aria-label="Close"

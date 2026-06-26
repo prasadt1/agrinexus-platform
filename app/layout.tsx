@@ -11,12 +11,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AgriNexus Platform — B2B Advisory Control Plane",
+  title: "Outturn by AgriNexus — Agricultural Accountability Engine",
   description:
-    "Provision district cohorts, monitor farmer follow-through, and license agricultural advisory programs at scale.",
+    "Outturn is the control plane that proves what your advisory program produced — tracking farmer follow-through across districts and surfacing where to act. Powered by AgriNexus AI.",
   openGraph: {
-    title: "AgriNexus Platform",
-    description: "B2B control plane for agricultural advisory services",
+    title: "Outturn by AgriNexus",
+    description: "Proof of what your advisory program produced.",
     type: "website",
   },
 };

@@ -32,16 +32,29 @@ export function AgriNexusWordmark({ light }: { light?: boolean }) {
       >
         <AgriNexusLogo size={30} />
       </div>
-      <span
-        style={{
-          fontSize: "18px",
-          fontWeight: 650,
-          color: light ? "#F9FAFB" : "var(--color-text-primary)",
-          letterSpacing: "-0.02em",
-        }}
-      >
-        Agri<span style={{ color: light ? "#6EE7A8" : "var(--color-primary)" }}>Nexus</span>
-      </span>
+      <div className="flex flex-col" style={{ lineHeight: 1.05 }}>
+        <span
+          style={{
+            fontSize: "18px",
+            fontWeight: 650,
+            color: light ? "#F9FAFB" : "var(--color-text-primary)",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Out<span style={{ color: light ? "#6EE7A8" : "var(--color-primary)" }}>turn</span>
+        </span>
+        <span
+          style={{
+            fontSize: "10px",
+            fontWeight: 500,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            color: light ? "rgba(249,250,251,0.62)" : "var(--color-text-muted)",
+          }}
+        >
+          by AgriNexus
+        </span>
+      </div>
     </div>
   );
 }
