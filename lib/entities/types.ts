@@ -267,6 +267,41 @@ export interface MemberStats {
 }
 
 // =============================================================================
+// Farmer Profile (USER#<phone>/PROFILE)
+// Owned by the AgriNexus delivery engine. The platform pre-seeds a
+// consent=pending profile on partner enrollment so the engine can see the
+// farmer by district (GSI1=LOCATION#) but will NOT nudge until they opt in
+// over WhatsApp (consent -> granted).
+// See docs/superpowers/specs/2026-06-26-close-the-loop-consent-design.md
+// =============================================================================
+
+export type ConsentState = 'pending' | 'granted' | 'declined';
+
+export interface FarmerProfileItem {
+  // Keys
+  PK: `USER#${string}`;
+  SK: 'PROFILE';
+
+  // Attributes (mirrors the engine's PROFILE shape)
+  phone_number: string;
+  dialect: string;
+  location: string;                          // district
+  location_coords: [number, number] | null;
+  crop: string;
+  consent: ConsentState;
+  consentSource: 'self' | 'partner' | 'template';
+  consentAt?: string;
+  onboarding_complete: boolean;
+  onboarding_state: string;
+  created_at: string;
+  demo_tier: string;
+
+  // GSI1: recipient selection by district / crop (engine reads LOCATION#)
+  GSI1PK: `LOCATION#${string}`;
+  GSI1SK: `CROP#${string}`;
+}
+
+// =============================================================================
 // Active Cohort (GSI2 projection for WeatherPoller)
 // =============================================================================
 
