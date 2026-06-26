@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AgriNexusWordmark } from "@/app/components/Logo";
 
 export const metadata = {
-  title: "For Hackathon Judges · Outturn by AgriNexus",
+  title: "For Hackathon Judges · Outturn",
   description: "H0 submission guide: demo path, AWS + Vercel stack, and what was built for the hackathon.",
 };
 
