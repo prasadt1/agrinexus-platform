@@ -174,7 +174,7 @@ const STEPS: Step[] = [
     key: "weather",
     short: "Watch weather",
     title: "1 · Watch the weather",
-    plain: "AgriNexus checks each village's weather every day, looking for the right moment to act.",
+    plain: "Outturn checks each village's weather every day, looking for the right moment to act.",
     tech: "A scheduled job polls weather per cohort's district coordinates (AWS Step Functions).",
     stage: () => <Cloud />,
   },
