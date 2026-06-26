@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthContext, AuthError } from '@/lib/api/auth';
+import { getAuthContext, AuthError, requireAdmin } from '@/lib/api/auth';
 import {
   getCohort,
   activateCohort,
@@ -18,7 +18,9 @@ interface RouteContext {
 
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
-    const { tenantId } = await getAuthContext(request);
+    const ctx = await getAuthContext(request);
+    requireAdmin(ctx);
+    const { tenantId } = ctx;
     const { id: cohortId } = await context.params;
 
     // Verify cohort exists and belongs to this tenant

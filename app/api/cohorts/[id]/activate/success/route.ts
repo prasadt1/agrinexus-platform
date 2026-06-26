@@ -13,7 +13,8 @@ import {
   activateCohort,
   createLicense,
 } from '@/lib/entities';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
+import type { PlanTier } from '@/lib/entities/types';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -30,6 +31,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       );
     }
 
+    const stripe = await getStripe();
     if (!stripe) {
       return NextResponse.redirect(
         new URL(`/dashboard/cohorts/${cohortId}?error=stripe_not_configured`, request.url)
@@ -81,10 +83,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const subscription = session.subscription as { id: string; current_period_start: number; current_period_end: number } | null;
 
     if (subscription) {
+      const plan = (session.metadata?.plan || 'growth') as PlanTier;
       await createLicense(tenantId, {
         cohortId,
         stripeSubId: subscription.id,
-        plan: 'growth', // Could be derived from price metadata
+        plan,
         currentPeriodStart: new Date(subscription.current_period_start * 1000).toISOString(),
         currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
       });

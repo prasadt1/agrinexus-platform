@@ -2,9 +2,8 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { Card, Badge, Button, EmptyState } from "@/app/components";
-
-const TENANT_ID = "demo-tenant-001";
+import { Card, Badge, Button, EmptyState, LineageBadge } from "@/app/components";
+import { useAuth } from "@/lib/context/AuthProvider";
 
 type Cohort = {
   cohortId: string;
@@ -49,6 +48,7 @@ export default function CohortDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const { tenantName, authHeaders } = useAuth();
   const [cohort, setCohort] = useState<Cohort | null>(null);
   const [license, setLicense] = useState<License>(null);
   const [summaries, setSummaries] = useState<Summary[]>([]);
@@ -60,12 +60,12 @@ export default function CohortDetailPage({
   useEffect(() => {
     fetchCohort();
     fetchMembers();
-  }, [id]);
+  }, [id, authHeaders]);
 
   async function fetchCohort() {
     try {
       const res = await fetch(`/api/cohorts/${id}`, {
-        headers: { "X-Tenant-ID": TENANT_ID },
+        headers: authHeaders(),
       });
       if (res.ok) {
         const data = await res.json();
@@ -86,7 +86,7 @@ export default function CohortDetailPage({
   async function fetchMembers() {
     try {
       const res = await fetch(`/api/cohorts/${id}/members`, {
-        headers: { "X-Tenant-ID": TENANT_ID },
+        headers: authHeaders(),
       });
       if (res.ok) {
         const data = await res.json();
@@ -106,8 +106,7 @@ export default function CohortDetailPage({
   const totalPending = totalNudgesSent - totalNudgesCompleted - totalNudgesExpired;
   const overallResponseRate = totalNudgesSent > 0 ? totalNudgesCompleted / totalNudgesSent : 0;
 
-  // For demo: estimate farmers reached (in production this would come from API)
-  const farmersReached = summaries.length > 0 ? Math.ceil(totalNudgesSent / 3) : 0;
+  const farmersReached = members.length;
 
   if (loading) {
     return (
@@ -179,7 +178,7 @@ export default function CohortDetailPage({
           <div className="text-right">
             <p className="text-label">Partner</p>
             <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>
-              {TENANT_ID.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()).replace(/\d+/g, "").trim()}
+              {tenantName || "Partner"}
             </p>
             {license && (
               <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
@@ -216,7 +215,10 @@ export default function CohortDetailPage({
       {/* Response Breakdown Chart */}
       <section className="mb-8">
         <Card>
-          <h2 className="text-card-title mb-6">Response Breakdown</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-card-title">Response Breakdown</h2>
+            <LineageBadge />
+          </div>
           {hasOutcomes ? (
             <div className="flex items-center gap-8">
               <div className="flex-1">

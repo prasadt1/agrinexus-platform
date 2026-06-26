@@ -1,200 +1,112 @@
 # AgriNexus Platform
 
-Multi-tenant B2B control plane for agricultural advisory services. Built on Next.js (App Router) with AWS DynamoDB backend.
+Multi-tenant B2B control plane for agricultural advisory services. Partners provision district cohorts, license them via Stripe, and monitor closed-loop farmer follow-through — all backed by Amazon DynamoDB on AWS and deployed on Vercel.
 
-## Project Structure
+**Hackathon:** [H0 — Hack the Zero Stack](https://h01.devpost.com/) (Track 2: Monetizable B2B)  
+**Primary database:** Amazon DynamoDB (single-table, multi-tenant, Streams-driven analytics)  
+**Frontend:** Next.js on Vercel  
+**For judges:** guided demo path + stack overview at [`/judges`](https://agrinexus-platform.vercel.app/judges) on the live app
+
+## New vs existing (submission boundary)
+
+| Component | Status |
+|-----------|--------|
+| **AgriNexus AI delivery engine** (WhatsApp advisory, Bedrock RAG, nudge loop, Step Functions) | Pre-existing — AWS AIdeas Innovation Award winner |
+| **AgriNexus Platform** (this repo: partner provisioning, tenant isolation, dashboard, Stripe licensing, Streams aggregation) | **New — built for H0** |
+
+The platform is the missing control plane: it lets NGOs, agri-input firms, and government extension programs ([KVK](https://en.wikipedia.org/wiki/Krishi_Vigyan_Kendra)s) provision and monitor advisory cohorts without engineering support.
+
+## What ships
+
+- Multi-tenant DynamoDB model (`TENANT#`, `COHORT#`, `LICENSE#`, `SUMMARY#`, membership)
+- Self-serve cohort provisioning wizard (district, crops, languages, nudge rules)
+- Tenant-scoped dashboard with materialized outcome summaries (DynamoDB Streams → Lambda)
+- Control-plane-drives-delivery-plane coupling (active cohorts → weather poll → nudges)
+- Tiered Stripe Checkout (Starter / Growth / Enterprise) + demo-activate for judges
+- Cognito-ready auth with demo personas and tenant switcher
+
+## Project structure
 
 ```
 agrinexus-platform/
-├── app/                    # Next.js App Router pages and API routes
-│   ├── api/
-│   │   └── healthcheck/    # DynamoDB integration test endpoint
-│   ├── layout.tsx
-│   └── page.tsx            # Home page with healthcheck UI
-├── lib/                    # Shared utilities
-│   └── dynamo.ts           # AWS SDK v3 DynamoDB client
-├── components/             # React components (empty for now)
-├── .env.example            # Environment variables template
-└── VALIDATION.md           # Delivery engine architecture analysis
+├── app/                    # Next.js App Router (dashboard, API routes, components)
+├── lib/                    # DynamoDB entities, Stripe, auth, Lambdas
+├── scripts/                # Seed and ops scripts
+├── docs/                   # Architecture, design, execution plan
+└── infra/                  # IAM policies
 ```
 
 ## Prerequisites
 
-1. **Node.js 18+** and npm
-2. **AWS Account** with DynamoDB table access
-3. **IAM Credentials** with the following permissions:
-   ```json
-   {
-     "Effect": "Allow",
-     "Action": [
-       "dynamodb:PutItem",
-       "dynamodb:GetItem",
-       "dynamodb:DeleteItem",
-       "dynamodb:Query"
-     ],
-     "Resource": "arn:aws:dynamodb:REGION:ACCOUNT:table/TABLE_NAME"
-   }
-   ```
+- Node.js 18+
+- AWS account with DynamoDB table access
+- (Optional) Stripe test keys, Cognito user pool, OpenWeatherMap API key
 
-## Local Development
-
-### Step 1: Install Dependencies
+## Local development
 
 ```bash
 cd agrinexus-platform
 npm install
-```
-
-### Step 2: Configure Environment Variables
-
-```bash
 cp .env.example .env.local
-```
-
-Edit `.env.local` with your AWS credentials:
-
-```env
-AWS_REGION=ap-south-1
-AWS_ACCESS_KEY_ID=your-access-key-id
-AWS_SECRET_ACCESS_KEY=your-secret-access-key
-DYNAMODB_TABLE_NAME=agrinexus-data
-```
-
-### Step 3: Run the Development Server
-
-```bash
+# Edit .env.local with AWS credentials
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+Open [http://localhost:3000](http://localhost:3000). Use **Demo Login** on `/login` for judge access.
 
-### Step 4: Test DynamoDB Integration
+### Seed demo data
 
-1. Click **"Run Healthcheck"** on the home page, or
-2. Visit [http://localhost:3000/api/healthcheck](http://localhost:3000/api/healthcheck) directly
-
-A successful response looks like:
-
-```json
-{
-  "status": "healthy",
-  "message": "DynamoDB integration verified: write, read, delete all succeeded",
-  "total_duration_ms": 145,
-  "checks": {
-    "env_configured": true,
-    "table_name": "agrinexus-data",
-    "write": { "success": true, "duration_ms": 52 },
-    "read": { "success": true, "duration_ms": 38, "data_matches": true },
-    "cleanup": { "success": true, "duration_ms": 41 }
-  }
-}
+```bash
+npm run seed
 ```
+
+Creates 3 partner tenants with cohorts, farmers, and outcome summaries for a full demo loop.
+
+### Healthcheck
+
+Visit [http://localhost:3000/api/healthcheck](http://localhost:3000/api/healthcheck) to verify DynamoDB connectivity.
 
 ## Deploy to Vercel
 
-### Step 1: Install Vercel CLI (Optional)
+1. Push to GitHub and import at [vercel.com/new](https://vercel.com/new)
+2. Set environment variables from `.env.example`
+3. Redeploy after env changes
 
-```bash
-npm i -g vercel
-```
+**Vercel Team ID:** see project settings or `.vercel/project.json`
 
-### Step 2: Deploy
+## Judge demo access
 
-**Option A: Via CLI**
+1. Go to `/login`
+2. Click **Demo Admin — GreenHarvest NGO** (or any demo persona)
+3. Explore Overview → Cohorts → cohort detail
+4. **Admin:** create cohort via wizard, activate (demo or Stripe), run advisory cycle
+5. **Tenant switcher:** flip between partners to see isolation
 
-```bash
-vercel
-```
+## AWS services (deliberate stack)
 
-Follow the prompts to link to your Vercel account and project.
+| Service | Role |
+|---------|------|
+| **DynamoDB** | Primary backend, multi-tenant single table, GSIs, Streams |
+| **Lambda** | `OutcomesAggregator` — materializes cohort summaries from Streams |
+| **Step Functions** | Nudge workflow (existing delivery engine) |
+| **Cognito** | Partner authentication (optional; demo mode available) |
+| **Secrets Manager** | Source of truth for all application secrets (Stripe, weather API key) |
 
-**Option B: Via GitHub**
+## Secrets strategy
 
-1. Push this repo to GitHub
-2. Go to [vercel.com/new](https://vercel.com/new)
-3. Import the repository
-4. Vercel auto-detects Next.js
+AWS Secrets Manager is the source of truth for application secrets. Only the bootstrap AWS credentials and non-sensitive config live in Vercel env vars (they are needed to authenticate to AWS in the first place).
 
-### Step 3: Configure Environment Variables in Vercel
+| Secret / config | Location | Notes |
+|-----------------|----------|-------|
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | Vercel env vars | Bootstrap credential; scoped to DynamoDB + Secrets Manager read (`infra/vercel-iam-policy.json`) |
+| `AWS_REGION`, `DYNAMODB_TABLE_NAME`, `AWS_ACCOUNT_ID`, `NEXT_PUBLIC_APP_URL` | Vercel env vars | Non-sensitive config |
+| Stripe key + per-tier price IDs | Secrets Manager `Stripe-Secret` | `{ secretKey, priceIds: { starter, growth, enterprise } }` |
+| Weather API key | Secrets Manager `agrinexus/weather/api-key` | Plain-string secret |
 
-1. Go to your project in the Vercel dashboard
-2. Navigate to **Settings → Environment Variables**
-3. Add each variable from `.env.example`:
+Runtime access (`lib/secrets.ts`, `lib/stripe-secrets.ts`) tries Secrets Manager first and only falls back to env vars for local dev. Values are cached in-memory for 5 minutes to avoid per-request fetches. The judge demo path uses "Demo activate" and never requires Stripe to be configured.
 
-   | Name | Value | Environment |
-   |------|-------|-------------|
-   | `AWS_REGION` | `ap-south-1` | Production, Preview, Development |
-   | `AWS_ACCESS_KEY_ID` | `(your key)` | Production, Preview, Development |
-   | `AWS_SECRET_ACCESS_KEY` | `(your secret)` | Production, Preview, Development |
-   | `DYNAMODB_TABLE_NAME` | `agrinexus-data` | Production, Preview, Development |
+## About AgriNexus AI
 
-4. Redeploy for changes to take effect:
-   ```bash
-   vercel --prod
-   ```
+AgriNexus AI won the **AWS AIdeas Innovation Award** for a production WhatsApp advisory engine at ~$0.54/farmer/year. This platform adds the B2B layer partners need to provision, license, and monitor it.
 
-### Step 4: Verify Deployment
-
-Visit `https://your-project.vercel.app/api/healthcheck` to confirm DynamoDB connectivity.
-
-## IAM Best Practices for Vercel
-
-Create a dedicated IAM user for Vercel with **least-privilege access**:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "DynamoDBTableAccess",
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:PutItem",
-        "dynamodb:GetItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:Query",
-        "dynamodb:UpdateItem"
-      ],
-      "Resource": [
-        "arn:aws:dynamodb:ap-south-1:ACCOUNT_ID:table/agrinexus-data",
-        "arn:aws:dynamodb:ap-south-1:ACCOUNT_ID:table/agrinexus-data/index/*"
-      ]
-    }
-  ]
-}
-```
-
-**Security notes:**
-- Never commit `.env.local` to git (it's already in `.gitignore`)
-- Rotate credentials periodically
-- Consider using Vercel's AWS integration for automatic credential management
-
-## Troubleshooting
-
-### "Missing required environment variable"
-
-Ensure all variables in `.env.example` are set in `.env.local` (local) or Vercel dashboard (production).
-
-### "AccessDeniedException"
-
-The IAM user lacks required permissions. Check the policy attached to your access key.
-
-### "ResourceNotFoundException"
-
-The DynamoDB table name is incorrect or the table doesn't exist in the specified region.
-
-### "UnrecognizedClientException"
-
-Invalid AWS credentials. Regenerate access keys in IAM console.
-
-## Next Steps
-
-This scaffold proves the Vercel → DynamoDB integration. Next features to build:
-
-1. **Multi-tenant data model** (TENANT#, COHORT#, LICENSE# entities)
-2. **Cognito authentication** (partner accounts)
-3. **Cohort provisioning API** (`POST /api/cohorts`)
-4. **Dashboard** (read materialized summaries)
-5. **Stripe billing** (cohort activation)
-
-See `VALIDATION.md` for architecture analysis of the existing delivery engine.
+See `docs/` for architecture, data model, design system, and the H0 execution checklist (`docs/09-h0-execution-plan.md`).

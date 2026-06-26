@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   PageHeader,
   Card,
@@ -14,24 +15,9 @@ import {
   Badge,
   Button,
   EmptyState,
+  toast,
 } from "@/app/components";
-
-const TENANT_ID = "demo-tenant-001";
-
-const SUPPORTED_DISTRICTS = [
-  "Latur", "Jalna", "Nagpur", "Pune", "Aurangabad", "Amravati", "Akola",
-  "Yavatmal", "Wardha", "Washim", "Adilabad", "Warangal", "Khammam",
-  "Rajkot", "Ahmedabad", "Surat", "Indore", "Ujjain", "Dewas",
-];
-
-const CROPS = ["cotton", "soybean", "groundnut", "wheat", "rice", "maize"];
-const LANGUAGES = [
-  { code: "hi", name: "Hindi" },
-  { code: "mr", name: "Marathi" },
-  { code: "te", name: "Telugu" },
-  { code: "gu", name: "Gujarati" },
-  { code: "en", name: "English" },
-];
+import { useAuth } from "@/lib/context/AuthProvider";
 
 type Cohort = {
   cohortId: string;
@@ -50,20 +36,16 @@ type Cohort = {
 };
 
 export default function CohortsPage() {
+  const router = useRouter();
+  const { isAdmin, authHeaders } = useAuth();
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const [activatingId, setActivatingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchCohorts();
-  }, []);
-
-  async function fetchCohorts() {
+  const fetchCohorts = useCallback(async () => {
+    setLoading(true);
     try {
-      const res = await fetch("/api/cohorts", {
-        headers: { "X-Tenant-ID": TENANT_ID },
-      });
+      const res = await fetch("/api/cohorts", { headers: authHeaders() });
       const data = await res.json();
       setCohorts(data.cohorts || []);
     } catch (err) {
@@ -71,23 +53,43 @@ export default function CohortsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [authHeaders]);
 
-  async function activateCohort(cohortId: string) {
+  useEffect(() => {
+    fetchCohorts();
+  }, [fetchCohorts]);
+
+  async function activateCohort(cohortId: string, mode: "demo" | "stripe", plan = "growth") {
     setActivatingId(cohortId);
     try {
+      if (mode === "stripe") {
+        const res = await fetch(`/api/cohorts/${cohortId}/activate`, {
+          method: "POST",
+          headers: { ...authHeaders(), "Content-Type": "application/json" },
+          body: JSON.stringify({ plan }),
+        });
+        const data = await res.json();
+        if (res.ok && data.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+          return;
+        }
+        toast(data.error || data.hint || "Stripe checkout unavailable — use demo activate", "error");
+        return;
+      }
+
       const res = await fetch(`/api/cohorts/${cohortId}/demo-activate`, {
         method: "POST",
-        headers: { "X-Tenant-ID": TENANT_ID },
+        headers: authHeaders(),
       });
       if (res.ok) {
+        toast("Cohort activated (demo mode)", "success");
         await fetchCohorts();
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to activate cohort");
+        toast(data.error || "Failed to activate cohort", "error");
       }
-    } catch (err) {
-      console.error("Failed to activate cohort:", err);
+    } catch {
+      toast("Activation request failed", "error");
     } finally {
       setActivatingId(null);
     }
@@ -99,24 +101,16 @@ export default function CohortsPage() {
         title="Cohorts"
         description="Manage farmer cohorts by district"
         actions={
-          <Button onClick={() => setShowCreateForm(true)}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Cohort
-          </Button>
+          isAdmin ? (
+            <Button onClick={() => router.push("/dashboard/cohorts/new")}>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              New Cohort
+            </Button>
+          ) : undefined
         }
       />
-
-      {showCreateForm && (
-        <CreateCohortForm
-          onClose={() => setShowCreateForm(false)}
-          onCreated={() => {
-            setShowCreateForm(false);
-            fetchCohorts();
-          }}
-        />
-      )}
 
       <Card noPadding className="overflow-hidden">
         <Table>
@@ -143,6 +137,13 @@ export default function CohortsPage() {
                   <EmptyState
                     title="No cohorts yet"
                     description="Create your first cohort to start onboarding farmers and sending advisories."
+                    action={
+                      isAdmin ? (
+                        <Link href="/dashboard/cohorts/new">
+                          <Button>Create cohort</Button>
+                        </Link>
+                      ) : undefined
+                    }
                   />
                 </td>
               </tr>
@@ -164,9 +165,7 @@ export default function CohortsPage() {
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {cohort.crops.map((crop) => (
-                        <span key={crop} className="chip">
-                          {crop}
-                        </span>
+                        <span key={crop} className="chip">{crop}</span>
                       ))}
                     </div>
                   </TableCell>
@@ -192,20 +191,27 @@ export default function CohortsPage() {
                     )}
                   </TableCell>
                   <TableCell align="right">
-                    {cohort.status === "draft" && (
-                      <Button
-                        onClick={() => activateCohort(cohort.cohortId)}
-                        disabled={activatingId === cohort.cohortId}
-                        className="text-sm py-1.5"
-                      >
-                        {activatingId === cohort.cohortId ? "Activating..." : "Activate"}
-                      </Button>
+                    {isAdmin && cohort.status === "draft" && (
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          onClick={() => activateCohort(cohort.cohortId, "demo")}
+                          disabled={activatingId === cohort.cohortId}
+                          variant="secondary"
+                          className="text-sm py-1.5"
+                        >
+                          {activatingId === cohort.cohortId ? "…" : "Demo activate"}
+                        </Button>
+                        <Button
+                          onClick={() => activateCohort(cohort.cohortId, "stripe", "growth")}
+                          disabled={activatingId === cohort.cohortId}
+                          className="text-sm py-1.5"
+                        >
+                          Pay & activate
+                        </Button>
+                      </div>
                     )}
                     {cohort.status === "active" && (
-                      <Link
-                        href={`/dashboard/cohorts/${cohort.cohortId}`}
-                        className="btn btn-secondary text-sm py-1.5"
-                      >
+                      <Link href={`/dashboard/cohorts/${cohort.cohortId}`} className="btn btn-secondary text-sm py-1.5">
                         View
                       </Link>
                     )}
@@ -216,177 +222,6 @@ export default function CohortsPage() {
           </TableBody>
         </Table>
       </Card>
-    </div>
-  );
-}
-
-function CreateCohortForm({
-  onClose,
-  onCreated,
-}: {
-  onClose: () => void;
-  onCreated: () => void;
-}) {
-  const [district, setDistrict] = useState("");
-  const [selectedCrops, setSelectedCrops] = useState<string[]>([]);
-  const [selectedLangs, setSelectedLangs] = useState<string[]>(["hi"]);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-
-    if (!district) {
-      setError("Please select a district");
-      return;
-    }
-    if (selectedCrops.length === 0) {
-      setError("Please select at least one crop");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/cohorts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Tenant-ID": TENANT_ID,
-        },
-        body: JSON.stringify({
-          district,
-          crops: selectedCrops,
-          languages: selectedLangs,
-        }),
-      });
-
-      if (res.ok) {
-        onCreated();
-      } else {
-        const data = await res.json();
-        setError(data.error || "Failed to create cohort");
-      }
-    } catch {
-      setError("Request failed");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  function toggleCrop(crop: string) {
-    setSelectedCrops((prev) =>
-      prev.includes(crop) ? prev.filter((c) => c !== crop) : [...prev, crop]
-    );
-  }
-
-  function toggleLang(lang: string) {
-    setSelectedLangs((prev) =>
-      prev.includes(lang) ? prev.filter((l) => l !== lang) : [...prev, lang]
-    );
-  }
-
-  return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div
-        className="rounded-lg w-full max-w-lg overflow-hidden"
-        style={{
-          background: "var(--color-surface)",
-          boxShadow: "var(--shadow-modal)",
-        }}
-      >
-        <div
-          className="px-6 py-5 flex items-center justify-between"
-          style={{ borderBottom: "1px solid var(--color-border)" }}
-        >
-          <h2 className="text-section">Create Cohort</h2>
-          <button
-            onClick={onClose}
-            className="p-1 rounded hover:bg-gray-100 transition-colors"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div>
-            <label className="text-label block mb-2">District</label>
-            <select
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
-              className="input select"
-            >
-              <option value="">Select a district...</option>
-              {SUPPORTED_DISTRICTS.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-label block mb-2">Crops</label>
-            <div className="flex flex-wrap gap-2">
-              {CROPS.map((crop) => (
-                <button
-                  key={crop}
-                  type="button"
-                  onClick={() => toggleCrop(crop)}
-                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border"
-                  style={{
-                    background: selectedCrops.includes(crop) ? "var(--color-primary)" : "var(--color-surface)",
-                    color: selectedCrops.includes(crop) ? "white" : "var(--color-text-secondary)",
-                    borderColor: selectedCrops.includes(crop) ? "var(--color-primary)" : "var(--color-border)",
-                  }}
-                >
-                  {crop}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="text-label block mb-2">Languages</label>
-            <div className="flex flex-wrap gap-2">
-              {LANGUAGES.map((lang) => (
-                <button
-                  key={lang.code}
-                  type="button"
-                  onClick={() => toggleLang(lang.code)}
-                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border"
-                  style={{
-                    background: selectedLangs.includes(lang.code) ? "var(--color-primary)" : "var(--color-surface)",
-                    color: selectedLangs.includes(lang.code) ? "white" : "var(--color-text-secondary)",
-                    borderColor: selectedLangs.includes(lang.code) ? "var(--color-primary)" : "var(--color-border)",
-                  }}
-                >
-                  {lang.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {error && (
-            <div
-              className="p-3 rounded-lg"
-              style={{ background: "var(--color-status-attention-bg)" }}
-            >
-              <p style={{ color: "var(--color-status-attention)" }}>{error}</p>
-            </div>
-          )}
-
-          <div className="flex gap-3 pt-2">
-            <Button type="button" onClick={onClose} variant="secondary" className="flex-1">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={submitting} className="flex-1">
-              {submitting ? "Creating..." : "Create Cohort"}
-            </Button>
-          </div>
-        </form>
-      </div>
     </div>
   );
 }

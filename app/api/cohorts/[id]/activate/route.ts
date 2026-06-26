@@ -13,9 +13,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthContext, AuthError } from '@/lib/api/auth';
+import { getAuthContext, AuthError, requireAdmin } from '@/lib/api/auth';
 import { getCohort } from '@/lib/entities';
-import { stripe, STRIPE_PRICE_ID, APP_URL } from '@/lib/stripe';
+import { getStripe, getStripePriceIdForPlan, APP_URL } from '@/lib/stripe';
+import type { PlanTier } from '@/lib/entities/types';
+import { z } from 'zod';
+
+const activateSchema = z.object({
+  plan: z.enum(['starter', 'growth', 'enterprise']).default('growth'),
+});
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -27,8 +33,19 @@ interface RouteContext {
 
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
-    const { tenantId } = await getAuthContext(request);
+    const ctx = await getAuthContext(request);
+    requireAdmin(ctx);
+    const { tenantId } = ctx;
     const { id: cohortId } = await context.params;
+
+    let plan: PlanTier = 'growth';
+    try {
+      const body = await request.json();
+      const parsed = activateSchema.safeParse(body);
+      if (parsed.success) plan = parsed.data.plan;
+    } catch {
+      // empty body ok
+    }
 
     // Verify cohort exists and belongs to this tenant
     const existing = await getCohort(tenantId, cohortId);
@@ -46,24 +63,29 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    // Check if Stripe is configured
-    if (!stripe || !STRIPE_PRICE_ID) {
+    // Get Stripe client and price ID from Secrets Manager
+    const stripe = await getStripe();
+    const priceId = await getStripePriceIdForPlan(plan);
+
+    if (!stripe || !priceId) {
       return NextResponse.json(
         {
           error: 'Stripe not configured',
-          hint: 'Set STRIPE_SECRET_KEY and STRIPE_PRICE_ID in .env.local',
+          hint: 'Set STRIPE_SECRET_KEY and STRIPE_PRICE_STARTER/GROWTH/ENTERPRISE in .env.local',
         },
         { status: 503 }
       );
     }
 
-    // Create Stripe Checkout Session
+    const productName = `AgriNexus — ${existing.district} cohort`;
+    const productDescription = `District advisory license (${plan}) · cohort ${cohortId.slice(0, 8)}`;
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
         {
-          price: STRIPE_PRICE_ID,
+          price: priceId,
           quantity: 1,
         },
       ],
@@ -71,6 +93,17 @@ export async function POST(request: NextRequest, context: RouteContext) {
         tenantId,
         cohortId,
         district: existing.district,
+        plan,
+      },
+      subscription_data: {
+        description: productDescription,
+        metadata: {
+          tenantId,
+          cohortId,
+          district: existing.district,
+          plan,
+          productName,
+        },
       },
       success_url: `${APP_URL}/api/cohorts/${cohortId}/activate/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${APP_URL}/dashboard/cohorts/${cohortId}?canceled=true`,
@@ -79,7 +112,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({
       checkoutUrl: session.url,
       sessionId: session.id,
-      message: 'Redirect to Stripe Checkout to complete activation',
+      plan,
+      message: `Redirect to Stripe Checkout for ${existing.district} (${plan})`,
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -90,8 +124,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     console.error('Error creating checkout session:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      {
+        error: 'Failed to create checkout session',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+      },
       { status: 500 }
     );
   }

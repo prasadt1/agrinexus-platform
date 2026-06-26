@@ -2,6 +2,17 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "SecretsManagerReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": [
+        "arn:aws:secretsmanager:us-east-1:043624892076:secret:Stripe-Secret-*",
+        "arn:aws:secretsmanager:us-east-1:043624892076:secret:agrinexus/weather/api-key-*"
+      ]
+    },
+    {
       "Sid": "DynamoDBControlPlaneReads",
       "Effect": "Allow",
       "Action": [
