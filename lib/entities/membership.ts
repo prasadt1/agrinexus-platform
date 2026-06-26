@@ -25,6 +25,8 @@ import {
   type CohortMembership,
   type MemberStats,
 } from './types';
+import { getCohort } from './cohort';
+import { upsertPendingProfile } from './profile';
 
 // =============================================================================
 // Key Builders
@@ -122,8 +124,17 @@ export async function bulkEnrollFarmers(
 ): Promise<{ enrolled: number; phones: string[] }> {
   const results: string[] = [];
 
+  // Look up the cohort once so each enrolled farmer also gets a consent=pending
+  // PROFILE seeded from the cohort's district / crop / language. That makes the
+  // farmer visible to the delivery engine (GSI1 = LOCATION#) while the engine's
+  // consent gate keeps them un-nudged until they opt in over WhatsApp.
+  const cohort = await getCohort(tenantId, cohortId);
+
   for (const phone of phones) {
     await enrollFarmer(tenantId, cohortId, phone);
+    if (cohort) {
+      await upsertPendingProfile(phone, cohort);
+    }
     const normalized = phone.replace(/\s+/g, '').replace(/^\+?/, '');
     results.push(normalized);
   }
