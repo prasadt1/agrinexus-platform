@@ -30,7 +30,7 @@
   /* Text */
   --color-text-primary: #101828;
   --color-text-secondary: #475467;
-  --color-text-muted: #98A2B3;
+  --color-text-muted: #667085;
 
   /* Status: Active */
   --color-status-active: #157347;
@@ -684,6 +684,30 @@ body {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+
+/* Skeleton loading */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    90deg,
+    var(--color-border-subtle) 25%,
+    var(--color-border) 37%,
+    var(--color-border-subtle) 63%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+  .hiw-anim { animation: none; opacity: 1; transform: none; }
+  .term-tip { transition: none; }
 }
 
 /* Lineage badge */
