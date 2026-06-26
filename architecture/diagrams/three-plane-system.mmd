@@ -1,0 +1,54 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Inter, system-ui, sans-serif','lineColor':'#475467','primaryTextColor':'#101828'}}}%%
+flowchart TB
+    subgraph CTRL["Control plane · Outturn (Vercel)"]
+        direction TB
+        L["Login / personas"]
+        W["Cohort wizard"]
+        D["Dashboard"]
+        B["Billing"]
+        R["API routes (server)"]
+    end
+    subgraph DATA["Data plane · Amazon DynamoDB"]
+        direction TB
+        T[("agrinexus-data<br/>single table")]
+        G1["GSI1 · cohort members"]
+        G2["GSI2 · active cohorts"]
+        STR[["Streams"]]
+    end
+    subgraph DEL["Delivery plane · AgriNexus engine (AWS)"]
+        direction TB
+        PO["Weather poller"]
+        SF["Step Functions"]
+        NS["NudgeSender λ"]
+        RD["Response detector λ"]
+        MW["WhatsApp Business API"]
+    end
+    AGG["OutcomesAggregator λ<br/>SUMMARY# rollups"]
+    ST["Stripe"]
+    SM[("Secrets Manager")]
+
+    W --> R
+    D --> R
+    B --> ST
+    R -->|"PutItem / Query · tenant-scoped"| T
+    R -.->|creds| SM
+    T --- G1
+    T --- G2
+    G2 --> PO
+    PO --> SF --> NS --> MW
+    MW --> RD -->|"NUDGE# → DONE"| T
+    NS -->|"NUDGE# = SENT"| T
+    T --> STR --> AGG -->|"SUMMARY#"| T
+    D -->|"read SUMMARY#"| T
+
+    classDef ctrl fill:#E6F4EC,stroke:#157347,color:#0F5132;
+    classDef data fill:#E0F2F7,stroke:#0E7490,color:#0E5063;
+    classDef del fill:#FEF0C7,stroke:#B54708,color:#7A3A06;
+    classDef ext fill:#F2F4F7,stroke:#98A2B3,color:#475467;
+    class L,W,D,B,R ctrl;
+    class T,G1,G2,STR data;
+    class PO,SF,NS,RD,MW del;
+    class AGG,ST,SM ext;
+    style CTRL fill:#F7FBF8,stroke:#157347,color:#0F5132;
+    style DATA fill:#F5FBFC,stroke:#0E7490,color:#0E5063;
+    style DEL fill:#FFFBF2,stroke:#B54708,color:#7A3A06;

@@ -1,0 +1,22 @@
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#E6F4EC','primaryBorderColor':'#157347','primaryTextColor':'#101828','lineColor':'#475467','actorBkg':'#E6F4EC','actorBorder':'#157347','signalColor':'#475467','signalTextColor':'#101828','noteBkgColor':'#FEF0C7','noteBorderColor':'#B54708'}}}%%
+sequenceDiagram
+    autonumber
+    actor P as Partner · Outturn
+    participant API as Outturn API · Vercel
+    participant DDB as DynamoDB · agrinexus-data
+    participant ENG as AgriNexus engine
+    participant WA as WhatsApp · Farmer
+    participant AGG as OutcomesAggregator
+    P->>API: Provision + activate cohort
+    API->>DDB: PutItem COHORT# (GSI2 = active)
+    ENG->>DDB: Query GSI2 — active cohorts
+    ENG->>DDB: Query GSI1 LOCATION# — recipients
+    ENG->>WA: Send nudge · PutItem NUDGE# = SENT
+    WA-->>ENG: Reply "Done"
+    ENG->>DDB: UpdateItem NUDGE# = DONE
+    DDB-->>AGG: Stream MODIFY event
+    AGG->>DDB: GetItem PHONE#/MEMBERSHIP — attribute by phone
+    AGG->>DDB: UpdateItem SUMMARY# — atomic ADD
+    P->>API: Open dashboard
+    API->>DDB: Read SUMMARY# — one item per cohort
+    API-->>P: Follow-through by cohort
