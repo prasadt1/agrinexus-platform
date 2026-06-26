@@ -8,7 +8,7 @@ export function AgriNexusLogo({ size = 32 }: { size?: number }) {
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/agrinexus-mark.png"
-      alt="AgriNexus"
+      alt="Outturn"
       width={size}
       height={size}
       style={{ display: "block", objectFit: "contain" }}

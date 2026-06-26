@@ -34,9 +34,9 @@ export default function LandingPage() {
           Proof of what your advisory program produced.
         </p>
         <p className="text-lg max-w-2xl mx-auto mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          AgriNexus AI delivers the advice over <Term term="nudge">WhatsApp</Term>. Outturn is the
-          control plane that tracks <Term term="follow-through">follow-through</Term> and surfaces where
-          it&apos;s collapsing — so partners know where to target their own field interventions.
+          Farmers get a timely <Term term="nudge">WhatsApp reminder</Term> when conditions are right.
+          Outturn tracks <Term term="follow-through">who acted</Term> — and surfaces where follow-through
+          is collapsing, so partners know where to target their field teams.
         </p>
         <p className="text-sm max-w-2xl mx-auto mb-10" style={{ color: "var(--color-text-muted)" }}>
           In agriculture and commodity trade, &ldquo;outturn&rdquo; is the actual result after

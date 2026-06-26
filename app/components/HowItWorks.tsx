@@ -86,7 +86,7 @@ function Phone({ stage }: { stage: "nudge" | "reply" }) {
               </svg>
             </span>
             <div style={{ lineHeight: 1.15 }}>
-              <div style={{ fontSize: 12, fontWeight: 600 }}>AgriNexus Advisory</div>
+              <div style={{ fontSize: 12, fontWeight: 600 }}>Outturn Advisory</div>
               <div style={{ fontSize: 9, opacity: 0.8 }}>online</div>
             </div>
           </div>
