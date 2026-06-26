@@ -23,9 +23,9 @@ const LANGUAGES = [
 ];
 
 const PLANS: { id: PlanTier; name: string; price: string; desc: string }[] = [
-  { id: "starter", name: "Starter", price: "$49/mo", desc: "Up to 1 active cohort, 500 farmers" },
-  { id: "growth", name: "Growth", price: "$149/mo", desc: "Up to 5 cohorts, 5,000 farmers" },
-  { id: "enterprise", name: "Enterprise", price: "$499/mo", desc: "Unlimited cohorts, priority support" },
+  { id: "starter", name: "Starter", price: "₹999/mo", desc: "Up to 1 active cohort, 500 farmers" },
+  { id: "growth", name: "Growth", price: "₹2,999/mo", desc: "Up to 5 cohorts, 5,000 farmers" },
+  { id: "enterprise", name: "Enterprise", price: "₹9,999/mo", desc: "Unlimited cohorts, priority support" },
 ];
 
 const DEFAULT_NUDGE = {
