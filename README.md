@@ -1,4 +1,4 @@
-# Outturn by AgriNexus
+# Outturn
 
 Outturn is the multi-tenant B2B control plane for agricultural advisory programs. Partners provision district cohorts, license them via Stripe, and monitor closed-loop farmer follow-through — all backed by Amazon DynamoDB on AWS and deployed on Vercel. Built on AgriNexus, our AWS-AIdeas-winning advisory engine.
 
@@ -14,7 +14,7 @@ Outturn is the multi-tenant B2B control plane for agricultural advisory programs
 | Component | Status |
 |-----------|--------|
 | **AgriNexus AI delivery engine** (WhatsApp advisory, Bedrock RAG, nudge loop, Step Functions) | Pre-existing — AWS AIdeas Innovation Award winner |
-| **AgriNexus Platform** (this repo: partner provisioning, tenant isolation, dashboard, Stripe licensing, Streams aggregation) | **New — built for H0** |
+| **Outturn** (this repo: partner provisioning, tenant isolation, dashboard, Stripe licensing, Streams aggregation) | **New — built for H0** |
 
 The platform is the missing control plane: it lets NGOs, agri-input firms, and government extension programs ([KVK](https://en.wikipedia.org/wiki/Krishi_Vigyan_Kendra)s) provision and monitor advisory cohorts without engineering support.
 

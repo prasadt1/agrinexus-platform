@@ -28,7 +28,7 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="px-8 pt-20 pb-12 max-w-5xl mx-auto text-center">
         <h1 className="text-4xl md:text-5xl font-semibold leading-tight mb-4" style={{ letterSpacing: "-0.02em" }}>
-          Outturn <span style={{ color: "var(--color-primary)" }}>by AgriNexus</span>
+          Out<span style={{ color: "var(--color-primary)" }}>turn</span>
         </h1>
         <p className="text-xl md:text-2xl font-medium mb-6" style={{ color: "var(--color-text-primary)" }}>
           Proof of what your advisory program produced.
