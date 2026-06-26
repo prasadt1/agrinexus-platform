@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AgriNexusWordmark } from "@/app/components/Logo";
 
 export const metadata = {
-  title: "For Hackathon Judges · AgriNexus Platform",
+  title: "For Hackathon Judges · Outturn by AgriNexus",
   description: "H0 submission guide: demo path, AWS + Vercel stack, and what was built for the hackathon.",
 };
 
@@ -42,8 +42,10 @@ export default function JudgesPage() {
         </p>
         <h1 className="text-page-title mb-3">For hackathon judges</h1>
         <p className="text-lg mb-2" style={{ color: "var(--color-text-secondary)" }}>
-          AgriNexus Platform is the B2B control plane that lets agricultural partners provision, license, and monitor
-          farmer advisory at district scale — backed by Amazon DynamoDB and deployed on Vercel.
+          <strong>AgriNexus AI is the delivery spine; Outturn is the accountability control plane</strong>{" "}
+          that proves advisory follow-through — backed by Amazon DynamoDB and deployed on Vercel. The
+          delivery engine pre-existed (AWS AIdeas award winner); the Outturn control plane is what was
+          built for H0.
         </p>
         <div className="flex flex-wrap gap-3 mt-5 mb-2">
           <a href={LIVE_URL} className="btn btn-primary" target="_blank" rel="noopener noreferrer">

@@ -1,6 +1,8 @@
-# AgriNexus Platform
+# Outturn by AgriNexus
 
-Multi-tenant B2B control plane for agricultural advisory services. Partners provision district cohorts, license them via Stripe, and monitor closed-loop farmer follow-through — all backed by Amazon DynamoDB on AWS and deployed on Vercel.
+Outturn is the multi-tenant B2B control plane for agricultural advisory programs. Partners provision district cohorts, license them via Stripe, and monitor closed-loop farmer follow-through — all backed by Amazon DynamoDB on AWS and deployed on Vercel. Built on AgriNexus, our AWS-AIdeas-winning advisory engine.
+
+> Naming note: "Outturn" is the product/display name for the H0 submission. Internal identifiers (repo, DynamoDB table `agrinexus-data`, API routes, env vars, entity keys) intentionally keep the `agrinexus` prefix.
 
 **Hackathon:** [H0 — Hack the Zero Stack](https://h01.devpost.com/) (Track 2: Monetizable B2B)  
 **Primary database:** Amazon DynamoDB (single-table, multi-tenant, Streams-driven analytics)  

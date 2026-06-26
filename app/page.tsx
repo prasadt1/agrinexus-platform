@@ -27,14 +27,20 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="px-8 pt-20 pb-12 max-w-5xl mx-auto text-center">
-        <h1 className="text-4xl md:text-5xl font-semibold leading-tight mb-6" style={{ letterSpacing: "-0.02em" }}>
-          Turn weather into action —<br />
-          <span style={{ color: "var(--color-primary)" }}>and prove farmers followed through.</span>
+        <h1 className="text-4xl md:text-5xl font-semibold leading-tight mb-4" style={{ letterSpacing: "-0.02em" }}>
+          Outturn <span style={{ color: "var(--color-primary)" }}>by AgriNexus</span>
         </h1>
-        <p className="text-lg max-w-2xl mx-auto mb-10" style={{ color: "var(--color-text-secondary)" }}>
-          AgriNexus is the control panel for organisations that fund farming advice. It sends farmers a
-          timely <Term term="nudge">WhatsApp reminder</Term> when conditions are right, then measures{" "}
-          <Term term="follow-through">who actually acted</Term> — across an entire village.
+        <p className="text-xl md:text-2xl font-medium mb-6" style={{ color: "var(--color-text-primary)" }}>
+          Proof of what your advisory program produced.
+        </p>
+        <p className="text-lg max-w-2xl mx-auto mb-4" style={{ color: "var(--color-text-secondary)" }}>
+          AgriNexus AI delivers the advice over <Term term="nudge">WhatsApp</Term>. Outturn is the
+          control plane that tracks <Term term="follow-through">follow-through</Term> and surfaces where
+          it&apos;s collapsing — so partners know where to target their own field interventions.
+        </p>
+        <p className="text-sm max-w-2xl mx-auto mb-10" style={{ color: "var(--color-text-muted)" }}>
+          In agriculture and commodity trade, &ldquo;outturn&rdquo; is the actual result after
+          processing. Here, it&apos;s the actual result after advisory.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link href="/login" className="btn btn-primary text-base px-6 py-3">
@@ -123,7 +129,7 @@ export default function LandingPage() {
         className="px-8 py-8 text-center text-sm border-t"
         style={{ color: "var(--color-text-muted)", borderColor: "var(--color-border)" }}
       >
-        AgriNexus Platform ·{" "}
+        Powered by AgriNexus AI · AWS AIdeas award winner ·{" "}
         <Link href="/judges" className="underline">
           For hackathon judges
         </Link>{" "}
