@@ -18,7 +18,7 @@ describe('buildPendingProfileItem', () => {
     expect(p.consent).toBe('pending');
     expect(p.consentSource).toBe('partner');
     expect(p.onboarding_complete).toBe(false);
-    expect(p.onboarding_state).toBe('consent'); // engine jumps straight to the consent step
+    expect(p.onboarding_state).toBe('pending_consent'); // engine prompts before reading the reply
     // The engine's NudgeSender selects recipients by GSI1 = LOCATION#<district>:
     expect(p.GSI1PK).toBe('LOCATION#Latur');
     expect(p.GSI1SK).toBe('CROP#cotton'); // first crop
