@@ -100,7 +100,7 @@ export default function BillingPage() {
       </Card>
 
       <p className="mt-6 text-sm" style={{ color: "var(--color-text-muted)" }}>
-        Stripe branding: upload the AgriNexus logo in Stripe Dashboard → Settings → Branding.
+        Stripe branding: upload the Outturn logo in Stripe Dashboard → Settings → Branding.
       </p>
     </div>
   );

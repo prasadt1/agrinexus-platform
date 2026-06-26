@@ -77,7 +77,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const productName = `AgriNexus — ${existing.district} cohort`;
+    const productName = `Outturn — ${existing.district} cohort`;
     const productDescription = `District advisory license (${plan}) · cohort ${cohortId.slice(0, 8)}`;
 
     const session = await stripe.checkout.sessions.create({
