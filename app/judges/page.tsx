@@ -6,7 +6,7 @@ export const metadata = {
   description: "H0 submission guide: demo path, AWS + Vercel stack, and what was built for the hackathon.",
 };
 
-const LIVE_URL = "https://agrinexus-platform.vercel.app";
+const LIVE_URL = "https://outturn.vercel.app";
 const REPO_URL = "https://github.com/prasadt1/agrinexus-platform";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

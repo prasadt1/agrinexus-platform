@@ -7,7 +7,7 @@ Outturn is the multi-tenant B2B control plane for agricultural advisory programs
 **Hackathon:** [H0 — Hack the Zero Stack](https://h01.devpost.com/) (Track 2: Monetizable B2B)  
 **Primary database:** Amazon DynamoDB (single-table, multi-tenant, Streams-driven analytics)  
 **Frontend:** Next.js on Vercel  
-**For judges:** guided demo path + stack overview at [`/judges`](https://agrinexus-platform.vercel.app/judges) on the live app
+**For judges:** guided demo path + stack overview at [`/judges`](https://outturn.vercel.app/judges) on the live app
 
 ## New vs existing (submission boundary)
 
