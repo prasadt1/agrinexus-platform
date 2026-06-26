@@ -53,7 +53,9 @@ export function buildPendingProfileItem(
     consent: 'pending',
     consentSource: 'partner',
     onboarding_complete: false,
-    onboarding_state: 'consent',
+    // The engine prompts for consent (then reads the YES) when it sees this state,
+    // so a partner-enrolled farmer's first "Hi" isn't mistaken for a consent answer.
+    onboarding_state: 'pending_consent',
     created_at: now,
     demo_tier: 'public',
     GSI1PK: `LOCATION#${cohort.district}` as `LOCATION#${string}`,
