@@ -14,6 +14,16 @@ export const glossary: Record<string, string> = {
     "The share of nudged farmers who actually confirmed they acted — outcomes, not just messages delivered.",
   aggregate:
     "Farmer replies rolled up across a whole cohort into a single response rate the partner can act on.",
+  "farmers reached":
+    "Unique farmers enrolled in this cohort who can receive WhatsApp advisories.",
+  "farmers enrolled":
+    "Total unique farmers across all your cohorts who can receive WhatsApp advisories.",
+  responses:
+    "Reminders where the farmer confirmed they acted — the proof behind your response rate.",
+  "reminders sent":
+    "Total weather-timed WhatsApp reminders delivered to this cohort's farmers.",
+  "response rate":
+    "Share of reminders where the farmer confirmed they acted — your proof of follow-through, not just delivery.",
 };
 
 export type GlossaryKey = keyof typeof glossary;
