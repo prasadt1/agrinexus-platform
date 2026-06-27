@@ -99,7 +99,7 @@ export default function NewCohortPage() {
     <div className="py-10 px-8 max-w-2xl">
       <PageHeader
         title="New cohort"
-        description="Provisioning writes COHORT# to DynamoDB — mirrored in each step below"
+        description="Set up a group of farmers in one district for WhatsApp advisory."
       />
 
       {/* Step indicator */}
@@ -179,7 +179,8 @@ export default function NewCohortPage() {
         {step === 2 && (
           <div className="space-y-6">
             <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              nudgeRules.sprayConditions — read by WeatherPoller when deciding to fire advisories
+              The safe-spray window for this cohort — the weather conditions under which farmers are
+              nudged to spray.
             </p>
             <div className="grid grid-cols-2 gap-4">
               {[
