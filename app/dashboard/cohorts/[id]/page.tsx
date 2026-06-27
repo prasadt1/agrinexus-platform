@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card, Badge, Button, EmptyState, LineageBadge, toast } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { parseFarmerLines } from "@/lib/parse-farmers";
+import { attentionFor } from "@/lib/attention";
 
 type Cohort = {
   cohortId: string;
@@ -60,6 +61,7 @@ export default function CohortDetailPage({
   const [showAddFarmers, setShowAddFarmers] = useState(false);
   const [addFarmersText, setAddFarmersText] = useState("");
   const [enrolling, setEnrolling] = useState(false);
+  const [renudging, setRenudging] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -134,6 +136,26 @@ export default function CohortDetailPage({
     }
   }
 
+  async function handleRenudge() {
+    setRenudging(true);
+    try {
+      const res = await fetch(`/api/cohorts/${id}/nudge`, {
+        method: "POST",
+        headers: authHeaders(),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast(data.message || "Nudge sent", "success");
+      } else {
+        toast(data.error || "Failed to send nudge", "error");
+      }
+    } catch {
+      toast("Request failed", "error");
+    } finally {
+      setRenudging(false);
+    }
+  }
+
   // Aggregate stats from summaries
   const totalNudgesSent = summaries.reduce((sum, s) => sum + (s.nudgesSent || 0), 0);
   const totalNudgesCompleted = summaries.reduce((sum, s) => sum + (s.nudgesCompleted || 0), 0);
@@ -178,6 +200,16 @@ export default function CohortDetailPage({
   }
 
   const hasOutcomes = summaries.length > 0 && totalNudgesSent > 0;
+  const attention = attentionFor({
+    status: cohort.status,
+    outcomes: hasOutcomes
+      ? {
+          followThroughRate: overallResponseRate,
+          nudgesSent: totalNudgesSent,
+          nudgesCompleted: totalNudgesCompleted,
+        }
+      : null,
+  });
 
   return (
     <div className="py-10 px-8">
@@ -223,6 +255,35 @@ export default function CohortDetailPage({
           </div>
         </div>
       </header>
+
+      {/* Action loop: detect (attention banner) + act (re-nudge) */}
+      {isAdmin && cohort.status === "active" && (
+        attention.needsAttention ? (
+          <div
+            className="mb-8 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            style={{ background: "var(--color-warning-bg)", border: "1px solid rgba(181,71,8,0.25)" }}
+          >
+            <div>
+              <p className="font-medium" style={{ color: "var(--color-warning)" }}>
+                Needs attention · {attention.label}
+              </p>
+              <p className="text-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
+                Follow-through is lagging. Send a fresh WhatsApp nudge to the farmers who haven&apos;t
+                acted yet.
+              </p>
+            </div>
+            <Button onClick={handleRenudge} disabled={renudging} className="shrink-0">
+              {renudging ? "Sending…" : "Re-nudge cohort"}
+            </Button>
+          </div>
+        ) : (
+          <div className="mb-8 flex justify-end">
+            <Button variant="secondary" onClick={handleRenudge} disabled={renudging}>
+              {renudging ? "Sending…" : "Re-nudge cohort"}
+            </Button>
+          </div>
+        )
+      )}
 
       {/* KPI Cards - Always show, with zeros when no data */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

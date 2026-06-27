@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/context/AuthProvider";
 
 type AuditEvent = {
   id: string;
-  eventType: "cohort.created" | "cohort.activated" | "cycle.run" | "license.issued";
+  eventType: "cohort.created" | "cohort.activated" | "cycle.run" | "license.issued" | "cohort.renudged";
   actor: string;
   actorRole?: string;
   summary: string;
@@ -24,6 +24,7 @@ const EVENT_META: Record<
   "cohort.activated": { label: "Activated", color: "#157347", tint: "#E6F4EC" },
   "license.issued": { label: "License issued", color: "#6938EF", tint: "#F4F3FF" },
   "cycle.run": { label: "Cycle run", color: "#B54708", tint: "#FFFAEB" },
+  "cohort.renudged": { label: "Re-nudged", color: "#0E7490", tint: "#ECFEFF" },
 };
 
 function relativeTime(iso: string): string {
