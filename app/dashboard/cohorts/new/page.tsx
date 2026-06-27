@@ -179,8 +179,8 @@ export default function NewCohortPage() {
         {step === 2 && (
           <div className="space-y-6">
             <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              The safe-spray window for this cohort — the weather conditions under which farmers are
-              nudged to spray.
+              These limits decide when this cohort&apos;s farmers are nudged to spray, and how
+              reminders are paced.
             </p>
             <div className="grid grid-cols-2 gap-4">
               {[
