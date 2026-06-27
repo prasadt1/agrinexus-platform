@@ -119,9 +119,25 @@ export function AdvisoryLoopHero() {
           })}
         </div>
 
+        {isAdmin && !result && !running && (
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+            <strong style={{ color: "var(--color-text-secondary)" }}>Run advisory cycle</strong> checks
+            live weather for every active cohort and sends real WhatsApp spray reminders where
+            conditions are right. It is a live action, not a simulation.
+          </p>
+        )}
+
         {result && (
           <div className="space-y-2 pt-4 border-t" style={{ borderColor: "var(--color-border)" }}>
-            <p className="text-sm font-medium">{result.message}</p>
+            <p className="text-sm font-medium">
+              Checked {result.cohorts_checked} active cohort{result.cohorts_checked === 1 ? "" : "s"}
+              {" · "}
+              <span style={{ color: "var(--color-success)" }}>
+                {result.nudges_triggered} reminder{result.nudges_triggered === 1 ? "" : "s"} sent
+              </span>
+              {result.cohorts_checked - result.nudges_triggered > 0 &&
+                ` · ${result.cohorts_checked - result.nudges_triggered} skipped (weather not right)`}
+            </p>
             {result.results.map((r) => (
               <div
                 key={r.cohortId}
@@ -140,7 +156,7 @@ export function AdvisoryLoopHero() {
                     color: r.triggered ? "var(--color-success)" : "var(--color-text-muted)",
                   }}
                 >
-                  {r.triggered ? "Nudge fired" : "Not favorable"}
+                  {r.triggered ? "Reminder sent" : "Weather not right"}
                 </span>
               </div>
             ))}

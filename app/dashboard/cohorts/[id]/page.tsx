@@ -294,7 +294,7 @@ export default function CohortDetailPage({
           empty={!hasOutcomes}
         />
         <KPICard
-          label="Advisories Sent"
+          label="Reminders sent"
           value={totalNudgesSent}
           format="number"
           empty={!hasOutcomes}
@@ -429,7 +429,7 @@ export default function CohortDetailPage({
             </div>
           ) : (
             <EmptyState
-              title="No advisories sent"
+              title="No reminders sent yet"
               description={
                 cohort.status === "draft"
                   ? "Activate this cohort to begin sending weather-based advisories to farmers."

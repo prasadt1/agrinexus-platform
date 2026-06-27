@@ -155,7 +155,7 @@ export default function OverviewPage() {
           }
         />
         <KPICard
-          label="Advisories Sent"
+          label="Reminders sent"
           value={totals?.nudgesSent || 0}
           format="number"
           loading={loading}
