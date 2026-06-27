@@ -302,7 +302,8 @@ body {
 }
 
 .card-kpi {
-  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-primary-tint) 120%);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card), inset 0 2px 0 var(--color-primary);
 }
 
 .card-no-padding {
