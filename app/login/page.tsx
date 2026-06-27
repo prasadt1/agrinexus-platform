@@ -21,8 +21,22 @@ export default function LoginPage() {
 
   if (loading || authenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--color-page-bg)" }}>
-        <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "var(--color-page-bg)" }}
+        role="status"
+        aria-label="Loading"
+      >
+        <div className="w-full max-w-md px-8">
+          <div className="skeleton" style={{ width: 140, height: 30, marginBottom: 28 }} />
+          <div className="skeleton" style={{ width: 120, height: 24, marginBottom: 8 }} />
+          <div className="skeleton" style={{ width: 220, height: 16, marginBottom: 28 }} />
+          <div className="space-y-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="skeleton" style={{ height: 72 }} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
