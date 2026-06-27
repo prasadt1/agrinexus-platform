@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Card, Badge, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
+import { attentionFor } from "@/lib/attention";
 
 type OverviewData = {
   tenant: {
@@ -64,6 +65,19 @@ export default function OverviewPage() {
   const cohorts = data?.cohorts || [];
   const activeCohorts = cohorts.filter((c) => c.status === "active");
   const topCohorts = cohorts.filter((c) => c.nudgesSent > 0).slice(0, 5);
+  const attentionCohorts = cohorts
+    .map((c) => ({
+      c,
+      flag: attentionFor({
+        status: c.status,
+        outcomes: {
+          followThroughRate: c.responseRate,
+          nudgesSent: c.nudgesSent,
+          nudgesCompleted: c.nudgesCompleted,
+        },
+      }),
+    }))
+    .filter((x) => x.flag.needsAttention);
 
   return (
     <div className="py-10 px-8">
@@ -249,6 +263,58 @@ export default function OverviewPage() {
                   Overall Response Rate
                 </p>
               </div>
+            </div>
+          </Card>
+        </section>
+      )}
+
+      {/* Needs attention — where to act */}
+      {attentionCohorts.length > 0 && (
+        <section className="mb-8">
+          <Card>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-card-title">Needs attention</h2>
+              <span
+                className="text-sm px-2 py-1 rounded"
+                style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)" }}
+              >
+                {attentionCohorts.length} cohort{attentionCohorts.length === 1 ? "" : "s"}
+              </span>
+            </div>
+            <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+              These cohorts are underperforming. Open one to send a fresh nudge to the farmers who
+              haven&apos;t acted.
+            </p>
+            <div className="space-y-2">
+              {attentionCohorts.map(({ c, flag }) => (
+                <Link
+                  key={c.cohortId}
+                  href={`/dashboard/cohorts/${c.cohortId}`}
+                  className="flex items-center justify-between gap-4 p-3 rounded-lg hover:bg-opacity-50 transition-colors"
+                  style={{ border: "1px solid var(--color-border)" }}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ background: "var(--color-warning)" }}
+                    />
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{c.district}</p>
+                      <p className="text-xs truncate" style={{ color: "var(--color-text-muted)" }}>
+                        {(c.crops || []).join(", ")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-sm" style={{ color: "var(--color-warning)" }}>
+                      {flag.label}
+                    </span>
+                    <span className="text-sm font-medium" style={{ color: "var(--color-primary)" }}>
+                      Review →
+                    </span>
+                  </div>
+                </Link>
+              ))}
             </div>
           </Card>
         </section>
