@@ -200,8 +200,10 @@ export async function getAllTenantSummaries(
 
 // =============================================================================
 // Access Pattern: Upsert Cohort Summary (Atomic Counters)
-// UpdateItem with ADD for idempotent counter increments
-// Used by OutcomesAggregator Lambda
+// UpdateItem with ADD — atomic, but NOT idempotent on its own: a replayed event
+// would double-count. Callers must dedupe (the OutcomesAggregator Lambda guards
+// each stream event via a DEDUPE#<eventID> marker before incrementing). This
+// entity helper is retained for reuse; the Lambda uses its own inline copy.
 // =============================================================================
 
 export type SummaryIncrement = {
