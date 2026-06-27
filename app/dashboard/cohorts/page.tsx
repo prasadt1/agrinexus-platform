@@ -73,7 +73,11 @@ export default function CohortsPage() {
           window.location.href = data.checkoutUrl;
           return;
         }
-        toast(data.error || data.hint || "Stripe checkout unavailable — use demo activate", "error");
+        if (res.status === 503) {
+          toast('Card checkout isn’t enabled in this demo — use “Demo activate” to go live.', "error");
+          return;
+        }
+        toast(data.error || "Stripe checkout unavailable — use demo activate", "error");
         return;
       }
 
