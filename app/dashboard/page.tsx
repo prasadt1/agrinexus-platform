@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Card, Badge, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term } from "@/app/components";
+import { Card, Badge, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, CropIcon } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { attentionFor } from "@/lib/attention";
 
@@ -428,8 +428,9 @@ export default function OverviewPage() {
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center"
                       style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
+                      title={cohort.crops.join(", ")}
                     >
-                      {cohort.district.slice(0, 2).toUpperCase()}
+                      <CropIcon crop={cohort.crops[0] || ""} size={22} />
                     </div>
                     <div>
                       <p className="font-medium">{cohort.district}</p>
@@ -566,9 +567,10 @@ function CohortRow({
       {/* Info */}
       <div className="flex-1 min-w-0">
         <p className="font-medium truncate">{cohort.district}</p>
-        <p className="text-sm truncate" style={{ color: "var(--color-text-muted)" }}>
-          {cohort.crops.join(", ")}
-        </p>
+        <div className="text-sm flex items-center gap-1.5" style={{ color: "var(--color-text-muted)" }}>
+          <CropIcon crop={cohort.crops[0] || ""} size={14} className="shrink-0" />
+          <span className="truncate">{cohort.crops.join(", ")}</span>
+        </div>
       </div>
 
       {/* Stats */}

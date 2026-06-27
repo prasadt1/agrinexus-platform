@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { Card, Badge, Button, EmptyState, LineageBadge, toast } from "@/app/components";
+import { Card, Badge, Button, EmptyState, LineageBadge, toast, CropIcon } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { parseFarmerLines } from "@/lib/parse-farmers";
 import { attentionFor } from "@/lib/attention";
@@ -267,14 +267,23 @@ export default function CohortDetailPage({
       {/* Header */}
       <header className="mb-4">
         <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-page-title">{cohort.district}</h1>
-              <Badge status={cohort.status} />
+          <div className="flex items-center gap-4">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+              style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
+              title={(cohort.crops || []).join(", ")}
+            >
+              <CropIcon crop={(cohort.crops && cohort.crops[0]) || ""} size={26} />
             </div>
-            <p style={{ color: "var(--color-text-secondary)" }}>
-              {(cohort.crops || []).join(", ")} • {(cohort.languages || []).map((l) => l.toUpperCase()).join(", ")}
-            </p>
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="text-page-title">{cohort.district}</h1>
+                <Badge status={cohort.status} />
+              </div>
+              <p style={{ color: "var(--color-text-secondary)" }}>
+                {(cohort.crops || []).join(", ")} • {(cohort.languages || []).map((l) => l.toUpperCase()).join(", ")}
+              </p>
+            </div>
           </div>
           <div className="text-right">
             <p className="text-label">Partner</p>

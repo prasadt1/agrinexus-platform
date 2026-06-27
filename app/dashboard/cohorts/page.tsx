@@ -16,6 +16,7 @@ import {
   Button,
   EmptyState,
   toast,
+  CropIcon,
 } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 
@@ -169,7 +170,10 @@ export default function CohortsPage() {
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {cohort.crops.map((crop) => (
-                        <span key={crop} className="chip">{crop}</span>
+                        <span key={crop} className="chip inline-flex items-center gap-1.5">
+                          <CropIcon crop={crop} size={14} />
+                          {crop}
+                        </span>
                       ))}
                     </div>
                   </TableCell>
