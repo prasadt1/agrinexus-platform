@@ -16,9 +16,16 @@ import type { NudgeRules } from '@/lib/entities/types';
 const WEATHER_API_BASE = 'https://api.openweathermap.org/data/2.5/weather';
 
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
-const AWS_ACCOUNT_ID = process.env.AWS_ACCOUNT_ID || '043624892076';
+// The nudge workflow lives in the SAME AWS account as the assumed role. Derive
+// the account from AWS_ROLE_ARN (arn:aws:iam::<acct>:role/...) — the AWS_ACCOUNT_ID
+// env was set to the wrong account and silently broke StartExecution (the poller
+// reported "0 triggered" and the re-nudge endpoint 500'd).
+const ACCOUNT_ID =
+  process.env.AWS_ROLE_ARN?.split(':')[4] ||
+  process.env.AWS_ACCOUNT_ID ||
+  '043624892076';
 const ENVIRONMENT = process.env.AGRINEXUS_ENV || 'dev';
-const STATE_MACHINE_ARN = `arn:aws:states:${AWS_REGION}:${AWS_ACCOUNT_ID}:stateMachine:agrinexus-nudge-workflow-${ENVIRONMENT}`;
+const STATE_MACHINE_ARN = `arn:aws:states:${AWS_REGION}:${ACCOUNT_ID}:stateMachine:agrinexus-nudge-workflow-${ENVIRONMENT}`;
 
 // Credentials: Vercel OIDC federation on Vercel (keyless), static keys or the
 // default chain locally — mirrors lib/dynamo.ts so SFN auth actually works.
