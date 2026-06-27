@@ -665,8 +665,24 @@ body {
    ============================================================================= */
 .term {
   border-bottom: 1px dashed var(--color-text-muted);
-  cursor: help;
+  cursor: pointer;
   position: relative;
+}
+
+.term-q {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: super;
+  color: var(--color-primary);
+  background: var(--color-primary-tint);
+  border-radius: 999px;
 }
 
 .term:focus-visible {
@@ -698,7 +714,8 @@ body {
 }
 
 .term:hover .term-tip,
-.term:focus-visible .term-tip {
+.term:focus-visible .term-tip,
+.term-open .term-tip {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
