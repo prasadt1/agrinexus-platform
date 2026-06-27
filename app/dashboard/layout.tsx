@@ -11,6 +11,7 @@ const navItems = [
   { href: "/dashboard", label: "Overview", icon: "grid", exact: true },
   { href: "/dashboard/cohorts", label: "Cohorts", icon: "users" },
   { href: "/dashboard/billing", label: "Billing", icon: "billing" },
+  { href: "/dashboard/activity", label: "Activity", icon: "activity" },
 ];
 
 function NavIcon({ name }: { name: string }) {
@@ -28,6 +29,11 @@ function NavIcon({ name }: { name: string }) {
     billing: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+      </svg>
+    ),
+    activity: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12h4l3 8 4-16 3 8h4" />
       </svg>
     ),
   };
@@ -53,8 +59,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--color-page-bg)" }}>
-        <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+      <div className="min-h-screen flex" role="status" aria-label="Loading dashboard">
+        <aside className="w-64 sidebar flex flex-col shrink-0">
+          <div className="p-5" style={{ borderBottom: "1px solid var(--color-sidebar-border)" }}>
+            <div className="skeleton" style={{ width: 124, height: 30, opacity: 0.22 }} />
+          </div>
+          <div className="flex-1 p-3 space-y-2">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="skeleton" style={{ height: 36, opacity: 0.16 }} />
+            ))}
+          </div>
+        </aside>
+        <main className="flex-1 p-8" style={{ background: "var(--color-page-bg)" }}>
+          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+            <div className="skeleton" style={{ width: 240, height: 28, marginBottom: 12 }} />
+            <div className="skeleton" style={{ width: 360, height: 16, marginBottom: 32 }} />
+            <div className="grid md:grid-cols-3 gap-6">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="skeleton" style={{ height: 120 }} />
+              ))}
+            </div>
+          </div>
+        </main>
       </div>
     );
   }

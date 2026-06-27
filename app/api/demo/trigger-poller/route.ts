@@ -20,6 +20,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthContext, AuthError } from '@/lib/api/auth';
 import { listActiveCohorts, type ActiveCohortProjection } from '@/lib/entities';
+import { logAuditEvent } from '@/lib/audit';
 import { getWeatherApiKey } from '@/lib/secrets';
 import {
   SFNClient,
@@ -153,7 +154,8 @@ async function triggerNudgeWorkflow(
 export async function POST(request: NextRequest) {
   try {
     // Require authentication (demo tenant only for safety)
-    const { tenantId } = await getAuthContext(request);
+    const ctx = await getAuthContext(request);
+    const { tenantId } = ctx;
 
     // Optional: restrict to demo tenants only
     if (!tenantId.startsWith('demo-')) {
@@ -226,6 +228,20 @@ export async function POST(request: NextRequest) {
     }
 
     const triggered = results.filter((r) => r.triggered);
+
+    await logAuditEvent({
+      tenantId,
+      eventType: 'cycle.run',
+      actor: ctx.email || ctx.userId,
+      actorRole: ctx.role,
+      summary: `Ran advisory cycle — ${triggered.length} nudge(s) triggered across ${cohorts.length} active cohort(s)`,
+      targetType: 'cycle',
+      metadata: {
+        cohortsChecked: cohorts.length,
+        nudgesTriggered: triggered.length,
+        districts: triggered.map((r) => r.district),
+      },
+    });
 
     return NextResponse.json({
       message: `Processed ${cohorts.length} active cohort(s)`,
