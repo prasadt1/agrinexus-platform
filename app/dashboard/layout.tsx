@@ -89,7 +89,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen flex">
       <aside className="w-64 sidebar flex flex-col shrink-0">
         <div className="p-5" style={{ borderBottom: "1px solid var(--color-sidebar-border)" }}>
-          <Link href="/dashboard">
+          <Link href="/" aria-label="Outturn home" title="Back to home">
             <AgriNexusWordmark light />
           </Link>
         </div>
