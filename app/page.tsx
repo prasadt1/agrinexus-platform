@@ -26,23 +26,22 @@ export default function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="px-8 pt-20 pb-12 max-w-5xl mx-auto text-center">
-        <h1 className="text-4xl md:text-5xl font-semibold leading-tight mb-4" style={{ letterSpacing: "-0.02em" }}>
-          Out<span style={{ color: "var(--color-primary)" }}>turn</span>
-        </h1>
-        <p className="text-xl md:text-2xl font-medium mb-6" style={{ color: "var(--color-text-primary)" }}>
+      <section className="px-8 pt-24 pb-16 max-w-3xl mx-auto text-center">
+        <p className="text-label mb-5" style={{ color: "var(--color-primary)" }}>
+          Advisory accountability · WhatsApp-native
+        </p>
+        <h1 className="text-display mb-5">
           Proof of what your advisory program produced.
+        </h1>
+        <p
+          className="text-lg md:text-xl max-w-xl mx-auto mb-9"
+          style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}
+        >
+          Farmers get a timely <Term term="nudge">WhatsApp nudge</Term> when conditions are right.
+          Outturn tracks <Term term="follow-through">who acted</Term>, then shows you where
+          follow-through is slipping, so field teams know exactly where to go.
         </p>
-        <p className="text-lg max-w-2xl mx-auto mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          Farmers get a timely <Term term="nudge">WhatsApp reminder</Term> when conditions are right.
-          Outturn tracks <Term term="follow-through">who acted</Term> — and surfaces where follow-through
-          is collapsing, so partners know where to target their field teams.
-        </p>
-        <p className="text-sm max-w-2xl mx-auto mb-10" style={{ color: "var(--color-text-muted)" }}>
-          In agriculture and commodity trade, &ldquo;outturn&rdquo; is the actual result after
-          processing. Here, it&apos;s the actual result after advisory.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-wrap justify-center items-center gap-3">
           <Link href="/login" className="btn btn-primary text-base px-6 py-3">
             Open demo dashboard
           </Link>
@@ -50,19 +49,19 @@ export default function LandingPage() {
             href="https://wa.me/4915120105731?text=Hi%20Outturn%2C%20show%20me%20the%20advisory%20demo"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn text-base px-6 py-3 inline-flex items-center gap-2"
-            style={{ background: "#25D366", color: "#0B141A", fontWeight: 600 }}
+            className="btn btn-secondary text-base px-6 py-3 inline-flex items-center gap-2"
             aria-label="Try the live advisory demo on WhatsApp"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true">
               <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.16c-.24.68-1.42 1.32-1.95 1.36-.5.05-.96.24-3.23-.67-2.74-1.08-4.46-3.88-4.6-4.06-.13-.18-1.1-1.46-1.1-2.79 0-1.32.7-1.97.94-2.24a1 1 0 01.72-.34c.18 0 .36.01.51.01.17 0 .39-.06.6.46.24.56.81 1.94.88 2.08.07.14.12.31.02.49-.09.18-.14.29-.27.45-.14.16-.29.36-.41.48-.14.14-.28.29-.12.57.16.27.71 1.17 1.53 1.9 1.05.93 1.94 1.23 2.21 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.55.73 1.81.86.27.14.45.2.51.31.07.12.07.66-.17 1.34z" />
             </svg>
             Try it on WhatsApp
           </a>
-          <Link href="/judges" className="btn btn-secondary text-base px-6 py-3">
-            For hackathon judges →
-          </Link>
         </div>
+        <p className="text-sm max-w-md mx-auto mt-7" style={{ color: "var(--color-text-muted)" }}>
+          &ldquo;Outturn&rdquo; is the trade term for the actual yield after processing. Here, it&apos;s
+          the actual result after advisory.
+        </p>
       </section>
 
       {/* How it works */}

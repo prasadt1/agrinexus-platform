@@ -100,7 +100,8 @@ export default function BillingPage() {
       </Card>
 
       <p className="mt-6 text-sm" style={{ color: "var(--color-text-muted)" }}>
-        Stripe branding: upload the Outturn logo in Stripe Dashboard → Settings → Branding.
+        Each district cohort is licensed monthly. Rows marked <span className="chip">Demo</span> were
+        activated without payment for evaluation; production cohorts are billed via Stripe.
       </p>
     </div>
   );
