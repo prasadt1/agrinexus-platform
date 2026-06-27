@@ -11,6 +11,11 @@
  *
  * Isolation: Reads from stream (passive), writes only to SUMMARY# items.
  * Does not modify NUDGE# records.
+ *
+ * Idempotency: DynamoDB Streams deliver at-least-once and Lambda retries failed
+ * batches, so each record is claimed exactly once via a DEDUPE#<eventID> marker
+ * (conditional put). A replayed record whose marker already exists is skipped,
+ * so counters are never double-incremented. Markers self-expire via TTL.
  */
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
@@ -77,6 +82,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
   GetCommand,
+  PutCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 
@@ -136,6 +142,40 @@ function getCurrentPeriod(): string {
   const year = now.getUTCFullYear();
   const month = String(now.getUTCMonth() + 1).padStart(2, '0');
   return `${year}-${month}`;
+}
+
+// =============================================================================
+// Helper: Idempotency claim — process each stream eventID at most once
+// =============================================================================
+
+/**
+ * Claim a stream event exactly once. Conditionally writes a DEDUPE#<eventID>
+ * marker; returns true the first time the event is seen, false if it was already
+ * processed (a replay/retry). Markers self-expire via TTL so the dedupe partition
+ * stays bounded. Without a usable eventID we cannot dedupe, so we process (true).
+ */
+async function claimEvent(eventID: string | undefined): Promise<boolean> {
+  if (!eventID) return true;
+  try {
+    await docClient.send(
+      new PutCommand({
+        TableName: TABLE_NAME,
+        Item: {
+          PK: `DEDUPE#${eventID}`,
+          SK: 'AGGREGATOR',
+          processedAt: new Date().toISOString(),
+          ttl: Math.floor(Date.now() / 1000) + 7 * 24 * 3600, // expire in 7 days
+        },
+        ConditionExpression: 'attribute_not_exists(PK)',
+      })
+    );
+    return true;
+  } catch (error) {
+    if (error instanceof Error && error.name === 'ConditionalCheckFailedException') {
+      return false; // already processed — idempotent replay
+    }
+    throw error; // real failure: let the batch error so Lambda retries
+  }
 }
 
 // =============================================================================
@@ -327,6 +367,12 @@ export async function handler(event: DynamoDBStreamEvent): Promise<void> {
 
   for (const record of event.Records) {
     try {
+      // Idempotency: claim each event once; skip replays/retries so the atomic
+      // ADD never double-counts on DynamoDB Streams' at-least-once redelivery.
+      if (!(await claimEvent(record.eventID))) {
+        console.log(`Skipping already-processed event ${record.eventID}`);
+        continue;
+      }
       const batch = await processRecord(record);
       if (batch) {
         const key = `${batch.tenantId}#${batch.cohortId}#${batch.period}`;
