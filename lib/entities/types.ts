@@ -312,6 +312,7 @@ export interface ActiveCohortProjection {
   lat: number;
   lon: number;
   crops: string[];
+  nudgeRules?: NudgeRules;
   GSI2PK: 'STATUS#active';
   GSI2SK: `COHORT#${string}`;
 }

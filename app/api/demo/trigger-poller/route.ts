@@ -22,6 +22,7 @@ import { getAuthContext, AuthError } from '@/lib/api/auth';
 import { listActiveCohorts, type ActiveCohortProjection } from '@/lib/entities';
 import { logAuditEvent } from '@/lib/audit';
 import { getWeatherApiKey } from '@/lib/secrets';
+import { isFavorable, buildNudgePayload } from '@/lib/nudge-policy';
 import {
   SFNClient,
   StartExecutionCommand,
@@ -132,14 +133,10 @@ async function fetchWeather(
  * Trigger the nudge workflow via Step Functions
  */
 async function triggerNudgeWorkflow(
-  location: string,
+  cohort: ActiveCohortProjection,
   weather: WeatherData
 ): Promise<{ executionArn: string }> {
-  const input = JSON.stringify({
-    location,
-    weather,
-    activity: 'spray',
-  });
+  const input = JSON.stringify(buildNudgePayload(cohort, weather));
 
   const command = new StartExecutionCommand({
     stateMachineArn: STATE_MACHINE_ARN,
@@ -197,9 +194,9 @@ export async function POST(request: NextRequest) {
       let triggered = false;
       let executionArn: string | undefined;
 
-      if (weather.favorable) {
+      if (isFavorable(weather, cohort.nudgeRules?.sprayConditions)) {
         try {
-          const result = await triggerNudgeWorkflow(cohort.district, weather);
+          const result = await triggerNudgeWorkflow(cohort, weather);
           triggered = true;
           executionArn = result.executionArn;
           console.log(
