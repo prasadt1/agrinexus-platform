@@ -246,6 +246,7 @@ export interface CohortMembershipItem {
 
   // Attributes
   phone: string;
+  name?: string;          // optional display name set at enrollment
   tenantId: string;
   cohortId: string;
   enrolledAt: string;
@@ -257,6 +258,7 @@ export interface CohortMembershipItem {
 
 export interface MemberStats {
   phone: string;
+  name?: string;
   tenantId: string;
   cohortId: string;
   enrolledAt: string;
@@ -373,6 +375,7 @@ export interface OutcomeSummary {
 
 export interface CohortMembership {
   phone: string;
+  name?: string;
   tenantId: string;
   cohortId: string;
   enrolledAt: string;
