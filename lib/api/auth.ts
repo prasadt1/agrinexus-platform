@@ -66,16 +66,20 @@ export async function getAuthContext(request: NextRequest): Promise<AuthContext>
     throw new AuthError('Cognito JWT validation not yet configured', 501);
   }
 
+  // Header-only fallback (no verified session). Restricted to DEMO tenants so a
+  // caller can never spoof X-Tenant-ID to reach a real tenant's data — that would
+  // break the multi-tenant isolation guarantee the product is built on. Real
+  // tenants must authenticate (Cognito-ready above); no session ⇒ 401.
   const tenantId = request.headers.get('x-tenant-id');
-  if (!tenantId) {
-    throw new AuthError('Not authenticated', 401);
+  if (tenantId && tenantId.startsWith('demo-')) {
+    return {
+      tenantId,
+      userId: 'dev-user',
+      role: 'admin',
+    };
   }
 
-  return {
-    tenantId,
-    userId: 'dev-user',
-    role: 'admin',
-  };
+  throw new AuthError('Not authenticated', 401);
 }
 
 export function requireAdmin(ctx: AuthContext): void {
