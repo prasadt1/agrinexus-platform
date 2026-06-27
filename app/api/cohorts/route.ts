@@ -16,6 +16,7 @@ import {
   getLatestCohortSummary,
   type NudgeRules,
 } from '@/lib/entities';
+import { logAuditEvent } from '@/lib/audit';
 
 // =============================================================================
 // POST /api/cohorts - Create Cohort
@@ -85,6 +86,17 @@ export async function POST(request: NextRequest) {
       languages: input.languages,
       nudgeRules,
       features: input.features,
+    });
+
+    await logAuditEvent({
+      tenantId,
+      eventType: 'cohort.created',
+      actor: ctx.email || ctx.userId,
+      actorRole: ctx.role,
+      summary: `Created ${cohort.district} cohort (${input.crops.join(', ')})`,
+      targetType: 'cohort',
+      targetId: cohort.cohortId,
+      district: cohort.district,
     });
 
     return NextResponse.json(

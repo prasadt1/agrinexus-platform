@@ -13,6 +13,7 @@ import {
   activateCohort,
   createLicense,
 } from '@/lib/entities';
+import { logAuditEvent } from '@/lib/audit';
 import { getStripe } from '@/lib/stripe';
 import type { PlanTier } from '@/lib/entities/types';
 
@@ -81,9 +82,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     // Create license from Stripe subscription
     const subscription = session.subscription as { id: string; current_period_start: number; current_period_end: number } | null;
+    const plan = (session.metadata?.plan || 'growth') as PlanTier;
 
     if (subscription) {
-      const plan = (session.metadata?.plan || 'growth') as PlanTier;
       await createLicense(tenantId, {
         cohortId,
         stripeSubId: subscription.id,
@@ -91,10 +92,32 @@ export async function GET(request: NextRequest, context: RouteContext) {
         currentPeriodStart: new Date(subscription.current_period_start * 1000).toISOString(),
         currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
       });
+
+      await logAuditEvent({
+        tenantId,
+        eventType: 'license.issued',
+        actor: 'stripe-checkout',
+        summary: `License issued for ${existing.district} (${plan} plan, paid)`,
+        targetType: 'license',
+        targetId: cohortId,
+        district: existing.district,
+        metadata: { plan, stripeSubId: subscription.id, paid: true },
+      });
     }
 
     // Activate the cohort
     await activateCohort(tenantId, cohortId);
+
+    await logAuditEvent({
+      tenantId,
+      eventType: 'cohort.activated',
+      actor: 'stripe-checkout',
+      summary: `Activated ${existing.district} cohort (paid, ${plan} plan)`,
+      targetType: 'cohort',
+      targetId: cohortId,
+      district: existing.district,
+      metadata: { plan, paid: true },
+    });
 
     // Redirect to cohort detail with success flag
     return NextResponse.redirect(

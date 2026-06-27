@@ -11,6 +11,7 @@ import {
   activateCohort,
   createDemoLicense,
 } from '@/lib/entities';
+import { logAuditEvent } from '@/lib/audit';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -44,6 +45,18 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     // Activate the cohort (sets GSI2PK/GSI2SK for WeatherPoller)
     const cohort = await activateCohort(tenantId, cohortId);
+
+    await logAuditEvent({
+      tenantId,
+      eventType: 'cohort.activated',
+      actor: ctx.email || ctx.userId,
+      actorRole: ctx.role,
+      summary: `Activated ${existing.district} cohort (demo, ${license.plan} plan)`,
+      targetType: 'cohort',
+      targetId: cohortId,
+      district: existing.district,
+      metadata: { demo: true, plan: license.plan },
+    });
 
     return NextResponse.json({
       cohortId: cohort.cohortId,
