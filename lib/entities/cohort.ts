@@ -251,7 +251,7 @@ export async function listActiveCohorts(): Promise<ActiveCohortProjection[]> {
         ':pk': KEY_PREFIXES.STATUS_ACTIVE,
       },
       // Only project what WeatherPoller needs
-      ProjectionExpression: 'tenantId, cohortId, district, lat, lon, crops, GSI2PK, GSI2SK',
+      ProjectionExpression: 'tenantId, cohortId, district, lat, lon, crops, nudgeRules, GSI2PK, GSI2SK',
     })
   );
 
