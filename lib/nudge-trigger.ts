@@ -8,6 +8,7 @@
  * re-nudge only reaches farmers who haven't been nudged recently.
  */
 import { SFNClient, StartExecutionCommand } from '@aws-sdk/client-sfn';
+import { awsCredentialsProvider } from '@vercel/oidc-aws-credentials-provider';
 import { getWeatherApiKey } from '@/lib/secrets';
 import { buildNudgePayload } from '@/lib/nudge-policy';
 import type { NudgeRules } from '@/lib/entities/types';
@@ -19,7 +20,21 @@ const AWS_ACCOUNT_ID = process.env.AWS_ACCOUNT_ID || '043624892076';
 const ENVIRONMENT = process.env.AGRINEXUS_ENV || 'dev';
 const STATE_MACHINE_ARN = `arn:aws:states:${AWS_REGION}:${AWS_ACCOUNT_ID}:stateMachine:agrinexus-nudge-workflow-${ENVIRONMENT}`;
 
-const sfnClient = new SFNClient({ region: AWS_REGION });
+// Credentials: Vercel OIDC federation on Vercel (keyless), static keys or the
+// default chain locally — mirrors lib/dynamo.ts so SFN auth actually works.
+const sfnConfig: ConstructorParameters<typeof SFNClient>[0] = { region: AWS_REGION };
+if (process.env.AWS_ROLE_ARN) {
+  sfnConfig.credentials = awsCredentialsProvider({
+    roleArn: process.env.AWS_ROLE_ARN,
+    audience: 'sts.amazonaws.com',
+  });
+} else if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+  sfnConfig.credentials = {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  };
+}
+const sfnClient = new SFNClient(sfnConfig);
 
 export interface WeatherData {
   location: string;
