@@ -1,7 +1,8 @@
-import type { NudgeRules } from "@/lib/entities/types";
+import type { NudgeRules, ActiveCohortProjection } from "@/lib/entities/types";
 
 type Weather = { wind_speed: number; rain: number; temperature?: number; humidity?: number };
 type SprayConditions = NonNullable<NudgeRules["sprayConditions"]>;
+type CohortForPayload = Pick<ActiveCohortProjection, "tenantId" | "cohortId" | "district" | "nudgeRules">;
 
 /** Per-cohort favorable gate. Falls back to the engine's legacy rule when no conditions set. */
 export function isFavorable(w: Weather, c?: SprayConditions): boolean {
@@ -23,8 +24,8 @@ function splitCadence(intervals?: number[]): { reminderIntervals: number[]; expi
   return { reminderIntervals: intervals.slice(0, -1), expiryHours: intervals[intervals.length - 1] };
 }
 
-export function buildNudgePayload(cohort: any, weather: Weather) {
-  const rules = cohort.nudgeRules ?? {};
+export function buildNudgePayload(cohort: CohortForPayload, weather: Weather) {
+  const rules: Partial<NudgeRules> = cohort.nudgeRules ?? {};
   const cadence = splitCadence(rules.reminderIntervals);
   return {
     schemaVersion: 1 as const,

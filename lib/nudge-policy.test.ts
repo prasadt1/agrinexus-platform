@@ -17,6 +17,10 @@ describe("isFavorable", () => {
     expect(isFavorable(weather, c)).toBe(false);                  // humidity 70 > 60
     expect(isFavorable({ ...weather, rain: 1 }, { ...c, maxHumidity: 85 })).toBe(false);
   });
+  it("treats maxWindSpeed as inclusive (wind == max is favorable)", () => {
+    expect(isFavorable({ wind_speed: 15, rain: 0, temperature: 28, humidity: 70 },
+      { maxWindSpeed: 15, maxHumidity: 85, minTemp: 15, maxTemp: 35 })).toBe(true);
+  });
 });
 
 describe("buildNudgePayload", () => {
@@ -38,6 +42,12 @@ describe("buildNudgePayload", () => {
   it("falls back to default cadence when cohort has no reminderIntervals", () => {
     const p = buildNudgePayload({ ...cohort, nudgeRules: {} }, weather);
     expect(p.rules.reminderIntervals).toEqual([24, 48]);
+    expect(p.rules.expiryHours).toBe(72);
+  });
+  it("maps a single reminder interval to that reminder + default expiry", () => {
+    const p = buildNudgePayload({ tenantId: "demo-t", cohortId: "01X", district: "Latur",
+      nudgeRules: { reminderIntervals: [12] } } as any, { wind_speed: 8, rain: 0 });
+    expect(p.rules.reminderIntervals).toEqual([12]);
     expect(p.rules.expiryHours).toBe(72);
   });
 });
