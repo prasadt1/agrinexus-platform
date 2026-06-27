@@ -12,7 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthContext, AuthError, requireAdmin } from '@/lib/api/auth';
 import { getCohort } from '@/lib/entities';
 import { logAuditEvent } from '@/lib/audit';
-import { fetchWeather, triggerCohortNudge } from '@/lib/nudge-trigger';
+import { fetchWeather, triggerCohortNudge, pollNudgeResult } from '@/lib/nudge-trigger';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -40,21 +40,34 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const weather = await fetchWeather(cohort.district, cohort.lat, cohort.lon);
     const { executionArn } = await triggerCohortNudge(cohort, weather);
 
+    // Poll the short workflow so we can report a truthful outcome — how many
+    // reminders actually went out vs were skipped (open nudge / not opted in).
+    const result = await pollNudgeResult(executionArn);
+
     await logAuditEvent({
       tenantId,
       eventType: 'cohort.renudged',
       actor: ctx.email || ctx.userId,
       actorRole: ctx.role,
-      summary: `Re-nudged the ${cohort.district} cohort`,
+      summary: `Re-nudged the ${cohort.district} cohort — ${result.sent} sent, ${result.skipped} skipped`,
       targetType: 'cohort',
       targetId: cohortId,
       district: cohort.district,
-      metadata: { executionArn, weatherMock: weather.mock },
+      metadata: {
+        executionArn,
+        weatherMock: weather.mock,
+        sent: result.sent,
+        skipped: result.skipped,
+        status: result.status,
+      },
     });
 
     return NextResponse.json({
       message: `Nudge sent to the ${cohort.district} cohort`,
       executionArn,
+      sent: result.sent,
+      skipped: result.skipped,
+      status: result.status,
     });
   } catch (error) {
     if (error instanceof AuthError) {

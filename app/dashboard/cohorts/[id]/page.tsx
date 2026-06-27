@@ -6,6 +6,7 @@ import { Card, Badge, Button, EmptyState, LineageBadge, toast } from "@/app/comp
 import { useAuth } from "@/lib/context/AuthProvider";
 import { parseFarmerLines } from "@/lib/parse-farmers";
 import { attentionFor } from "@/lib/attention";
+import { Term } from "@/app/components/Term";
 
 type Cohort = {
   cohortId: string;
@@ -145,7 +146,26 @@ export default function CohortDetailPage({
       });
       const data = await res.json();
       if (res.ok) {
-        toast(data.message || "Nudge sent", "success");
+        const sent = Number(data.sent) || 0;
+        const skipped = Number(data.skipped) || 0;
+        const skippedNote =
+          skipped > 0 ? ` · ${skipped} skipped (already have a pending reminder)` : "";
+        if (data.status === "RUNNING") {
+          toast("Nudge cycle started — results will appear in a moment.", "info");
+        } else if (sent > 0) {
+          toast(`Sent ${sent} reminder${sent === 1 ? "" : "s"}${skippedNote}`, "success");
+        } else if (skipped > 0) {
+          toast(
+            `No new reminders — all ${skipped} eligible farmer${skipped === 1 ? "" : "s"} already have a pending reminder.`,
+            "info"
+          );
+        } else {
+          toast("No farmers were due for a reminder right now.", "info");
+        }
+        // Reflect the new send in the KPIs and farmer table.
+        fetchCohort();
+        setMembersLoading(true);
+        fetchMembers();
       } else {
         toast(data.error || "Failed to send nudge", "error");
       }
@@ -211,6 +231,20 @@ export default function CohortDetailPage({
       : null,
   });
 
+  // One plain-language sentence that tells the partner what's happening here,
+  // so the page leads with meaning before the numbers.
+  const cropLabel = (cohort.crops || []).join(", ") || "the crop";
+  const storyLine =
+    cohort.status === "draft"
+      ? "This cohort is in draft. Activate it to start sending weather-timed reminders to enrolled farmers."
+      : cohort.status === "paused"
+      ? "This cohort is paused. No reminders go out until you resume it."
+      : cohort.status === "expired"
+      ? "This cohort's license has expired. Renew it to resume sending reminders."
+      : !hasOutcomes
+      ? `Active. Reminders go out automatically when the weather is right for ${cropLabel}.`
+      : `${totalNudgesSent} reminder${totalNudgesSent === 1 ? "" : "s"} sent to ${farmersReached} farmer${farmersReached === 1 ? "" : "s"}. ${totalNudgesCompleted} confirmed they acted — a ${Math.round(overallResponseRate * 100)}% follow-through rate.`;
+
   return (
     <div className="py-10 px-8">
       {/* Breadcrumb */}
@@ -231,7 +265,7 @@ export default function CohortDetailPage({
       </nav>
 
       {/* Header */}
-      <header className="mb-8">
+      <header className="mb-4">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -255,6 +289,11 @@ export default function CohortDetailPage({
           </div>
         </div>
       </header>
+
+      {/* Plain-language summary: what's happening in this cohort, in one line. */}
+      <p className="mb-8 max-w-2xl" style={{ color: "var(--color-text-secondary)" }}>
+        {storyLine}
+      </p>
 
       {/* Action loop: detect (attention banner) + act (re-nudge) */}
       {isAdmin && cohort.status === "active" && (
@@ -289,18 +328,21 @@ export default function CohortDetailPage({
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <KPICard
           label="Farmers Reached"
+          term="farmers reached"
           value={farmersReached}
           format="number"
-          empty={!hasOutcomes}
+          empty={false}
         />
         <KPICard
           label="Reminders sent"
+          term="reminders sent"
           value={totalNudgesSent}
           format="number"
           empty={!hasOutcomes}
         />
         <KPICard
           label="Response Rate"
+          term="response rate"
           value={overallResponseRate}
           format="percent"
           highlight
@@ -575,12 +617,14 @@ export default function CohortDetailPage({
 
 function KPICard({
   label,
+  term,
   value,
   format,
   highlight,
   empty,
 }: {
   label: string;
+  term?: string;
   value: number;
   format: "number" | "percent";
   highlight?: boolean;
@@ -594,7 +638,7 @@ function KPICard({
 
   return (
     <Card>
-      <p className="text-label mb-2">{label}</p>
+      <p className="text-label mb-2">{term ? <Term term={term}>{label}</Term> : label}</p>
       <p
         className="text-kpi"
         style={{

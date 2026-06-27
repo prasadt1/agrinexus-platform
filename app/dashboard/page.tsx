@@ -145,6 +145,7 @@ export default function OverviewPage() {
       <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <KPICard
           label="Farmers Enrolled"
+          term="farmers enrolled"
           value={totals?.farmers || 0}
           format="number"
           loading={loading}
@@ -156,6 +157,7 @@ export default function OverviewPage() {
         />
         <KPICard
           label="Reminders sent"
+          term="reminders sent"
           value={totals?.nudgesSent || 0}
           format="number"
           loading={loading}
@@ -167,6 +169,7 @@ export default function OverviewPage() {
         />
         <KPICard
           label="Responses"
+          term="responses"
           value={totals?.nudgesCompleted || 0}
           format="number"
           loading={loading}
@@ -178,6 +181,7 @@ export default function OverviewPage() {
         />
         <KPICard
           label="Response Rate"
+          term="response rate"
           value={totals?.responseRate || 0}
           format="percent"
           loading={loading}
@@ -469,6 +473,7 @@ export default function OverviewPage() {
 
 function KPICard({
   label,
+  term,
   value,
   format,
   highlight,
@@ -476,6 +481,7 @@ function KPICard({
   icon,
 }: {
   label: string;
+  term?: string;
   value: number;
   format: "number" | "percent";
   highlight?: boolean;
@@ -492,7 +498,7 @@ function KPICard({
     <Card className={highlight ? "card-kpi" : ""}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-label mb-2">{label}</p>
+          <p className="text-label mb-2">{term ? <Term term={term}>{label}</Term> : label}</p>
           {loading ? (
             <div className="h-9 w-20 rounded animate-pulse" style={{ background: "var(--color-page-bg)" }} />
           ) : (

@@ -7,7 +7,7 @@
  * double-sending to a farmer who already has an open nudge, so a manual
  * re-nudge only reaches farmers who haven't been nudged recently.
  */
-import { SFNClient, StartExecutionCommand } from '@aws-sdk/client-sfn';
+import { SFNClient, StartExecutionCommand, DescribeExecutionCommand } from '@aws-sdk/client-sfn';
 import { awsCredentialsProvider } from '@vercel/oidc-aws-credentials-provider';
 import { getWeatherApiKey } from '@/lib/secrets';
 import { buildNudgePayload } from '@/lib/nudge-policy';
@@ -122,4 +122,47 @@ export async function triggerCohortNudge(
   });
   const response = await sfnClient.send(command);
   return { executionArn: response.executionArn! };
+}
+
+export type NudgeRunStatus = 'SUCCEEDED' | 'FAILED' | 'RUNNING' | 'TIMED_OUT' | 'ABORTED' | 'PENDING_REDRIVE';
+
+export interface NudgeRunResult {
+  /** Execution status; RUNNING means it hadn't finished within the poll window. */
+  status: NudgeRunStatus;
+  /** Reminders actually delivered this run. */
+  sent: number;
+  /** Eligible farmers skipped (already had an open nudge, not yet opted in, etc.). */
+  skipped: number;
+}
+
+/**
+ * Poll a nudge execution to completion (best-effort, short window) and read how
+ * many reminders were actually sent vs skipped, so a manual re-nudge can report
+ * a truthful outcome instead of a bare "success". The workflow is short (one
+ * Lambda + two pass states), so it almost always resolves within the window;
+ * if it doesn't, we return RUNNING and the workflow still finishes in the
+ * background — the caller just can't show exact counts yet.
+ */
+export async function pollNudgeResult(
+  executionArn: string,
+  { timeoutMs = 8000, intervalMs = 700 }: { timeoutMs?: number; intervalMs?: number } = {}
+): Promise<NudgeRunResult> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const res = await sfnClient.send(new DescribeExecutionCommand({ executionArn }));
+    if (res.status && res.status !== 'RUNNING') {
+      let sent = 0;
+      let skipped = 0;
+      try {
+        const out = res.output ? JSON.parse(res.output) : {};
+        sent = Number(out.nudges_sent) || 0;
+        skipped = Number(out.nudges_skipped) || 0;
+      } catch {
+        // leave zeros — status still tells the caller it finished
+      }
+      return { status: res.status as NudgeRunStatus, sent, skipped };
+    }
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+  return { status: 'RUNNING', sent: 0, skipped: 0 };
 }
