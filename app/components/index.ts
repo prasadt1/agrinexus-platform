@@ -9,3 +9,4 @@ export { AdvisoryLoopHero, LineageBadge } from "./AdvisoryLoop";
 export { ToastProvider, toast } from "./Toast";
 export { HowItWorks } from "./HowItWorks";
 export { Term } from "./Term";
+export { CropIcon } from "./CropIcon";
