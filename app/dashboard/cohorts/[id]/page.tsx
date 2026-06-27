@@ -2,8 +2,9 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { Card, Badge, Button, EmptyState, LineageBadge } from "@/app/components";
+import { Card, Badge, Button, EmptyState, LineageBadge, toast } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
+import { parseFarmerLines } from "@/lib/parse-farmers";
 
 type Cohort = {
   cohortId: string;
@@ -35,6 +36,7 @@ type Summary = {
 
 type Member = {
   phone: string;
+  name?: string;
   enrolledAt: string;
   nudgesSent: number;
   nudgesCompleted: number;
@@ -48,13 +50,16 @@ export default function CohortDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { tenantName, authHeaders } = useAuth();
+  const { tenantName, authHeaders, isAdmin } = useAuth();
   const [cohort, setCohort] = useState<Cohort | null>(null);
   const [license, setLicense] = useState<License>(null);
   const [summaries, setSummaries] = useState<Summary[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [membersLoading, setMembersLoading] = useState(true);
+  const [showAddFarmers, setShowAddFarmers] = useState(false);
+  const [addFarmersText, setAddFarmersText] = useState("");
+  const [enrolling, setEnrolling] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -96,6 +101,36 @@ export default function CohortDetailPage({
       console.error("Failed to fetch members:", err);
     } finally {
       setMembersLoading(false);
+    }
+  }
+
+  async function handleEnrollFarmers() {
+    const farmers = parseFarmerLines(addFarmersText);
+    if (farmers.length === 0) {
+      toast("Add at least one valid phone number (10+ digits)", "error");
+      return;
+    }
+    setEnrolling(true);
+    try {
+      const res = await fetch(`/api/cohorts/${id}/members`, {
+        method: "POST",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ farmers }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast(`Enrolled ${data.enrolled} farmer${data.enrolled === 1 ? "" : "s"}`, "success");
+        setAddFarmersText("");
+        setShowAddFarmers(false);
+        setMembersLoading(true);
+        fetchMembers();
+      } else {
+        toast(data.error || "Failed to enroll farmers", "error");
+      }
+    } catch {
+      toast("Request failed", "error");
+    } finally {
+      setEnrolling(false);
     }
   }
 
@@ -349,13 +384,50 @@ export default function CohortDetailPage({
         <Card>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-card-title">Enrolled Farmers</h2>
-            <span
-              className="text-sm px-2 py-1 rounded"
-              style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
-            >
-              {members.length} farmers
-            </span>
+            <div className="flex items-center gap-3">
+              <span
+                className="text-sm px-2 py-1 rounded"
+                style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
+              >
+                {members.length} farmers
+              </span>
+              {isAdmin && (
+                <Button variant="secondary" onClick={() => setShowAddFarmers((v) => !v)}>
+                  {showAddFarmers ? "Cancel" : "Add farmers"}
+                </Button>
+              )}
+            </div>
           </div>
+
+          {showAddFarmers && isAdmin && (
+            <div
+              className="mb-6 p-4 rounded-lg"
+              style={{ background: "var(--color-page-bg)", border: "1px solid var(--color-border)" }}
+            >
+              <label className="text-label block mb-2">
+                Paste one farmer per line —{" "}
+                <span style={{ color: "var(--color-text-muted)" }}>phone, name (name optional)</span>
+              </label>
+              <textarea
+                className="input w-full font-mono text-sm"
+                rows={5}
+                placeholder={"+91 98765 43210, Ramesh Patil\n+91 91234 56789, Sita Devi"}
+                value={addFarmersText}
+                onChange={(e) => setAddFarmersText(e.target.value)}
+              />
+              <div className="flex items-center gap-3 mt-3">
+                <Button onClick={handleEnrollFarmers} disabled={enrolling || !addFarmersText.trim()}>
+                  {enrolling ? "Enrolling…" : "Enroll farmers"}
+                </Button>
+                <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  {parseFarmerLines(addFarmersText).length} valid
+                </span>
+              </div>
+              <p className="text-sm mt-2" style={{ color: "var(--color-text-muted)" }}>
+                Enrolled farmers join with consent pending — they start receiving advisories after they opt in on WhatsApp.
+              </p>
+            </div>
+          )}
           {membersLoading ? (
             <div className="animate-pulse space-y-3">
               {[1, 2, 3].map((i) => (
@@ -367,7 +439,7 @@ export default function CohortDetailPage({
               <table className="w-full">
                 <thead>
                   <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
-                    <th className="text-left py-3 px-4 text-label font-medium">Phone</th>
+                    <th className="text-left py-3 px-4 text-label font-medium">Farmer</th>
                     <th className="text-center py-3 px-4 text-label font-medium">Nudges</th>
                     <th className="text-center py-3 px-4 text-label font-medium">Completed</th>
                     <th className="text-center py-3 px-4 text-label font-medium">Expired</th>
@@ -644,6 +716,10 @@ function MemberRow({ member }: { member: Member }) {
     ? `${member.phone.slice(0, 3)}***${member.phone.slice(-3)}`
     : member.phone;
 
+  const initials = member.name
+    ? member.name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+    : member.phone.slice(-2);
+
   return (
     <tr
       className="hover:bg-opacity-50 transition-colors"
@@ -658,9 +734,18 @@ function MemberRow({ member }: { member: Member }) {
               color: "var(--color-primary)",
             }}
           >
-            {member.phone.slice(-2)}
+            {initials}
           </div>
-          <span className="font-mono text-sm">{maskedPhone}</span>
+          {member.name ? (
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{member.name}</span>
+              <span className="font-mono text-xs" style={{ color: "var(--color-text-muted)" }}>
+                {maskedPhone}
+              </span>
+            </div>
+          ) : (
+            <span className="font-mono text-sm">{maskedPhone}</span>
+          )}
         </div>
       </td>
       <td className="py-3 px-4 text-center">

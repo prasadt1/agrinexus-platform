@@ -41,6 +41,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       memberCount: members.length,
       members: members.map((m) => ({
         phone: m.phone,
+        name: m.name,
         enrolledAt: m.enrolledAt,
         nudgesSent: m.nudgesSent,
         nudgesCompleted: m.nudgesCompleted,
@@ -75,22 +76,27 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     // Parse request body
     const body = await request.json();
-    const phones: string[] = body.phones;
+    // Accept either { farmers: [{ phone, name? }] } (new) or { phones: string[] } (legacy).
+    const farmers: Array<{ phone: string; name?: string }> = Array.isArray(body.farmers)
+      ? body.farmers
+      : Array.isArray(body.phones)
+        ? body.phones.map((phone: string) => ({ phone }))
+        : [];
 
-    if (!phones || !Array.isArray(phones) || phones.length === 0) {
+    if (farmers.length === 0) {
       return NextResponse.json(
-        { error: 'phones array is required' },
+        { error: 'farmers (or phones) array is required' },
         { status: 400 }
       );
     }
 
-    // Validate phone format (basic E.164-ish check)
-    const invalidPhones = phones.filter(
-      (p) => typeof p !== 'string' || p.length < 10
+    // Validate phone format (basic E.164-ish check — at least 10 digits)
+    const invalid = farmers.filter(
+      (f) => !f || typeof f.phone !== 'string' || f.phone.replace(/\D/g, '').length < 10
     );
-    if (invalidPhones.length > 0) {
+    if (invalid.length > 0) {
       return NextResponse.json(
-        { error: `Invalid phone numbers: ${invalidPhones.join(', ')}` },
+        { error: `Invalid phone numbers: ${invalid.map((f) => f?.phone ?? '(empty)').join(', ')}` },
         { status: 400 }
       );
     }
@@ -105,7 +111,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     // Enroll farmers
-    const result = await bulkEnrollFarmers(tenantId, cohortId, phones);
+    const result = await bulkEnrollFarmers(tenantId, cohortId, farmers);
 
     return NextResponse.json({
       message: `Enrolled ${result.enrolled} farmers to cohort ${cohortId}`,
