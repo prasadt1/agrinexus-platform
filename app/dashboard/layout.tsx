@@ -117,10 +117,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Tenant switcher */}
         <div className="px-4 pb-3">
-          <label className="text-xs font-medium uppercase tracking-wide px-2 mb-1 block" style={{ color: "var(--color-sidebar-text)" }}>
+          <label htmlFor="tenant-switcher" className="text-xs font-medium uppercase tracking-wide px-2 mb-1 block" style={{ color: "var(--color-sidebar-text)" }}>
             Viewing as
           </label>
           <select
+            id="tenant-switcher"
+            aria-label="Viewing as tenant"
             value={tenantId}
             onChange={(e) => switchTenant(e.target.value)}
             className="w-full text-sm rounded-lg px-3 py-2 border-0 outline-none"
