@@ -8,7 +8,7 @@ import { toast } from "@/app/components/Toast";
 type PollerResult = {
   cohortId: string;
   district: string;
-  weather: { favorable: boolean; wind_speed: number; rain: number; mock?: boolean };
+  weather: { wind_speed: number; rain: number; mock?: boolean };
   triggered: boolean;
   executionArn?: string;
 };

@@ -9,7 +9,7 @@
  * Flow:
  * 1. Query GSI2 for STATUS#active cohorts
  * 2. Fetch weather for each cohort's coordinates
- * 3. If favorable, trigger the existing Step Functions nudge workflow
+ * 3. If conditions are favorable (per-cohort rules), trigger the nudge workflow
  *
  * Safety:
  * - Production WeatherPoller remains untouched (different code, different trigger)
@@ -47,7 +47,6 @@ interface WeatherData {
   rain: number;
   temperature: number;
   humidity: number;
-  favorable: boolean;
   mock: boolean;
 }
 
@@ -61,7 +60,7 @@ async function fetchWeather(
 ): Promise<WeatherData> {
   const apiKey = await getWeatherApiKey();
 
-  // If no API key, return mock favorable conditions
+  // If no API key, return mock conditions
   if (!apiKey) {
     console.log(`Weather: No API key, using mock for ${district}`);
     return {
@@ -71,7 +70,6 @@ async function fetchWeather(
       rain: 0,
       temperature: 28,
       humidity: 65,
-      favorable: true,
       mock: true,
     };
   }
@@ -100,9 +98,6 @@ async function fetchWeather(
     const temperature = data.main?.temp ?? 0;
     const humidity = data.main?.humidity ?? 0;
 
-    // Favorable: wind < 10 km/h and no rain
-    const favorable = wind_kmh < 10 && rain === 0;
-
     return {
       location: district,
       coordinates: { lat, lon },
@@ -110,7 +105,6 @@ async function fetchWeather(
       rain,
       temperature,
       humidity,
-      favorable,
       mock: false,
     };
   } catch (error) {
@@ -123,7 +117,6 @@ async function fetchWeather(
       rain: 0,
       temperature: 28,
       humidity: 65,
-      favorable: true,
       mock: true,
     };
   }
