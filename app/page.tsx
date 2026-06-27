@@ -69,7 +69,8 @@ export default function LandingPage() {
         <div className="text-center mb-6">
           <h2 className="text-section">How it works</h2>
           <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
-            One advisory cycle, start to finish. Tap a step or watch it play.
+            From weather to proof to re-nudge — the whole loop, shown in the real product. Tap a step
+            or watch it play.
           </p>
         </div>
         <HowItWorks />

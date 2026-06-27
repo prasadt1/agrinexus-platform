@@ -562,6 +562,11 @@ body {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes hiw-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
 .hiw-phone {
   width: 188px;
   background: #fff;
