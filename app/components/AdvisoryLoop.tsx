@@ -21,12 +21,12 @@ type PollerResponse = {
 };
 
 const LOOP_STEPS = [
-  { id: "provision", label: "Set up", plain: "Add a district cohort", tech: "COHORT# → DynamoDB" },
-  { id: "activate", label: "Go live", plain: "License & activate", tech: "status=active + LICENSE#" },
-  { id: "poll", label: "Check weather", plain: "Watch each district", tech: "Per-cohort lat/lon" },
-  { id: "nudge", label: "Send reminders", plain: "WhatsApp nudges", tech: "Step Functions → WhatsApp" },
-  { id: "stream", label: "Collect replies", plain: "Roll up responses", tech: "OutcomesAggregator λ" },
-  { id: "dashboard", label: "See results", plain: "Follow-through rate", tech: "SUMMARY# read" },
+  { id: "provision", label: "Set up", plain: "Add a district" },
+  { id: "activate", label: "Go live", plain: "Activate the group" },
+  { id: "poll", label: "Check weather", plain: "Watch each district" },
+  { id: "nudge", label: "Send reminders", plain: "WhatsApp reminders" },
+  { id: "stream", label: "Collect replies", plain: "Tally responses" },
+  { id: "dashboard", label: "See results", plain: "Follow-through rate" },
 ];
 
 export function AdvisoryLoopHero() {
@@ -34,7 +34,6 @@ export function AdvisoryLoopHero() {
   const [running, setRunning] = useState(false);
   const [activeStep, setActiveStep] = useState<string | null>(null);
   const [result, setResult] = useState<PollerResponse | null>(null);
-  const [showTech, setShowTech] = useState(false);
 
   async function runCycle() {
     setRunning(true);
@@ -78,20 +77,13 @@ export function AdvisoryLoopHero() {
               Each active cohort is watched for the right conditions, nudged on WhatsApp, and measured by who acted.
             </p>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={() => setShowTech((t) => !t)}
-              className="btn btn-secondary"
-              style={{ fontSize: 13 }}
-            >
-              {showTech ? "Hide technical detail" : "Show technical detail"}
-            </button>
-            {isAdmin && (
+          {isAdmin && (
+            <div className="shrink-0">
               <Button onClick={runCycle} disabled={running}>
                 {running ? "Running cycle…" : "Run advisory cycle"}
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Loop steps */}
@@ -109,7 +101,7 @@ export function AdvisoryLoopHero() {
                   }}
                 >
                   <p className="text-xs font-semibold">{step.label}</p>
-                  <p className="text-[10px] opacity-80 mt-0.5">{showTech ? step.tech : step.plain}</p>
+                  <p className="text-[10px] opacity-80 mt-0.5">{step.plain}</p>
                 </div>
                 {i < LOOP_STEPS.length - 1 && (
                   <span style={{ color: "var(--color-text-muted)" }}>→</span>
@@ -169,11 +161,11 @@ export function AdvisoryLoopHero() {
 
 export function LineageBadge() {
   return (
-    <span className="lineage-badge" title="Counters updated by the platform's OutcomesAggregator Lambda from DynamoDB Streams (NUDGE# → SUMMARY#)">
+    <span className="lineage-badge" title="These numbers update on their own as farmers reply — you never refresh or import anything.">
       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>
-      DynamoDB Streams
+      Updated automatically
     </span>
   );
 }
