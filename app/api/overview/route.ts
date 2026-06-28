@@ -64,13 +64,14 @@ export async function GET(request: NextRequest) {
     const totalFarmers = memberCounts.reduce((sum, count) => sum + count, 0);
 
     // Build cohort breakdown with stats
-    const cohortBreakdown = cohorts.map((cohort) => {
+    const cohortBreakdown = cohorts.map((cohort, i) => {
       const summary = latestByCohort.get(cohort.cohortId);
       return {
         cohortId: cohort.cohortId,
         district: cohort.district,
         status: cohort.status,
         crops: cohort.crops,
+        memberCount: memberCounts[i] || 0,
         nudgesSent: summary?.nudgesSent || 0,
         nudgesCompleted: summary?.nudgesCompleted || 0,
         responseRate: summary?.followThroughRate || 0,

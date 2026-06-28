@@ -27,6 +27,7 @@ type OverviewData = {
     district: string;
     status: "draft" | "active" | "paused" | "expired";
     crops: string[];
+    memberCount: number;
     nudgesSent: number;
     nudgesCompleted: number;
     responseRate: number;
@@ -429,15 +430,16 @@ export default function OverviewPage() {
                     <div>
                       <p className="font-medium">{cohort.district}</p>
                       <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                        {cohort.crops.join(", ")}
+                        {cohort.crops.join(", ")} · {cohort.memberCount} farmer
+                        {cohort.memberCount === 1 ? "" : "s"}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="text-right">
-                      <p className="text-sm font-medium">{cohort.nudgesSent} sent</p>
+                      <p className="text-sm font-medium">{cohort.nudgesSent} reminders</p>
                       <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                        {cohort.nudgesCompleted} completed
+                        {cohort.nudgesCompleted} acted
                       </p>
                     </div>
                     <Badge status={cohort.status} />
@@ -535,6 +537,7 @@ function CohortRow({
     cohortId: string;
     district: string;
     crops: string[];
+    memberCount: number;
     nudgesSent: number;
     nudgesCompleted: number;
     responseRate: number;
@@ -566,7 +569,7 @@ function CohortRow({
       <div className="flex-1 min-w-0">
         <p className="font-medium truncate">{cohort.district}</p>
         <p className="text-sm truncate" style={{ color: "var(--color-text-muted)" }}>
-          {cohort.crops.join(", ")}
+          {cohort.crops.join(", ")} · {cohort.memberCount} farmer{cohort.memberCount === 1 ? "" : "s"}
         </p>
       </div>
 

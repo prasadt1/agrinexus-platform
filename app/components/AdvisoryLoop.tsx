@@ -22,8 +22,8 @@ type PollerResponse = {
 
 const LOOP_STEPS = [
   { id: "provision", label: "Set up", plain: "Add a district cohort", tech: "COHORT# → DynamoDB" },
-  { id: "activate", label: "Go live", plain: "License & activate", tech: "GSI2 active + LICENSE#" },
-  { id: "poll", label: "Check weather", plain: "Watch each district", tech: "Per-cohort coordinates" },
+  { id: "activate", label: "Go live", plain: "License & activate", tech: "status=active + LICENSE#" },
+  { id: "poll", label: "Check weather", plain: "Watch each district", tech: "Per-cohort lat/lon" },
   { id: "nudge", label: "Send reminders", plain: "WhatsApp nudges", tech: "Step Functions → WhatsApp" },
   { id: "stream", label: "Collect replies", plain: "Roll up responses", tech: "OutcomesAggregator λ" },
   { id: "dashboard", label: "See results", plain: "Follow-through rate", tech: "SUMMARY# read" },
@@ -169,7 +169,7 @@ export function AdvisoryLoopHero() {
 
 export function LineageBadge() {
   return (
-    <span className="lineage-badge" title="Counters updated by OutcomesAggregator Lambda via DynamoDB Streams">
+    <span className="lineage-badge" title="Counters updated by the platform's OutcomesAggregator Lambda from DynamoDB Streams (NUDGE# → SUMMARY#)">
       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>

@@ -243,7 +243,7 @@ export default function CohortDetailPage({
       ? "This cohort's license has expired. Renew it to resume sending reminders."
       : !hasOutcomes
       ? `Active. Reminders go out automatically when the weather is right for ${cropLabel}.`
-      : `${totalNudgesSent} reminder${totalNudgesSent === 1 ? "" : "s"} sent to ${farmersReached} farmer${farmersReached === 1 ? "" : "s"}. ${totalNudgesCompleted} confirmed they acted — a ${Math.round(overallResponseRate * 100)}% follow-through rate.`;
+      : `${totalNudgesSent} reminder${totalNudgesSent === 1 ? "" : "s"} sent to ${farmersReached} farmer${farmersReached === 1 ? "" : "s"}. ${totalNudgesCompleted} confirmed they acted, a ${Math.round(overallResponseRate * 100)}% response rate.`;
 
   return (
     <div className="py-10 px-8">
@@ -435,6 +435,10 @@ export default function CohortDetailPage({
                     </span>
                   </div>
                 </div>
+                <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
+                  Done = farmer confirmed they acted · Pending = reminder sent, awaiting reply ·
+                  Expired = no reply before the window closed
+                </p>
               </div>
               {/* Big number */}
               <div
@@ -556,10 +560,10 @@ export default function CohortDetailPage({
                 <thead>
                   <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <th className="text-left py-3 px-4 text-label font-medium">Farmer</th>
-                    <th className="text-center py-3 px-4 text-label font-medium">Nudges</th>
-                    <th className="text-center py-3 px-4 text-label font-medium">Completed</th>
-                    <th className="text-center py-3 px-4 text-label font-medium">Expired</th>
-                    <th className="text-right py-3 px-4 text-label font-medium">Response Rate</th>
+                    <th className="text-center py-3 px-4 text-label font-medium">Reminders</th>
+                    <th className="text-center py-3 px-4 text-label font-medium">Acted</th>
+                    <th className="text-center py-3 px-4 text-label font-medium">No reply</th>
+                    <th className="text-right py-3 px-4 text-label font-medium">Response rate</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -581,18 +585,19 @@ export default function CohortDetailPage({
       {/* Cohort Details */}
       <section>
         <Card>
-          <h2 className="text-card-title mb-6">Cohort Configuration</h2>
-          <dl className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <h2 className="text-card-title mb-1">Cohort details</h2>
+          <p className="text-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
+            Reference information for this district advisory.
+          </p>
+          <dl className="grid grid-cols-2 md:grid-cols-3 gap-6">
             <div>
-              <dt className="text-label">Cohort ID</dt>
-              <dd className="mt-1 font-mono text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                {cohort.cohortId.slice(0, 8)}…
-              </dd>
-            </div>
-            <div>
-              <dt className="text-label">Location</dt>
-              <dd className="mt-1 text-sm">
-                {cohort.lat?.toFixed(2)}°N, {cohort.lon?.toFixed(2)}°E
+              <dt className="text-label">Reference ID</dt>
+              <dd
+                className="mt-1 font-mono text-sm"
+                style={{ color: "var(--color-text-secondary)" }}
+                title={cohort.cohortId}
+              >
+                {cohort.cohortId.slice(0, 12)}…
               </dd>
             </div>
             <div>
