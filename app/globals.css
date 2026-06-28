@@ -588,6 +588,8 @@ body {
 @media (min-width: 1000px) { .flow-grid { grid-template-columns: repeat(6, 1fr); } }
 .hiw-2col { display: grid; grid-template-columns: 1fr; }
 @media (min-width: 760px) { .hiw-2col { grid-template-columns: minmax(376px, 0.9fr) 1.1fr; } }
+.arch-seq { grid-template-columns: 1fr; }
+@media (min-width: 720px) { .arch-seq { grid-template-columns: 1fr 1fr; } }
 
 .hiw-phone {
   width: 188px;
