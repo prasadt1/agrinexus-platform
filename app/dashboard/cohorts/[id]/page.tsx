@@ -243,7 +243,7 @@ export default function CohortDetailPage({
       ? "This cohort's license has expired. Renew it to resume sending reminders."
       : !hasOutcomes
       ? `Active. Reminders go out automatically when the weather is right for ${cropLabel}.`
-      : `${totalNudgesSent} reminder${totalNudgesSent === 1 ? "" : "s"} sent to ${farmersReached} farmer${farmersReached === 1 ? "" : "s"}. ${totalNudgesCompleted} confirmed they acted, a ${Math.round(overallResponseRate * 100)}% response rate.`;
+      : `${totalNudgesSent} reminder${totalNudgesSent === 1 ? "" : "s"} sent to ${farmersReached} farmer${farmersReached === 1 ? "" : "s"}. ${totalNudgesCompleted} confirmed they acted, a ${Math.round(overallResponseRate * 100)}% follow-through.`;
 
   return (
     <div className="py-10 px-8">
@@ -344,7 +344,7 @@ export default function CohortDetailPage({
       {/* KPI Cards - Always show, with zeros when no data */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <KPICard
-          label="Farmers Reached"
+          label="Farmers reached"
           term="farmers reached"
           value={farmersReached}
           format="number"
@@ -358,8 +358,8 @@ export default function CohortDetailPage({
           empty={!hasOutcomes}
         />
         <KPICard
-          label="Response Rate"
-          term="response rate"
+          label="Follow-through"
+          term="follow-through"
           value={overallResponseRate}
           format="percent"
           highlight
@@ -367,11 +367,11 @@ export default function CohortDetailPage({
         />
       </section>
 
-      {/* Response Breakdown Chart */}
+      {/* Follow-through breakdown Chart */}
       <section className="mb-8">
         <Card>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-card-title">Response Breakdown</h2>
+            <h2 className="text-card-title">Follow-through breakdown</h2>
             <LineageBadge />
           </div>
           {hasOutcomes ? (
@@ -453,7 +453,7 @@ export default function CohortDetailPage({
                   {Math.round(overallResponseRate * 100)}%
                 </p>
                 <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  Response Rate
+                  Follow-through
                 </p>
               </div>
             </div>
@@ -474,7 +474,7 @@ export default function CohortDetailPage({
       {hasOutcomes && summaries.length > 1 && (
         <section className="mb-8">
           <Card>
-            <h2 className="text-card-title mb-6">Response Rate Over Time</h2>
+            <h2 className="text-card-title mb-6">Follow-through over time</h2>
             <ResponseTrendChart summaries={summaries} />
           </Card>
         </section>
@@ -564,10 +564,8 @@ export default function CohortDetailPage({
                 <thead>
                   <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <th className="text-left py-3 px-4 text-label font-medium">Farmer</th>
-                    <th className="text-center py-3 px-4 text-label font-medium">Reminders</th>
-                    <th className="text-center py-3 px-4 text-label font-medium">Acted</th>
-                    <th className="text-center py-3 px-4 text-label font-medium">No reply</th>
-                    <th className="text-right py-3 px-4 text-label font-medium">Response rate</th>
+                    <th className="text-left py-3 px-4 text-label font-medium">Phone</th>
+                    <th className="text-left py-3 px-4 text-label font-medium">Enrolled</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -802,7 +800,7 @@ function AuditRow({ summary }: { summary: Summary }) {
           {Math.round(responseRate * 100)}%
         </p>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          response rate
+          follow-through
         </p>
       </div>
     </div>
@@ -814,28 +812,19 @@ function AuditRow({ summary }: { summary: Summary }) {
 // =============================================================================
 
 function MemberRow({ member }: { member: Member }) {
-  // Responsiveness indicator
-  const getResponsivenessColor = (rate: number) => {
-    if (rate >= 0.7) return "var(--color-success)";
-    if (rate >= 0.4) return "var(--color-warning)";
-    return "var(--color-text-muted)";
-  };
-
-  const getResponsivenessLabel = (rate: number) => {
-    if (rate >= 0.7) return "High";
-    if (rate >= 0.4) return "Medium";
-    if (rate > 0) return "Low";
-    return "No data";
-  };
-
-  // Format phone for display (mask middle digits)
-  const maskedPhone = member.phone.length > 6
-    ? `${member.phone.slice(0, 3)}***${member.phone.slice(-3)}`
-    : member.phone;
+  // Mask the middle digits for display.
+  const maskedPhone =
+    member.phone.length > 6
+      ? `${member.phone.slice(0, 3)}***${member.phone.slice(-3)}`
+      : member.phone;
 
   const initials = member.name
     ? member.name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase()
     : member.phone.slice(-2);
+
+  const enrolled = member.enrolledAt
+    ? new Date(member.enrolledAt).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+    : "—";
 
   return (
     <tr
@@ -846,55 +835,18 @@ function MemberRow({ member }: { member: Member }) {
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium"
-            style={{
-              background: "var(--color-primary-tint)",
-              color: "var(--color-primary)",
-            }}
+            style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
           >
             {initials}
           </div>
-          {member.name ? (
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{member.name}</span>
-              <span className="font-mono text-xs" style={{ color: "var(--color-text-muted)" }}>
-                {maskedPhone}
-              </span>
-            </div>
-          ) : (
-            <span className="font-mono text-sm">{maskedPhone}</span>
-          )}
+          <span className="text-sm font-medium">{member.name || "Farmer"}</span>
         </div>
       </td>
-      <td className="py-3 px-4 text-center">
-        <span style={{ color: "var(--color-text-secondary)" }}>
-          {member.nudgesSent}
-        </span>
+      <td className="py-3 px-4 font-mono text-sm" style={{ color: "var(--color-text-muted)" }}>
+        {maskedPhone}
       </td>
-      <td className="py-3 px-4 text-center">
-        <span style={{ color: "var(--color-success)" }}>
-          {member.nudgesCompleted}
-        </span>
-      </td>
-      <td className="py-3 px-4 text-center">
-        <span style={{ color: "var(--color-text-muted)" }}>
-          {member.nudgesExpired}
-        </span>
-      </td>
-      <td className="py-3 px-4 text-right">
-        <div className="flex items-center justify-end gap-2">
-          <span
-            className="text-xs px-2 py-0.5 rounded-full"
-            style={{
-              background: `${getResponsivenessColor(member.responseRate)}20`,
-              color: getResponsivenessColor(member.responseRate),
-            }}
-          >
-            {getResponsivenessLabel(member.responseRate)}
-          </span>
-          <span className="font-medium" style={{ color: getResponsivenessColor(member.responseRate) }}>
-            {member.nudgesSent > 0 ? `${Math.round(member.responseRate * 100)}%` : "—"}
-          </span>
-        </div>
+      <td className="py-3 px-4 text-sm" style={{ color: "var(--color-text-muted)" }}>
+        {enrolled}
       </td>
     </tr>
   );
