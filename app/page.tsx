@@ -1,270 +1,518 @@
 import Link from "next/link";
-import { AgriNexusWordmark } from "@/app/components/Logo";
 import { HowItWorks } from "@/app/components/HowItWorks";
-import { Term } from "@/app/components/Term";
+import { TryDemoButton } from "@/app/components/TryDemoButton";
+
+const WA_LINK =
+  "https://wa.me/4915120105731?text=Hi%20Outturn%2C%20show%20me%20the%20advisory%20demo";
+
+const C = {
+  cream: "#F6F2EA",
+  cream2: "#FBF8F2",
+  ink: "#1A1714",
+  muted: "#5A554C",
+  faint: "#8A8275",
+  green: "#157347",
+  greenD: "#0F5132",
+  greenTint: "#E9F1EB",
+  border: "#E6E0D4",
+  white: "#FFFFFF",
+  teal: "#0E7490",
+  amber: "#B54708",
+  dark: "#14110D",
+};
+
+const SERIF = "var(--font-serif), Georgia, 'Times New Roman', serif";
+
+function Leaf({ size = 18, color = "#fff" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 21V11" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M12 13C8.5 13 6.5 10.5 6.5 7c3.5 0 5.5 2 5.5 5.5z" fill={color} />
+      <path d="M12 11.5C15.5 11.5 17.5 9 17.5 5.5c-3.5 0-5.5 2-5.5 5.5z" fill={color} />
+    </svg>
+  );
+}
+
+function Check({ color }: { color: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ flexShrink: 0, marginTop: 2 }}>
+      <path d="M5 13l4 4L19 7" stroke={color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function Eyebrow({ children, onDark }: { children: React.ReactNode; onDark?: boolean }) {
+  return (
+    <p
+      style={{
+        fontSize: 12,
+        letterSpacing: "0.13em",
+        textTransform: "uppercase",
+        color: onDark ? "#6EE7A8" : C.green,
+        fontWeight: 500,
+        margin: 0,
+      }}
+    >
+      {children}
+    </p>
+  );
+}
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen">
+    <div style={{ background: C.cream, color: C.ink, fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
       {/* Nav */}
       <header
-        className="flex items-center justify-between px-8 py-5 border-b"
-        style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "18px 32px",
+          maxWidth: 1180,
+          margin: "0 auto",
+        }}
       >
-        <AgriNexusWordmark />
-        <div className="flex items-center gap-4">
-          <Link href="/judges" className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-            For hackathon judges
-          </Link>
-          <Link href="/login" className="btn btn-secondary">
-            Sign in
-          </Link>
-          <Link href="/login" className="btn btn-primary">
-            Try demo
-          </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 8,
+              background: C.green,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Leaf size={18} />
+          </span>
+          <span style={{ fontFamily: SERIF, fontSize: 21, color: C.ink, lineHeight: 1 }}>Outturn</span>
+          <span
+            style={{
+              fontSize: 11.5,
+              color: C.faint,
+              borderLeft: `1px solid ${C.border}`,
+              paddingLeft: 10,
+              marginLeft: 2,
+            }}
+          >
+            Advice, followed through
+          </span>
         </div>
+        <nav style={{ display: "flex", alignItems: "center", gap: 22, fontSize: 14, color: C.muted }}>
+          <a href="#how" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
+            How it works
+          </a>
+          <a href="#architecture" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
+            Architecture
+          </a>
+          <TryDemoButton
+            style={{
+              background: C.green,
+              color: C.white,
+              fontSize: 14,
+              fontWeight: 500,
+              padding: "9px 16px",
+              borderRadius: 9,
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Try the live demo
+          </TryDemoButton>
+        </nav>
       </header>
 
       {/* Hero */}
-      <section className="px-8 pt-24 pb-16 max-w-3xl mx-auto text-center">
-        <p className="text-label mb-5" style={{ color: "var(--color-primary)" }}>
-          WhatsApp advisory accountability for agriculture
-        </p>
-        <h1 className="text-display mb-5">
-          Send farmers the right advice at the right moment, and prove they acted on it.
-        </h1>
-        <p
-          className="text-lg md:text-xl max-w-2xl mx-auto mb-9"
-          style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}
-        >
-          Outturn Advisory is the control plane for WhatsApp farming advisory. When the weather is
-          right, it sends each farmer a <Term term="nudge">timely nudge</Term> in their own language
-          to spray, irrigate, or scout, then tracks who actually did it and rolls it up per district.
-          So the NGOs, agri-input firms, and government programs that fund the advice can measure{" "}
-          <Term term="follow-through">follow-through</Term>, not just delivery.
-        </p>
-        <div className="flex flex-wrap justify-center items-center gap-3">
-          <Link href="/login" className="btn btn-primary text-base px-6 py-3">
-            Open demo dashboard
-          </Link>
-          <a
-            href="https://wa.me/4915120105731?text=Hi%20Outturn%2C%20show%20me%20the%20advisory%20demo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-secondary text-base px-6 py-3 inline-flex items-center gap-2"
-            aria-label="Try the live advisory demo on WhatsApp"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true">
-              <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.16c-.24.68-1.42 1.32-1.95 1.36-.5.05-.96.24-3.23-.67-2.74-1.08-4.46-3.88-4.6-4.06-.13-.18-1.1-1.46-1.1-2.79 0-1.32.7-1.97.94-2.24a1 1 0 01.72-.34c.18 0 .36.01.51.01.17 0 .39-.06.6.46.24.56.81 1.94.88 2.08.07.14.12.31.02.49-.09.18-.14.29-.27.45-.14.16-.29.36-.41.48-.14.14-.28.29-.12.57.16.27.71 1.17 1.53 1.9 1.05.93 1.94 1.23 2.21 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.55.73 1.81.86.27.14.45.2.51.31.07.12.07.66-.17 1.34z" />
-            </svg>
-            Try it on WhatsApp
-          </a>
-        </div>
-        <p className="text-sm max-w-md mx-auto mt-7" style={{ color: "var(--color-text-muted)" }}>
-          &ldquo;Outturn&rdquo; is the trade term for the actual yield after processing. Here, it&apos;s
-          the actual result after advisory.
-        </p>
-      </section>
+      <section style={{ maxWidth: 1180, margin: "0 auto", padding: "40px 32px 64px" }}>
+        <div className="hero-grid">
+          <div>
+            <Eyebrow>Closed-loop farm advisory on WhatsApp</Eyebrow>
+            <h1
+              style={{
+                fontFamily: SERIF,
+                fontSize: "clamp(44px, 7vw, 68px)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.015em",
+                margin: "18px 0 20px",
+                fontWeight: 500,
+              }}
+            >
+              From advice to action.
+            </h1>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: C.muted, maxWidth: 480, margin: "0 0 28px" }}>
+              A closed-loop engine nudges each farmer until they act. Outturn gives partners eyes on
+              follow-through across every district, and the lever to act where it slips.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+              <TryDemoButton
+                style={{
+                  background: C.green,
+                  color: C.white,
+                  fontSize: 15,
+                  fontWeight: 500,
+                  padding: "12px 22px",
+                  borderRadius: 10,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Try the live demo
+              </TryDemoButton>
+              <a
+                href={WA_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: 15,
+                  fontWeight: 500,
+                  color: C.ink,
+                  textDecoration: "none",
+                  padding: "12px 18px",
+                  borderRadius: 10,
+                  border: `1px solid ${C.border}`,
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true">
+                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.16c-.24.68-1.42 1.32-1.95 1.36-.5.05-.96.24-3.23-.67-2.74-1.08-4.46-3.88-4.6-4.06-.13-.18-1.1-1.46-1.1-2.79 0-1.32.7-1.97.94-2.24a1 1 0 01.72-.34c.18 0 .36.01.51.01.17 0 .39-.06.6.46.24.56.81 1.94.88 2.08.07.14.12.31.02.49-.09.18-.14.29-.27.45-.14.16-.29.36-.41.48-.14.14-.28.29-.12.57.16.27.71 1.17 1.53 1.9 1.05.93 1.94 1.23 2.21 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.55.73 1.81.86.27.14.45.2.51.31.07.12.07.66-.17 1.34z" />
+                </svg>
+                See it on WhatsApp
+              </a>
+            </div>
+            <p style={{ fontSize: 12.5, color: C.faint, margin: "12px 0 0" }}>
+              Message our demo number and the engine replies like it would to a farmer: advice, then a
+              follow-up nudge.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 18, marginTop: 26, fontSize: 12.5, color: C.faint }}>
+              <span>Weather-timed</span>
+              <span>·</span>
+              <span>Tracked to done</span>
+              <span>·</span>
+              <span>Rolled up per district</span>
+            </div>
+          </div>
 
-      {/* The problem */}
-      <section className="px-8 py-16" style={{ background: "var(--color-page-bg)" }}>
-        <div className="max-w-4xl mx-auto">
-          <p className="text-label mb-2 text-center" style={{ color: "var(--color-primary)" }}>
-            The gap
-          </p>
-          <h2 className="text-section text-center mb-3">Advice without accountability</h2>
-          <p
-            className="text-center max-w-2xl mx-auto mb-10"
-            style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}
-          >
-            Extension programs send farmers good advice, when to spray, when to irrigate, when to
-            scout for pests. But once the message goes out, no one knows if it was acted on. The
-            people who fund these programs are judged on impact, yet the only thing most advisory
-            tools can show them is that a message was delivered.
-          </p>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="card">
-              <p className="text-label mb-2" style={{ color: "var(--color-text-muted)" }}>
-                What most tools show
+          {/* Product shot */}
+          <div style={{ position: "relative" }}>
+            <div style={{ background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: 20 }}>
+              <p
+                style={{
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: C.faint,
+                  margin: 0,
+                }}
+              >
+                Latur cotton cohort · this month
               </p>
-              <p className="text-card-title mb-1">Messages delivered</p>
-              <p style={{ color: "var(--color-text-secondary)" }}>
-                A broadcast count. It says the advice was sent, not whether a single farmer changed
-                what they did in the field.
-              </p>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8, margin: "12px 0 4px" }}>
+                <span style={{ fontFamily: SERIF, fontSize: 52, color: C.green, lineHeight: 1, fontWeight: 500 }}>67%</span>
+                <span style={{ fontSize: 14, color: C.muted }}>follow-through</span>
+              </div>
+              <div
+                style={{
+                  height: 12,
+                  borderRadius: 999,
+                  overflow: "hidden",
+                  display: "flex",
+                  background: "#F0EBE0",
+                  margin: "12px 0 10px",
+                }}
+              >
+                <div style={{ width: "67%", background: C.green }} />
+                <div style={{ width: "12%", background: C.teal }} />
+                <div style={{ width: "21%", background: C.amber }} />
+              </div>
+              <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>28 of 42 farmers acted</p>
+              <div style={{ marginTop: 16, display: "flex", gap: 10, alignItems: "center" }}>
+                <span style={{ background: C.green, color: C.white, fontSize: 13, padding: "8px 14px", borderRadius: 9 }}>
+                  Re-nudge cohort
+                </span>
+                <span style={{ fontSize: 13, color: C.faint }}>7 haven&apos;t acted</span>
+              </div>
             </div>
-            <div className="card" style={{ borderColor: "var(--color-primary)" }}>
-              <p className="text-label mb-2" style={{ color: "var(--color-primary)" }}>
-                What actually matters
-              </p>
-              <p className="text-card-title mb-1">Farmers who acted</p>
-              <p style={{ color: "var(--color-text-secondary)" }}>
-                Confirmed follow-through, per village and per district, so a partner can prove real
-                outcomes and find where to help.
-              </p>
-            </div>
+            <span
+              style={{
+                position: "absolute",
+                top: -12,
+                right: -8,
+                background: C.green,
+                color: C.white,
+                fontSize: 13,
+                fontWeight: 500,
+                padding: "6px 13px",
+                borderRadius: 999,
+              }}
+            >
+              +9% this month
+            </span>
           </div>
         </div>
       </section>
 
-      {/* How the loop works */}
-      <section className="px-8 py-16 max-w-4xl mx-auto">
-        <div className="text-center mb-6">
-          <p className="text-label mb-2" style={{ color: "var(--color-primary)" }}>
-            How it works
+      {/* How it works */}
+      <section id="how" style={{ background: C.cream2, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "56px 32px" }}>
+          <Eyebrow>How it works</Eyebrow>
+          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 6px", fontWeight: 500 }}>
+            See the loop run, end to end.
+          </h2>
+          <p style={{ fontSize: 16, color: C.muted, maxWidth: 620, margin: "0 0 28px", lineHeight: 1.6 }}>
+            A nudge is one timely WhatsApp message telling a farmer to act now, in their own language.
+            Outturn watches each district&apos;s weather, sends only when conditions are right, and follows
+            up until the farmer confirms or the window closes. Tap a step or watch it play.
           </p>
-          <h2 className="text-section">The closed advisory loop</h2>
-          <p
-            className="mt-2 max-w-2xl mx-auto"
-            style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}
-          >
-            A <Term term="nudge">nudge</Term> is one timely WhatsApp message telling a farmer to act
-            now. Timing is the point: a spray window is open for hours, not days. Outturn watches each
-            district&apos;s weather and only sends when conditions are right, then follows up until the
-            farmer confirms or the window closes. Tap a step or watch it play.
-          </p>
+          <HowItWorks />
         </div>
-        <HowItWorks />
       </section>
 
-      {/* Why track who acted */}
-      <section className="px-8 py-16" style={{ background: "var(--color-page-bg)" }}>
-        <div className="max-w-4xl mx-auto">
-          <p className="text-label mb-2 text-center" style={{ color: "var(--color-primary)" }}>
-            Why it matters
-          </p>
-          <h2 className="text-section text-center mb-3">Every reply becomes proof</h2>
-          <p
-            className="text-center max-w-2xl mx-auto mb-10"
-            style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}
-          >
-            When a farmer replies &ldquo;done,&rdquo; the loop closes and the reminders stop. When a
-            cohort goes quiet, that silence is a signal. This is the accountability engine: the same
-            reusable loop of trigger, send, confirm, remind, detect, and measure, no matter the crop
-            or the advice.
-          </p>
-          <div className="grid md:grid-cols-3 gap-6">
+      {/* Differentiator */}
+      <section style={{ maxWidth: 1180, margin: "0 auto", padding: "60px 32px" }}>
+        <Eyebrow>The differentiator</Eyebrow>
+        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 26px", fontWeight: 500 }}>
+          Where farm advisors stop, the loop begins.
+        </h2>
+        <div className="diff-grid">
+          <div style={{ background: C.cream2, border: `1px solid ${C.border}`, borderRadius: 14, padding: 22 }}>
+            <p style={{ fontSize: 11.5, letterSpacing: "0.06em", textTransform: "uppercase", color: C.faint, margin: "0 0 14px" }}>
+              Table stakes · every advisor does this
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 13, fontSize: 15, color: C.muted }}>
+              <span style={{ display: "flex", gap: 9 }}><Check color="#B6AE9E" />WhatsApp-native advice</span>
+              <span style={{ display: "flex", gap: 9 }}><Check color="#B6AE9E" />Local languages</span>
+              <span style={{ display: "flex", gap: 9 }}><Check color="#B6AE9E" />Photo and voice diagnosis</span>
+            </div>
+          </div>
+          <div style={{ background: C.white, border: `2px solid ${C.green}`, borderRadius: 14, padding: 22 }}>
+            <p style={{ fontSize: 11.5, letterSpacing: "0.06em", textTransform: "uppercase", color: C.green, margin: "0 0 14px" }}>
+              The closed loop · only Outturn
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 13, fontSize: 15, color: C.ink }}>
+              <span style={{ display: "flex", gap: 9 }}><Check color={C.green} />Weather-gated nudges, fired at the right moment</span>
+              <span style={{ display: "flex", gap: 9 }}><Check color={C.green} />Tracks whether the farmer actually acted</span>
+              <span style={{ display: "flex", gap: 9 }}><Check color={C.green} />Reminders cancel the moment they confirm done</span>
+              <span style={{ display: "flex", gap: 9 }}><Check color={C.green} />Follow-through rolled up per district</span>
+              <span style={{ display: "flex", gap: 9 }}><Check color={C.green} />A control plane for partners to act on it</span>
+            </div>
+          </div>
+        </div>
+        <p style={{ fontSize: 13, color: C.faint, marginTop: 18 }}>
+          Peers like Farmer.Chat, iSDA, and AgriChat deliver the advice. None we found documents the
+          closed loop.
+        </p>
+      </section>
+
+      {/* How partners run it */}
+      <section style={{ background: C.cream2, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "56px 32px" }}>
+          <Eyebrow>For partners</Eyebrow>
+          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 28px", fontWeight: 500 }}>
+            Provision, license, monitor, act.
+          </h2>
+          <div className="steps-grid">
             {[
-              {
-                title: "Capture every reply",
-                body: "Each farmer confirmation is recorded with consent, in the language they replied in.",
-              },
-              {
-                title: "Roll it up per district",
-                body: (
-                  <>
-                    Replies are <Term term="aggregate">aggregated</Term> into a follow-through rate
-                    you can act on, not a list of receipts.
-                  </>
-                ),
-              },
-              {
-                title: "Act where it slips",
-                body: "Cohorts that go quiet surface automatically, so field teams know exactly where to go.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="card">
-                <h3 className="text-card-title mb-2">{item.title}</h3>
-                <p style={{ color: "var(--color-text-secondary)" }}>{item.body}</p>
+              ["1", "Provision a cohort", "A district’s farmers with their crops and languages. The engine starts watching that area’s weather."],
+              ["2", "License it", "Activate per cohort on a Starter, Growth, or Enterprise plan. Checkout runs through Stripe."],
+              ["3", "Monitor follow-through", "Watch confirmed action per cohort and per district, not message-delivery receipts."],
+              ["4", "Act where it slips", "Re-nudge the farmers who haven’t acted, manually or on an automated schedule."],
+            ].map(([n, title, body]) => (
+              <div key={n}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    width: 30,
+                    height: 30,
+                    borderRadius: 999,
+                    background: C.greenTint,
+                    color: C.green,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    marginBottom: 12,
+                  }}
+                >
+                  {n}
+                </span>
+                <h3 style={{ fontFamily: SERIF, fontSize: 19, margin: "0 0 6px", fontWeight: 500 }}>{title}</h3>
+                <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.55, margin: 0 }}>{body}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Who it's for */}
-      <section className="px-8 py-16 max-w-5xl mx-auto">
-        <h2 className="text-section text-center mb-2">Built for the people who fund advice</h2>
-        <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: "var(--color-text-secondary)" }}>
-          NGOs, agri-input companies, and government extension programmes such as India&apos;s{" "}
-          <a
-            href="https://en.wikipedia.org/wiki/Krishi_Vigyan_Kendra"
-            className="underline"
-            style={{ color: "var(--color-primary)" }}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Krishi Vigyan Kendras
-          </a>
-          , the district farm-science centres.
+      {/* Why it matters — dark punctuation */}
+      <section style={{ background: C.dark }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "62px 32px" }}>
+          <Eyebrow onDark>Why it matters</Eyebrow>
+          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 42px)", lineHeight: 1.1, margin: "12px 0 10px", fontWeight: 500, color: C.cream }}>
+            Information isn&apos;t the gap. Follow-through is.
+          </h2>
+          <p style={{ fontSize: 16, color: "#B7AE9E", maxWidth: 640, margin: "0 0 36px", lineHeight: 1.6 }}>
+            Farmers know their crops. The right moment passes while competing demands stack up, and a
+            spray tip that lands after the wind picks up behaves like no advice at all.
+          </p>
+          <div className="stats-grid">
+            {[
+              ["~126M", "smallholder and marginal farmers in India, 86% of all holdings.", "Agriculture Census 2015-16"],
+              ["up to 40%", "of global crop production lost to pests and diseases each year.", "FAO"],
+              ["~1:5,000", "farmers per extension worker in some contexts, vs a norm nearer 1:750.", "Bharat-VISTAAR"],
+            ].map(([big, body, src]) => (
+              <div key={big} style={{ borderTop: `1px solid rgba(255,255,255,0.14)`, paddingTop: 16 }}>
+                <p style={{ fontFamily: SERIF, fontSize: 38, color: "#6EE7A8", margin: "0 0 8px", fontWeight: 500 }}>{big}</p>
+                <p style={{ fontSize: 14.5, color: C.cream, lineHeight: 1.5, margin: "0 0 6px" }}>{body}</p>
+                <p style={{ fontSize: 12, color: "#8A8275", margin: 0 }}>{src}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Architecture */}
+      <section id="architecture" style={{ maxWidth: 1180, margin: "0 auto", padding: "62px 32px" }}>
+        <Eyebrow>How it&apos;s built</Eyebrow>
+        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 8px", fontWeight: 500 }}>
+          Three planes, one DynamoDB table.
+        </h2>
+        <p style={{ fontSize: 16, color: C.muted, maxWidth: 640, margin: "0 0 28px", lineHeight: 1.6 }}>
+          A multi-tenant control plane built over an award-winning delivery engine, with an
+          event-driven analytics path. Not a dashboard bolted onto a database.
         </p>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="arch-grid">
           {[
-            {
-              title: "Set up in minutes",
-              body: (
-                <>
-                  Create a <Term term="cohort">cohort</Term>, a district&apos;s farmers with their crops
-                  and languages, and the engine starts watching that area&apos;s weather.
-                </>
-              ),
-            },
-            {
-              title: "Measure outcomes, not sends",
-              body: (
-                <>
-                  See <Term term="follow-through">follow-through</Term>, not just delivery. Replies are
-                  rolled up per village into a number you can act on.
-                </>
-              ),
-            },
-            {
-              title: "Fund what works",
-              body: "Compare districts side by side, double down on the cohorts that respond, and show funders real impact.",
-            },
-          ].map((item) => (
-            <div key={item.title} className="card">
-              <h3 className="text-card-title mb-3">{item.title}</h3>
-              <p style={{ color: "var(--color-text-secondary)" }}>{item.body}</p>
+            ["Delivery engine", "The award-winning WhatsApp engine", ["Weather poller, per district", "Step Functions nudge workflow", "WhatsApp Business API"]],
+            ["Control plane", "Next.js on Vercel", ["Provisioning + Stripe licensing", "Dashboard + analytics", "Manual + scheduled re-nudge"]],
+            ["Data + analytics", "Amazon DynamoDB", ["Single-table, multi-tenant", "Streams to OutcomesAggregator", "Materialized SUMMARY# reads"]],
+          ].map(([plane, sub, items]) => (
+            <div key={plane as string} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: 22 }}>
+              <h3 style={{ fontFamily: SERIF, fontSize: 20, margin: "0 0 2px", fontWeight: 500 }}>{plane}</h3>
+              <p style={{ fontSize: 12.5, color: C.green, margin: "0 0 14px" }}>{sub}</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                {(items as string[]).map((it) => (
+                  <span key={it} style={{ display: "flex", gap: 8, fontSize: 13.5, color: C.muted }}>
+                    <Check color={C.green} />
+                    {it}
+                  </span>
+                ))}
+              </div>
             </div>
           ))}
         </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 20 }}>
+          {["Amazon DynamoDB", "AWS Lambda", "AWS Step Functions", "Amazon EventBridge", "AWS Secrets Manager", "Vercel OIDC", "WhatsApp Business API"].map((s) => (
+            <span
+              key={s}
+              style={{
+                fontSize: 12.5,
+                color: C.greenD,
+                background: C.greenTint,
+                border: `1px solid rgba(21,115,71,0.2)`,
+                padding: "5px 11px",
+                borderRadius: 8,
+              }}
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+        <p style={{ fontSize: 13, color: C.faint, marginTop: 16, maxWidth: 720, lineHeight: 1.5 }}>
+          One table is the source of truth. The control plane activates the engine and reads
+          pre-computed outcomes, and Vercel reaches AWS keyless via OIDC, no static credentials.
+        </p>
       </section>
 
-      {/* Data + credibility */}
-      <section className="px-8 py-16" style={{ background: "var(--color-page-bg)" }}>
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-10 items-start">
-          <div>
-            <h2 className="text-section mb-3">What we collect, and why</h2>
-            <p style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
-              Outturn records who was nudged, when, on what advice, and whether they confirmed,
-              always with the farmer&apos;s consent and isolated per partner. That record is the only
-              way to turn advice into a measurable outcome instead of a hopeful broadcast.
-            </p>
-          </div>
-          <div>
-            <h2 className="text-section mb-3">Production-grade, not a prototype</h2>
-            <p style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
-              Outturn is the control plane; the delivery engine is{" "}
-              <span style={{ color: "var(--color-text-primary)", fontWeight: 600 }}>AgriNexus AI</span>,
-              an AWS AIdeas award winner running in production at about $0.54 per farmer per year, on
-              Amazon DynamoDB and Vercel.
-            </p>
+      {/* Roadmap */}
+      <section style={{ background: C.cream2, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "40px 32px", display: "flex", flexWrap: "wrap", gap: 18, alignItems: "center" }}>
+          <Eyebrow>What&apos;s next</Eyebrow>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {["Gamification + scorecards", "Mandi price alerts", "Adverse-weather prep", "Partner integrations"].map((r) => (
+              <span key={r} style={{ fontSize: 13.5, color: C.muted, background: C.white, border: `1px solid ${C.border}`, padding: "6px 12px", borderRadius: 999 }}>
+                {r}
+              </span>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="px-8 py-16 max-w-3xl mx-auto text-center">
-        <h2 className="text-section mb-3">See the loop run on live data</h2>
-        <p className="mb-8" style={{ color: "var(--color-text-secondary)" }}>
-          Open the demo dashboard, switch between partner organisations, and run a full advisory cycle
-          yourself.
-        </p>
-        <Link href="/login" className="btn btn-primary text-base px-6 py-3">
-          Open demo dashboard
-        </Link>
+      {/* Final CTA */}
+      <section style={{ maxWidth: 760, margin: "0 auto", padding: "72px 32px", textAlign: "center" }}>
+        <Eyebrow>See it live</Eyebrow>
+        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(30px, 5vw, 48px)", lineHeight: 1.08, margin: "14px 0 26px", fontWeight: 500 }}>
+          From advice to action, on live data.
+        </h2>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
+          <TryDemoButton
+            style={{
+              background: C.green,
+              color: C.white,
+              fontSize: 15,
+              fontWeight: 500,
+              padding: "12px 24px",
+              borderRadius: 10,
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Try the live demo
+          </TryDemoButton>
+          <a
+            href={WA_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: 15,
+              fontWeight: 500,
+              color: C.ink,
+              textDecoration: "none",
+              padding: "12px 20px",
+              borderRadius: 10,
+              border: `1px solid ${C.border}`,
+            }}
+          >
+            See it on WhatsApp
+          </a>
+        </div>
       </section>
 
-      <footer
-        className="px-8 py-8 text-center text-sm border-t"
-        style={{ color: "var(--color-text-muted)", borderColor: "var(--color-border)" }}
-      >
-        Outturn Advisory · Powered by AgriNexus AI · AWS AIdeas award winner ·{" "}
-        <Link href="/judges" className="underline">
-          For hackathon judges
-        </Link>{" "}
-        · Built on Amazon DynamoDB + Vercel
+      {/* Footer */}
+      <footer style={{ borderTop: `1px solid ${C.border}` }}>
+        <div
+          style={{
+            maxWidth: 1180,
+            margin: "0 auto",
+            padding: "26px 32px",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 14,
+            alignItems: "center",
+            justifyContent: "space-between",
+            fontSize: 13,
+            color: C.faint,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+            <span style={{ width: 24, height: 24, borderRadius: 7, background: C.green, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Leaf size={15} />
+            </span>
+            <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink }}>Outturn</span>
+            <span>Advice, followed through</span>
+          </div>
+          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+            <Link href="/judges" style={{ color: C.faint, textDecoration: "none" }}>
+              Technical write-up
+            </Link>
+            <span>Built on the AgriNexus AI engine · Amazon DynamoDB + Vercel</span>
+          </div>
+        </div>
       </footer>
     </div>
   );

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
 import { AuthProvider } from "@/lib/context/AuthProvider";
 import { ToastProvider } from "@/app/components/Toast";
 import "./globals.css";
@@ -10,14 +10,21 @@ const inter = Inter({
   display: "swap",
 });
 
+const fraunces = Fraunces({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://outturn.vercel.app"),
-  title: "Outturn Advisory — Agricultural Accountability Engine",
+  title: "Outturn — Advice, followed through",
   description:
-    "Outturn Advisory is the accountability layer for farmer advisory programs: it sends weather-timed WhatsApp reminders, tracks which farmers actually acted, and shows funders the real follow-through per district. Powered by AgriNexus AI.",
+    "Outturn is the accountability control plane for closed-loop farm advisory. A WhatsApp engine nudges each farmer until they act; Outturn shows partners follow-through per district and the lever to act where it slips.",
   openGraph: {
-    title: "Outturn Advisory",
-    description: "Send the advice. Prove it was acted on.",
+    title: "Outturn — Advice, followed through",
+    description: "Closed-loop farm advisory: from advice to action.",
     type: "website",
   },
 };
@@ -28,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html lang="en" className={`${inter.variable} ${fraunces.variable} h-full`}>
       <body className="min-h-full">
         <AuthProvider>
           <ToastProvider>{children}</ToastProvider>
