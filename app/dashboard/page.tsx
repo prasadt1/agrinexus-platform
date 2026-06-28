@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Card, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, DistrictThumb, MaharashtraMap } from "@/app/components";
+import { Card, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, DistrictThumb, MaharashtraMap, DashboardTour } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { attentionFor } from "@/lib/attention";
 
@@ -89,7 +89,7 @@ export default function OverviewPage() {
 
       {/* Header with Tenant Identity */}
       <header className="mb-8">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-page-title">Overview</h1>
             <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
@@ -97,20 +97,23 @@ export default function OverviewPage() {
               <Term term="cohort">cohorts</Term>
             </p>
           </div>
-          {tenant && (
-            <div
-              className="text-right px-4 py-3 rounded-lg"
-              style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
-            >
-              <p className="text-label">Viewing as</p>
-              <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                {tenant.name || tenantName}
-              </p>
-              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                {tenant.plan} plan
-              </p>
-            </div>
-          )}
+          <div className="flex flex-col items-end gap-3 shrink-0">
+            <DashboardTour cohortCount={cohorts.length} loading={loading} />
+            {tenant && (
+              <div
+                className="text-right px-4 py-3 rounded-lg"
+                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+              >
+                <p className="text-label">Viewing as</p>
+                <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                  {tenant.name || tenantName}
+                </p>
+                <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                  {tenant.plan} plan
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -187,7 +190,7 @@ export default function OverviewPage() {
       )}
 
       {/* Primary KPI Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <section data-tour="kpi" className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <KPICard
           label="Farmers enrolled"
           term="farmers enrolled"
@@ -319,7 +322,7 @@ export default function OverviewPage() {
 
       {/* Needs attention — a loud, act-now call to action */}
       {attentionCohorts.length > 0 && (
-        <section className="mb-8">
+        <section data-tour="attention" className="mb-8">
           <div
             className="rounded-xl p-6"
             style={{
@@ -431,7 +434,7 @@ export default function OverviewPage() {
         </div>
 
         {/* Cohorts — ranked, the single source for "which cohorts" */}
-        <div className="lg:col-span-2">
+        <div data-tour="cohorts" className="lg:col-span-2">
           <Card>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-card-title">Your cohorts</h2>

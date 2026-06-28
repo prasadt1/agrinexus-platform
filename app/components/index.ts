@@ -15,3 +15,5 @@ export { LanguagePills } from "./LanguagePills";
 export { MaharashtraMap } from "./MaharashtraMap";
 export { PartnerLeadForm } from "./PartnerLeadForm";
 export { DistrictThumb } from "./DistrictThumb";
+export { DashboardTour } from "./DashboardTour";
+export { CohortTour } from "./CohortTour";

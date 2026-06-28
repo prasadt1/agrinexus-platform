@@ -91,9 +91,11 @@ export function AdvisoryLoopHero({ onHowItWorks }: { onHowItWorks?: () => void }
               </button>
             )}
             {isAdmin && (
-              <Button onClick={runCycle} disabled={running}>
-                {running ? "Running cycle…" : "Run advisory cycle"}
-              </Button>
+              <span data-tour="run-cycle">
+                <Button onClick={runCycle} disabled={running}>
+                  {running ? "Running cycle…" : "Run advisory cycle"}
+                </Button>
+              </span>
             )}
           </div>
         </div>

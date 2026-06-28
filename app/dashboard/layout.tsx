@@ -114,6 +114,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    data-tour={`nav-${item.icon}`}
                     className={`sidebar-nav-item ${isActive ? "sidebar-nav-item-active" : ""}`}
                   >
                     <NavIcon name={item.icon} />

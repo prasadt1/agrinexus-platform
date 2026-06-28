@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { Card, Badge, Button, EmptyState, LineageBadge, toast, CropIcon, LanguagePills, MaharashtraMap } from "@/app/components";
+import { Card, Badge, Button, EmptyState, LineageBadge, toast, CropIcon, LanguagePills, MaharashtraMap, CohortTour } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { parseFarmerLines } from "@/lib/parse-farmers";
 import { attentionFor } from "@/lib/attention";
@@ -264,16 +264,19 @@ export default function CohortDetailPage({
             <li style={{ color: "var(--color-text-secondary)" }}>{cohort.district}</li>
           </ol>
         </nav>
-        <div className="text-right shrink-0">
-          <p className="text-label">Partner</p>
-          <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>
-            {tenantName || "Partner"}
-          </p>
-          {license && (
-            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-              {license.plan} plan
+        <div className="flex items-center gap-4 shrink-0">
+          <CohortTour />
+          <div className="text-right">
+            <p className="text-label">Partner</p>
+            <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>
+              {tenantName || "Partner"}
             </p>
-          )}
+            {license && (
+              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                {license.plan} plan
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -316,6 +319,7 @@ export default function CohortDetailPage({
       {isAdmin && cohort.status === "active" && (
         attention.needsAttention ? (
           <div
+            data-tour="cohort-renudge"
             className="mb-8 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             style={{ background: "var(--color-warning-bg)", border: "1px solid rgba(181,71,8,0.25)" }}
           >
@@ -333,7 +337,7 @@ export default function CohortDetailPage({
             </Button>
           </div>
         ) : (
-          <div className="mb-8 flex justify-end">
+          <div data-tour="cohort-renudge" className="mb-8 flex justify-end">
             <Button variant="secondary" onClick={handleRenudge} disabled={renudging}>
               {renudging ? "Sending…" : "Re-nudge cohort"}
             </Button>
@@ -368,7 +372,7 @@ export default function CohortDetailPage({
       </section>
 
       {/* Follow-through breakdown Chart */}
-      <section className="mb-8">
+      <section data-tour="cohort-followthrough" className="mb-8">
         <Card>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-card-title">Follow-through breakdown</h2>
@@ -504,7 +508,7 @@ export default function CohortDetailPage({
       </section>
 
       {/* Farmers Section */}
-      <section className="mb-8">
+      <section data-tour="cohort-roster" className="mb-8">
         <Card>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-card-title">Enrolled Farmers</h2>
