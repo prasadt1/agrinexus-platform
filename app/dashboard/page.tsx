@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Card, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, DistrictThumb, MaharashtraMap, DashboardTour } from "@/app/components";
+import { Card, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, DistrictThumb, MaharashtraMap, DashboardTour, OnboardingWelcome } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { attentionFor } from "@/lib/attention";
 
@@ -82,6 +82,41 @@ export default function OverviewPage() {
     .filter((x) => x.flag.needsAttention);
   const activeDistricts = Array.from(new Set(activeCohorts.map((c) => c.district)));
   const listCohorts = (topCohorts.length > 0 ? topCohorts : activeCohorts).slice(0, 6);
+
+  // Just-signed-up partner: empty workspace → onboarding welcome + plan selector
+  // instead of a dashboard full of zeros.
+  if (!loading && cohorts.length === 0) {
+    return (
+      <div className="py-10 px-8">
+        <header className="mb-8">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-page-title">Overview</h1>
+              <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
+                Your workspace is ready — set up your first cohort to begin.
+              </p>
+            </div>
+            <div className="flex flex-col items-end gap-3 shrink-0">
+              <DashboardTour cohortCount={0} loading={loading} />
+              <div
+                className="text-right px-4 py-3 rounded-lg"
+                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+              >
+                <p className="text-label">Viewing as</p>
+                <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                  {tenant?.name || tenantName}
+                </p>
+                <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                  No plan yet
+                </p>
+              </div>
+            </div>
+          </div>
+        </header>
+        <OnboardingWelcome orgName={tenant?.name || tenantName} />
+      </div>
+    );
+  }
 
   return (
     <div className="py-10 px-8">

@@ -57,6 +57,17 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     email: 'admin@kvk.demo',
     description: 'Government extension program',
   },
+  {
+    id: 'sunrise-admin',
+    label: 'Sunrise Growers (new partner)',
+    tenantId: 'demo-tenant-004',
+    tenantName: 'Sunrise Growers',
+    tenantType: 'agri-input',
+    plan: 'growth',
+    role: 'admin',
+    email: 'admin@sunrise.demo',
+    description: 'Just signed up — empty workspace, pick a plan',
+  },
 ];
 
 /**
@@ -75,6 +86,7 @@ export const DEMO_TENANTS: DemoTenant[] = [
   { tenantId: 'demo-tenant-001', name: 'GreenHarvest NGO', brandColor: '#157347' },
   { tenantId: 'demo-tenant-002', name: 'AgriInput Corp', brandColor: '#1D4ED8' },
   { tenantId: 'demo-tenant-003', name: 'Maharashtra KVK Network', brandColor: '#7C3AED' },
+  { tenantId: 'demo-tenant-004', name: 'Sunrise Growers', brandColor: '#B54708' },
 ];
 
 const DEFAULT_BRAND_COLOR = '#157347';

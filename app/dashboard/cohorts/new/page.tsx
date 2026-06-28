@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Card, PageHeader, toast } from "@/app/components";
@@ -42,7 +42,19 @@ export default function NewCohortPage() {
   const [selectedLangs, setSelectedLangs] = useState<string[]>(["hi"]);
   const [nudgeRules, setNudgeRules] = useState(DEFAULT_NUDGE);
   const [plan, setPlan] = useState<PlanTier>("growth");
+  const [checkoutIntent, setCheckoutIntent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Came from the onboarding plan selector? Preselect the plan + jump to checkout.
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const p = sp.get("plan");
+    if (p === "starter" || p === "growth" || p === "enterprise") setPlan(p);
+    if (sp.get("checkout") === "1") {
+      setCheckoutIntent(true);
+      setStep(3);
+    }
+  }, []);
 
   if (!isAdmin) {
     return (
@@ -60,7 +72,7 @@ export default function NewCohortPage() {
     );
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(mode: "draft" | "checkout") {
     setSubmitting(true);
     try {
       const res = await fetch("/api/cohorts", {
@@ -74,12 +86,32 @@ export default function NewCohortPage() {
         }),
       });
       const data = await res.json();
-      if (res.ok) {
-        toast(`Cohort created for ${district}`, "success");
-        router.push(`/dashboard/cohorts/${data.cohortId}`);
-      } else {
+      if (!res.ok) {
         toast(data.error || "Failed to create cohort", "error");
+        return;
       }
+      const newId = data.cohortId;
+
+      if (mode === "checkout") {
+        // Take them straight to Stripe Checkout for the chosen plan.
+        const act = await fetch(`/api/cohorts/${newId}/activate`, {
+          method: "POST",
+          headers: { ...authHeaders(), "Content-Type": "application/json" },
+          body: JSON.stringify({ plan }),
+        });
+        const actData = await act.json().catch(() => ({}));
+        if (act.ok && actData.checkoutUrl) {
+          window.location.href = actData.checkoutUrl;
+          return;
+        }
+        // Stripe unavailable — don't lose the work; land them on the draft cohort.
+        toast("Checkout isn’t available right now — cohort saved as draft.", "info");
+        router.push(`/dashboard/cohorts/${newId}`);
+        return;
+      }
+
+      toast(`Cohort created for ${district}`, "success");
+      router.push(`/dashboard/cohorts/${newId}`);
     } catch {
       toast("Request failed", "error");
     } finally {
@@ -245,12 +277,19 @@ export default function NewCohortPage() {
               <p><strong>District:</strong> {district}</p>
               <p><strong>Crops:</strong> {selectedCrops.join(", ")}</p>
               <p><strong>Languages:</strong> {selectedLangs.join(", ")}</p>
-              <p><strong>Status:</strong> Not yet live — you&apos;ll activate it after it&apos;s created</p>
+              <p><strong>Plan:</strong> {PLANS.find((p) => p.id === plan)?.name} ({PLANS.find((p) => p.id === plan)?.price})</p>
+              <p>
+                <strong>Next:</strong> secure Stripe checkout for the{" "}
+                {PLANS.find((p) => p.id === plan)?.name} plan — or save as a draft and activate later.
+              </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Button variant="secondary" onClick={() => setStep(2)}>Back</Button>
-              <Button onClick={handleSubmit} disabled={submitting}>
-                {submitting ? "Creating…" : "Create cohort"}
+              <Button onClick={() => handleSubmit("checkout")} disabled={submitting}>
+                {submitting ? "Working…" : "Create & continue to payment"}
+              </Button>
+              <Button variant="secondary" onClick={() => handleSubmit("draft")} disabled={submitting}>
+                Save as draft
               </Button>
             </div>
           </div>

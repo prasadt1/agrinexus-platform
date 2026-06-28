@@ -17,3 +17,4 @@ export { PartnerLeadForm } from "./PartnerLeadForm";
 export { DistrictThumb } from "./DistrictThumb";
 export { DashboardTour } from "./DashboardTour";
 export { CohortTour } from "./CohortTour";
+export { OnboardingWelcome } from "./OnboardingWelcome";
