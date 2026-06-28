@@ -246,10 +246,55 @@ export default function LandingPage() {
         <h2 style={{ fontFamily: SERIF, fontSize: "clamp(26px, 4vw, 38px)", lineHeight: 1.12, margin: "12px 0 8px", fontWeight: 500 }}>
           A full advisory engine on WhatsApp — that closes the loop.
         </h2>
-        <p style={{ fontSize: 16, color: C.muted, maxWidth: 670, margin: "0 0 30px", lineHeight: 1.6 }}>
-          Built on the award-winning AgriNexus engine. Farmers get far more than a reminder; partners
-          get proof it worked.
+        <p style={{ fontSize: 16, color: C.muted, maxWidth: 690, margin: "0 0 20px", lineHeight: 1.6 }}>
+          Built on AgriNexus AI —{" "}
+          <a
+            href="https://builder.aws.com/content/3C8hBRTcsRuQrHzE3Pq243yhXTF/aideas-finalist-agrinexus-ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: C.green, textDecoration: "underline", textUnderlineOffset: 2 }}
+          >
+            winner of the AWS AIdeas Innovation Award
+          </a>{" "}
+          — a multimodal farm-advisory engine. Farmers get far more than a reminder; partners get proof
+          it worked.
         </p>
+        {/* Proof — walk the talk */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 30 }}>
+          {(
+            [
+              ["Watch the full demo", "https://www.youtube.com/watch?v=Hr9EcblzkwI", <path key="i" d="M8 5v14l11-7z" fill="currentColor" stroke="none" />],
+              ["AWS AIdeas write-up", "https://builder.aws.com/content/3C8hBRTcsRuQrHzE3Pq243yhXTF/aideas-finalist-agrinexus-ai", <path key="i" strokeLinecap="round" strokeLinejoin="round" d="M14 3v5h5M15 3H7a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V8l-5-5z" />],
+              ["Engine on GitHub", "https://github.com/prasadt1/agrinexus-ai", <path key="i" strokeLinecap="round" strokeLinejoin="round" d="M16 18l6-6-6-6M8 6l-6 6 6 6" />],
+              ["Try it on WhatsApp", WA_LINK, <path key="i" strokeLinecap="round" strokeLinejoin="round" d="M21 11.5a8.38 8.38 0 01-9 8.5 8.5 8.5 0 01-3.8-.9L3 21l1.9-5.2A8.38 8.38 0 014 11.5 8.5 8.5 0 0112 3a8.38 8.38 0 019 8.5z" />],
+            ] as [string, string, React.ReactNode][]
+          ).map(([label, href, icon]) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: 13.5,
+                fontWeight: 500,
+                color: C.ink,
+                textDecoration: "none",
+                padding: "9px 15px",
+                borderRadius: 999,
+                border: `1px solid ${C.border}`,
+                background: C.white,
+              }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} style={{ color: C.green }} aria-hidden="true">
+                {icon}
+              </svg>
+              {label}
+            </a>
+          ))}
+        </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16 }}>
           {(
             [
@@ -332,9 +377,10 @@ export default function LandingPage() {
             See the loop run, end to end.
           </h2>
           <p style={{ fontSize: 16, color: C.muted, maxWidth: 620, margin: "0 0 28px", lineHeight: 1.6 }}>
-            A nudge is one timely WhatsApp message telling a farmer to act now, in their own language.
-            Outturn watches each district&apos;s weather, sends only when conditions are right, and follows
-            up until the farmer confirms or the window closes. Tap a step or watch it play.
+            A nudge is one timely WhatsApp message telling a farmer to act now, in their own language —
+            like the short dry, low-wind window when spraying actually works. Outturn watches each
+            district&apos;s weather, sends only when that window opens, and follows up until the farmer
+            confirms or it closes. Tap a step or watch it play.
           </p>
           <HowItWorks />
         </div>
@@ -482,12 +528,21 @@ export default function LandingPage() {
       <section id="why" style={{ background: C.dark }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "62px 32px" }}>
           <Eyebrow onDark>Why it matters</Eyebrow>
-          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 42px)", lineHeight: 1.1, margin: "12px 0 10px", fontWeight: 500, color: C.cream }}>
+          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 42px)", lineHeight: 1.1, margin: "12px 0 16px", fontWeight: 500, color: C.cream, maxWidth: 720 }}>
             Information isn&apos;t the gap. Follow-through is.
           </h2>
-          <p style={{ fontSize: 16, color: "#B7AE9E", maxWidth: 640, margin: "0 0 36px", lineHeight: 1.6 }}>
-            Farmers know their crops. The right moment passes while competing demands stack up, and a
-            spray tip that lands after the wind picks up behaves like no advice at all.
+          <p style={{ fontSize: 17, color: C.cream, maxWidth: 680, margin: "0 0 14px", lineHeight: 1.62 }}>
+            Good crop advice already exists — it just rarely arrives in time. With far too few extension
+            workers to reach everyone, no one is there at the moment it counts. And in farming, the
+            moment is everything: spraying only works in a short dry, low-wind window. Miss it and the
+            pass is wasted — the pest spreads, and the crop is lost.
+          </p>
+          <p style={{ fontSize: 16, color: "#B7AE9E", maxWidth: 680, margin: "0 0 38px", lineHeight: 1.6 }}>
+            So the bottleneck was never knowing what to do. It&apos;s getting it done — the right action,
+            at the right moment, across thousands of farmers at once.
+          </p>
+          <p style={{ fontSize: 11, letterSpacing: "0.13em", textTransform: "uppercase", color: "#8A8275", margin: "0 0 18px" }}>
+            The scale of the gap
           </p>
           <div className="stats-grid">
             {[
@@ -509,6 +564,11 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+          <p style={{ fontSize: 15.5, color: C.cream, maxWidth: 680, marginTop: 34, lineHeight: 1.6 }}>
+            Outturn closes that gap — advice tracked all the way to{" "}
+            <strong style={{ color: "#6EE7A8", fontWeight: 600 }}>done</strong>, so a missed window
+            becomes a re-nudge instead of a lost crop.
+          </p>
         </div>
       </section>
 
