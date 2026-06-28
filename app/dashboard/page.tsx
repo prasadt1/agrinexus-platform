@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Card, Badge, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, CropIcon } from "@/app/components";
+import { Card, Badge, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, CropImage } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { attentionFor } from "@/lib/attention";
 
@@ -425,13 +425,7 @@ export default function OverviewPage() {
                   style={{ background: "transparent" }}
                 >
                   <div className="flex items-center gap-4">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
-                      title={cohort.crops.join(", ")}
-                    >
-                      <CropIcon crop={cohort.crops[0] || ""} size={22} />
-                    </div>
+                    <CropImage crop={cohort.crops[0] || ""} size={48} className="shrink-0" />
                     <div>
                       <p className="font-medium">{cohort.district}</p>
                       <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
@@ -553,24 +547,27 @@ function CohortRow({
       className="flex items-center gap-4 p-4 rounded-lg transition-colors"
       style={{ background: "var(--color-page-bg)" }}
     >
-      {/* Rank */}
-      <div
-        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-medium"
-        style={{
-          background: rank <= 3 ? "var(--color-primary-tint)" : "var(--color-border)",
-          color: rank <= 3 ? "var(--color-primary)" : "var(--color-text-muted)",
-        }}
-      >
-        {rank}
+      {/* Crop photo + rank badge */}
+      <div className="relative flex-shrink-0">
+        <CropImage crop={cohort.crops[0] || ""} size={44} />
+        <span
+          className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
+          style={{
+            background: rank <= 3 ? "var(--color-primary)" : "var(--color-text-muted)",
+            color: "#fff",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+          }}
+        >
+          {rank}
+        </span>
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
         <p className="font-medium truncate">{cohort.district}</p>
-        <div className="text-sm flex items-center gap-1.5" style={{ color: "var(--color-text-muted)" }}>
-          <CropIcon crop={cohort.crops[0] || ""} size={14} className="shrink-0" />
-          <span className="truncate">{cohort.crops.join(", ")}</span>
-        </div>
+        <p className="text-sm truncate" style={{ color: "var(--color-text-muted)" }}>
+          {cohort.crops.join(", ")}
+        </p>
       </div>
 
       {/* Stats */}

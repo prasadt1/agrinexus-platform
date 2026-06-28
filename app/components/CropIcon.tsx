@@ -5,7 +5,7 @@
  * functional identifier — not decorative agtech clip-art.
  */
 
-function normalizeCrop(c: string): string {
+export function normalizeCrop(c: string): string {
   const k = (c || "").trim().toLowerCase();
   const synonyms: Record<string, string> = {
     soy: "soybean",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { Card, Badge, Button, EmptyState, LineageBadge, toast, CropIcon } from "@/app/components";
+import { Card, Badge, Button, EmptyState, LineageBadge, toast, CropImage } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { parseFarmerLines } from "@/lib/parse-farmers";
 import { attentionFor } from "@/lib/attention";
@@ -247,57 +247,61 @@ export default function CohortDetailPage({
 
   return (
     <div className="py-10 px-8">
-      {/* Breadcrumb */}
-      <nav className="mb-6">
-        <ol className="flex items-center gap-2 text-sm">
-          <li>
-            <Link
-              href="/dashboard/cohorts"
-              className="hover:underline"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              Cohorts
-            </Link>
-          </li>
-          <li style={{ color: "var(--color-text-muted)" }}>/</li>
-          <li style={{ color: "var(--color-text-secondary)" }}>{cohort.district}</li>
-        </ol>
-      </nav>
-
-      {/* Header */}
-      <header className="mb-4">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div
-              className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-              style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
-              title={(cohort.crops || []).join(", ")}
-            >
-              <CropIcon crop={(cohort.crops && cohort.crops[0]) || ""} size={26} />
-            </div>
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-page-title">{cohort.district}</h1>
-                <Badge status={cohort.status} />
-              </div>
-              <p style={{ color: "var(--color-text-secondary)" }}>
-                {(cohort.crops || []).join(", ")} • {(cohort.languages || []).map((l) => l.toUpperCase()).join(", ")}
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-label">Partner</p>
-            <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>
-              {tenantName || "Partner"}
+      {/* Breadcrumb + partner */}
+      <div className="flex items-center justify-between gap-4 mb-5">
+        <nav>
+          <ol className="flex items-center gap-2 text-sm">
+            <li>
+              <Link
+                href="/dashboard/cohorts"
+                className="hover:underline"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                Cohorts
+              </Link>
+            </li>
+            <li style={{ color: "var(--color-text-muted)" }}>/</li>
+            <li style={{ color: "var(--color-text-secondary)" }}>{cohort.district}</li>
+          </ol>
+        </nav>
+        <div className="text-right shrink-0">
+          <p className="text-label">Partner</p>
+          <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>
+            {tenantName || "Partner"}
+          </p>
+          {license && (
+            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+              {license.plan} plan {license.isDemo && "(demo)"}
             </p>
-            {license && (
-              <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
-                {license.plan} plan {license.isDemo && "(demo)"}
-              </p>
-            )}
-          </div>
+          )}
         </div>
-      </header>
+      </div>
+
+      {/* Hero banner — large crop photo (falls back to a themed crop emblem) */}
+      <div
+        className="relative h-48 md:h-60 rounded-xl overflow-hidden mb-6"
+        style={{ background: "var(--color-primary-tint)" }}
+      >
+        <CropImage crop={(cohort.crops && cohort.crops[0]) || ""} fill priority rounded="none" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.66) 0%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0) 72%)",
+          }}
+        />
+        <div className="absolute left-5 right-5 bottom-4">
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-page-title" style={{ color: "#fff" }}>
+              {cohort.district}
+            </h1>
+            <Badge status={cohort.status} />
+          </div>
+          <p style={{ color: "rgba(255,255,255,0.92)" }}>
+            {(cohort.crops || []).join(", ")} • {(cohort.languages || []).map((l) => l.toUpperCase()).join(", ")}
+          </p>
+        </div>
+      </div>
 
       {/* Plain-language summary: what's happening in this cohort, in one line. */}
       <p className="mb-8 max-w-2xl" style={{ color: "var(--color-text-secondary)" }}>
