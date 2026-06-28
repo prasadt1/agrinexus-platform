@@ -17,6 +17,7 @@ import {
   EmptyState,
   toast,
   CropIcon,
+  CropImage,
 } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 
@@ -156,16 +157,21 @@ export default function CohortsPage() {
               cohorts.map((cohort) => (
                 <TableRow key={cohort.cohortId}>
                   <TableCell>
-                    <Link
-                      href={`/dashboard/cohorts/${cohort.cohortId}`}
-                      className="font-medium hover:underline"
-                      style={{ color: "var(--color-primary)" }}
-                    >
-                      {cohort.district}
-                    </Link>
-                    <p className="text-xs mt-0.5 font-mono text-muted">
-                      {cohort.cohortId.slice(0, 8)}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <CropImage crop={cohort.crops[0] || ""} size={44} className="shrink-0" />
+                      <div>
+                        <Link
+                          href={`/dashboard/cohorts/${cohort.cohortId}`}
+                          className="font-medium hover:underline"
+                          style={{ color: "var(--color-primary)" }}
+                        >
+                          {cohort.district}
+                        </Link>
+                        <p className="text-xs mt-0.5 font-mono text-muted">
+                          {cohort.cohortId.slice(0, 8)}
+                        </p>
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">

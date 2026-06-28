@@ -10,3 +10,4 @@ export { ToastProvider, toast } from "./Toast";
 export { HowItWorks } from "./HowItWorks";
 export { Term } from "./Term";
 export { CropIcon } from "./CropIcon";
+export { CropImage } from "./CropImage";
