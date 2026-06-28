@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Card, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, CropImage, MaharashtraMap } from "@/app/components";
+import { Card, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, DistrictThumb, MaharashtraMap } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { attentionFor } from "@/lib/attention";
 
@@ -40,6 +40,7 @@ export default function OverviewPage() {
   const [data, setData] = useState<OverviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const [showCoverage, setShowCoverage] = useState(false);
 
   const fetchOverview = useCallback(async () => {
     if (!tenantId) return;
@@ -84,7 +85,7 @@ export default function OverviewPage() {
 
   return (
     <div className="py-10 px-8">
-      <AdvisoryLoopHero />
+      <AdvisoryLoopHero onHowItWorks={() => setShowHowItWorks(true)} />
 
       {/* Header with Tenant Identity */}
       <header className="mb-8">
@@ -95,16 +96,6 @@ export default function OverviewPage() {
               <Term term="aggregate">Aggregate</Term> performance across all{" "}
               <Term term="cohort">cohorts</Term>
             </p>
-            <button
-              onClick={() => setShowHowItWorks(true)}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium"
-              style={{ color: "var(--color-primary)" }}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              How it works
-            </button>
           </div>
           {tenant && (
             <div
@@ -139,6 +130,57 @@ export default function OverviewPage() {
             </div>
             <div className="px-6 pb-6">
               <HowItWorks allowTech={false} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCoverage && (
+        <div className="modal-overlay" onClick={() => setShowCoverage(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 900 }}>
+            <div className="flex items-center justify-between px-6 pt-5 pb-3">
+              <div>
+                <h2 className="text-section">Where you work</h2>
+                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  {activeDistricts.length} district{activeDistricts.length === 1 ? "" : "s"} ·{" "}
+                  {activeCohorts.length} active cohort{activeCohorts.length === 1 ? "" : "s"} ·{" "}
+                  {(totals?.farmers || 0).toLocaleString()} farmers
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCoverage(false)}
+                aria-label="Close"
+                className="text-2xl leading-none"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="px-6 pb-6 grid md:grid-cols-2 gap-6 items-start">
+              <MaharashtraMap highlight={activeDistricts} showLabels maxWidth={560} />
+              <div className="space-y-2">
+                {activeCohorts.map((c) => (
+                  <Link
+                    key={c.cohortId}
+                    href={`/dashboard/cohorts/${c.cohortId}`}
+                    className="flex items-center justify-between gap-3 p-2.5 rounded-lg transition-colors hover:bg-opacity-50"
+                    style={{ border: "1px solid var(--color-border)" }}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <DistrictThumb district={c.district} size={34} />
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate">{c.district}</p>
+                        <p className="text-xs truncate" style={{ color: "var(--color-text-muted)" }}>
+                          {c.crops.join(", ")} · {c.memberCount} farmer{c.memberCount === 1 ? "" : "s"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-semibold shrink-0" style={{ color: "var(--color-primary)" }}>
+                      {Math.round(c.responseRate * 100)}%
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -338,13 +380,47 @@ export default function OverviewPage() {
         {/* Coverage map */}
         <div className="lg:col-span-1">
           <Card>
-            <h2 className="text-card-title mb-4">Where you work</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-card-title">Where you work</h2>
+              {activeDistricts.length > 0 && (
+                <button
+                  onClick={() => setShowCoverage(true)}
+                  className="text-xs font-medium inline-flex items-center gap-1"
+                  style={{ color: "var(--color-primary)" }}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  </svg>
+                  Enlarge
+                </button>
+              )}
+            </div>
             {loading ? (
               <div className="h-56 rounded-xl animate-pulse" style={{ background: "var(--color-page-bg)" }} />
-            ) : activeDistricts.length > 0 ? (
-              <MaharashtraMap highlight={activeDistricts} showLabels={activeDistricts.length <= 8} />
             ) : (
-              <MaharashtraMap highlight={[]} showLabels={false} />
+              <button
+                type="button"
+                onClick={() => activeDistricts.length > 0 && setShowCoverage(true)}
+                className="block w-full"
+                style={{ cursor: activeDistricts.length > 0 ? "zoom-in" : "default" }}
+                aria-label="Enlarge coverage map"
+              >
+                <MaharashtraMap highlight={activeDistricts} showLabels={false} />
+              </button>
+            )}
+            {activeDistricts.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {activeDistricts.map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => setShowCoverage(true)}
+                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                    style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
             )}
             <div className="grid grid-cols-3 gap-2 mt-4 text-center">
               <CoverageStat value={activeDistricts.length} label="Districts" loading={loading} />
@@ -505,9 +581,9 @@ function CohortRow({
       className="flex items-center gap-4 p-4 rounded-lg transition-colors"
       style={{ background: "var(--color-page-bg)" }}
     >
-      {/* Crop photo + rank badge */}
+      {/* District thumbnail + rank badge */}
       <div className="relative flex-shrink-0">
-        <CropImage crop={cohort.crops[0] || ""} size={44} />
+        <DistrictThumb district={cohort.district} size={44} />
         <span
           className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
           style={{

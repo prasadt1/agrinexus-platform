@@ -17,7 +17,7 @@ import {
   EmptyState,
   toast,
   CropIcon,
-  CropImage,
+  DistrictThumb,
   LanguagePills,
 } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
@@ -159,7 +159,7 @@ export default function CohortsPage() {
                 <TableRow key={cohort.cohortId}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <CropImage crop={cohort.crops[0] || ""} size={44} className="shrink-0" />
+                      <DistrictThumb district={cohort.district} size={44} className="shrink-0" />
                       <div>
                         <Link
                           href={`/dashboard/cohorts/${cohort.cohortId}`}
