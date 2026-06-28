@@ -41,3 +41,6 @@ yarn-error.log*
 next-env.d.ts
 dist/
 public/logo/
+
+# private submission/working prep — for my eyes only, not public
+docs/devpost-assets/
