@@ -2,6 +2,7 @@ import Link from "next/link";
 import { HowItWorks } from "@/app/components/HowItWorks";
 import { TryDemoButton } from "@/app/components/TryDemoButton";
 import { OutturnMark } from "@/app/components/OutturnMark";
+import { ArchitectureLoop } from "@/app/components/ArchitectureLoop";
 
 const WA_LINK =
   "https://wa.me/4915120105731?text=Hi%20Outturn%2C%20show%20me%20the%20advisory%20demo";
@@ -433,68 +434,14 @@ export default function LandingPage() {
           A multi-tenant control plane built over an award-winning delivery engine, with an
           event-driven analytics path. Not a dashboard bolted onto a database.
         </p>
-        {/* Event flow — the closed loop, mapped to AWS services */}
-        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: "20px 18px", marginBottom: 14 }}>
-          <div className="flow-grid">
-            {([
-              ["1", "Watch weather", "EventBridge · WeatherPoller λ", C.green],
-              ["2", "Orchestrate", "Step Functions", C.green],
-              ["3", "Send nudge", "NudgeSender λ · Meta WhatsApp Cloud API", C.green],
-              ["4", "Farmer replies", "Meta webhook · API Gateway · WebhookHandler λ", C.teal],
-              ["5", "Detect + record", "ResponseDetector λ · DynamoDB Streams", C.teal],
-              ["6", "Roll up + show", "OutcomesAggregator λ · SUMMARY# · Vercel dashboard", C.amber],
-            ] as [string, string, string, string][]).map(([n, title, svc, color]) => (
-              <div
-                key={n}
-                style={{
-                  background: C.cream2,
-                  border: `1px solid ${C.border}`,
-                  borderTop: `2px solid ${color}`,
-                  borderRadius: 10,
-                  padding: "12px 12px 14px",
-                }}
-              >
-                <span
-                  style={{
-                    display: "inline-flex",
-                    width: 22,
-                    height: 22,
-                    borderRadius: 999,
-                    background: color,
-                    color: "#fff",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    marginBottom: 9,
-                  }}
-                >
-                  {n}
-                </span>
-                <p style={{ fontSize: 13.5, fontWeight: 500, color: C.ink, margin: "0 0 4px" }}>{title}</p>
-                <p style={{ fontSize: 11.5, color: C.muted, margin: 0, lineHeight: 1.4 }}>{svc}</p>
-              </div>
-            ))}
-          </div>
-          <p style={{ fontSize: 12.5, color: C.muted, margin: "14px 0 0", padding: "11px 13px", background: C.cream, borderRadius: 10, lineHeight: 1.5 }}>
-            <span style={{ fontWeight: 500, color: C.ink }}>Amazon DynamoDB</span> is the single
-            multi-tenant table at the centre, with two Streams consumers: the ResponseDetector flips a
-            nudge to done, the OutcomesAggregator rolls it up. The loop runs on an EventBridge
-            schedule, or the moment a partner re-nudges from the dashboard.
-          </p>
-        </div>
-        {/* Plane legend */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 18px", marginBottom: 16, fontSize: 12.5, color: C.muted }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <span style={{ width: 9, height: 9, borderRadius: 2, background: C.green }} />Engine, sends the nudge
-          </span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <span style={{ width: 9, height: 9, borderRadius: 2, background: C.teal }} />Data, one DynamoDB table and Streams
-          </span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <span style={{ width: 9, height: 9, borderRadius: 2, background: C.amber }} />Control, partners monitor and act
-          </span>
-        </div>
+        {/* Animated event loop */}
+        <ArchitectureLoop />
+        <p style={{ fontSize: 12.5, color: C.muted, margin: "0 0 8px", lineHeight: 1.5, maxWidth: 760 }}>
+          The pulse traces the live event path. The loop runs on an EventBridge schedule, or the moment
+          a partner re-nudges from the Vercel dashboard. Two DynamoDB Streams consumers keep the
+          dashboard in sync: the ResponseDetector flips a nudge to done, the OutcomesAggregator rolls
+          it up.
+        </p>
         <p style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: C.faint, margin: "28px 0 12px" }}>
           Built on
         </p>
