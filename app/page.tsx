@@ -23,16 +23,6 @@ const C = {
 
 const SERIF = "var(--font-serif), Georgia, 'Times New Roman', serif";
 
-function Leaf({ size = 18, color = "#fff" }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 21V11" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M12 13C8.5 13 6.5 10.5 6.5 7c3.5 0 5.5 2 5.5 5.5z" fill={color} />
-      <path d="M12 11.5C15.5 11.5 17.5 9 17.5 5.5c-3.5 0-5.5 2-5.5 5.5z" fill={color} />
-    </svg>
-  );
-}
-
 function Check({ color }: { color: string }) {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ flexShrink: 0, marginTop: 2 }}>
@@ -72,36 +62,23 @@ export default function LandingPage() {
           margin: "0 auto",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 8,
-              background: C.green,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Leaf size={18} />
+        <a
+          href="/"
+          style={{ textDecoration: "none", display: "inline-flex", flexDirection: "column", lineHeight: 1.1 }}
+        >
+          <span style={{ fontFamily: SERIF, fontSize: 24, color: C.ink, fontWeight: 500 }}>
+            Out<span style={{ color: C.green }}>turn</span>
           </span>
-          <span style={{ fontFamily: SERIF, fontSize: 21, color: C.ink, lineHeight: 1 }}>Outturn</span>
-          <span
-            style={{
-              fontSize: 11.5,
-              color: C.faint,
-              borderLeft: `1px solid ${C.border}`,
-              paddingLeft: 10,
-              marginLeft: 2,
-            }}
-          >
+          <span style={{ fontSize: 11.5, color: C.faint, marginTop: 2, letterSpacing: "0.01em" }}>
             Advice, followed through
           </span>
-        </div>
+        </a>
         <nav style={{ display: "flex", alignItems: "center", gap: 22, fontSize: 14, color: C.muted }}>
           <a href="#how" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
             How it works
+          </a>
+          <a href="#why" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
+            Why it matters
           </a>
           <a href="#architecture" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
             Architecture
@@ -347,7 +324,7 @@ export default function LandingPage() {
       </section>
 
       {/* Why it matters — dark punctuation */}
-      <section style={{ background: C.dark }}>
+      <section id="why" style={{ background: C.dark }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "62px 32px" }}>
           <Eyebrow onDark>Why it matters</Eyebrow>
           <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 42px)", lineHeight: 1.1, margin: "12px 0 10px", fontWeight: 500, color: C.cream }}>
@@ -359,14 +336,21 @@ export default function LandingPage() {
           </p>
           <div className="stats-grid">
             {[
-              ["~126M", "smallholder and marginal farmers in India, 86% of all holdings.", "Agriculture Census 2015-16"],
-              ["up to 40%", "of global crop production lost to pests and diseases each year.", "FAO"],
-              ["~1:5,000", "farmers per extension worker in some contexts, vs a norm nearer 1:750.", "Bharat-VISTAAR"],
-            ].map(([big, body, src]) => (
+              ["~126M", "smallholder and marginal farmers in India, about 86% of all holdings.", "Agriculture Census 2015-16", "https://agcensus.nic.in/document/agcen1516/T1_ac_2015_16.pdf"],
+              ["up to 40%", "of global crop production lost to pests and diseases each year.", "FAO", "https://www.fao.org/newsroom/detail/Climate-change-fans-spread-of-pests-and-threatens-plants-and-crops-new-FAO-study/en"],
+              ["~1:5,000", "farmers per extension worker, vs a guideline norm nearer 1:750.", "NAAS / ICRISAT", "https://naas.org.in/News/NN25032025.pdf"],
+            ].map(([big, body, src, url]) => (
               <div key={big} style={{ borderTop: `1px solid rgba(255,255,255,0.14)`, paddingTop: 16 }}>
                 <p style={{ fontFamily: SERIF, fontSize: 38, color: "#6EE7A8", margin: "0 0 8px", fontWeight: 500 }}>{big}</p>
                 <p style={{ fontSize: 14.5, color: C.cream, lineHeight: 1.5, margin: "0 0 6px" }}>{body}</p>
-                <p style={{ fontSize: 12, color: "#8A8275", margin: 0 }}>{src}</p>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: 12, color: "#8A8275", textDecoration: "underline", textUnderlineOffset: 2 }}
+                >
+                  {src}
+                </a>
               </div>
             ))}
           </div>
@@ -383,25 +367,67 @@ export default function LandingPage() {
           A multi-tenant control plane built over an award-winning delivery engine, with an
           event-driven analytics path. Not a dashboard bolted onto a database.
         </p>
-        <div className="arch-grid">
-          {[
-            ["Delivery engine", "The award-winning WhatsApp engine", ["Weather poller, per district", "Step Functions nudge workflow", "WhatsApp Business API"]],
-            ["Control plane", "Next.js on Vercel", ["Provisioning + Stripe licensing", "Dashboard + analytics", "Manual + scheduled re-nudge"]],
-            ["Data + analytics", "Amazon DynamoDB", ["Single-table, multi-tenant", "Streams to OutcomesAggregator", "Materialized SUMMARY# reads"]],
-          ].map(([plane, sub, items]) => (
-            <div key={plane as string} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: 22 }}>
-              <h3 style={{ fontFamily: SERIF, fontSize: 20, margin: "0 0 2px", fontWeight: 500 }}>{plane}</h3>
-              <p style={{ fontSize: 12.5, color: C.green, margin: "0 0 14px" }}>{sub}</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                {(items as string[]).map((it) => (
-                  <span key={it} style={{ display: "flex", gap: 8, fontSize: 13.5, color: C.muted }}>
-                    <Check color={C.green} />
-                    {it}
-                  </span>
-                ))}
+        {/* Event flow — the closed loop, mapped to AWS services */}
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: "20px 18px", marginBottom: 14 }}>
+          <div className="flow-grid">
+            {([
+              ["1", "Watch weather", "EventBridge · WeatherPoller λ", C.green],
+              ["2", "Orchestrate", "Step Functions", C.green],
+              ["3", "Send nudge", "NudgeSender λ · WhatsApp Cloud API", C.green],
+              ["4", "Farmer replies", "API Gateway · WebhookHandler λ", C.teal],
+              ["5", "Detect + record", "ResponseDetector λ · DynamoDB Streams", C.teal],
+              ["6", "Roll up + show", "OutcomesAggregator λ · SUMMARY# · Dashboard", C.amber],
+            ] as [string, string, string, string][]).map(([n, title, svc, color]) => (
+              <div
+                key={n}
+                style={{
+                  background: C.cream2,
+                  border: `1px solid ${C.border}`,
+                  borderTop: `2px solid ${color}`,
+                  borderRadius: 10,
+                  padding: "12px 12px 14px",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-flex",
+                    width: 22,
+                    height: 22,
+                    borderRadius: 999,
+                    background: color,
+                    color: "#fff",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    marginBottom: 9,
+                  }}
+                >
+                  {n}
+                </span>
+                <p style={{ fontSize: 13.5, fontWeight: 500, color: C.ink, margin: "0 0 4px" }}>{title}</p>
+                <p style={{ fontSize: 11.5, color: C.muted, margin: 0, lineHeight: 1.4 }}>{svc}</p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <p style={{ fontSize: 12.5, color: C.muted, margin: "14px 0 0", padding: "11px 13px", background: C.cream, borderRadius: 10, lineHeight: 1.5 }}>
+            <span style={{ fontWeight: 500, color: C.ink }}>Amazon DynamoDB</span> is the single
+            multi-tenant table at the centre, with two Streams consumers: the ResponseDetector flips a
+            nudge to done, the OutcomesAggregator rolls it up. The loop runs on an EventBridge
+            schedule, or the moment a partner re-nudges from the dashboard.
+          </p>
+        </div>
+        {/* Plane legend */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 18px", marginBottom: 16, fontSize: 12.5, color: C.muted }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <span style={{ width: 9, height: 9, borderRadius: 2, background: C.green }} />Engine, sends the nudge
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <span style={{ width: 9, height: 9, borderRadius: 2, background: C.teal }} />Data, one DynamoDB table and Streams
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <span style={{ width: 9, height: 9, borderRadius: 2, background: C.amber }} />Control, partners monitor and act
+          </span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 20 }}>
           {["Amazon DynamoDB", "AWS Lambda", "AWS Step Functions", "Amazon EventBridge", "AWS Secrets Manager", "Vercel OIDC", "WhatsApp Business API"].map((s) => (
@@ -499,12 +525,11 @@ export default function LandingPage() {
             color: C.faint,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <span style={{ width: 24, height: 24, borderRadius: 7, background: C.green, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Leaf size={15} />
+          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
+            <span style={{ fontFamily: SERIF, fontSize: 17, color: C.ink, fontWeight: 500 }}>
+              Out<span style={{ color: C.green }}>turn</span>
             </span>
-            <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink }}>Outturn</span>
-            <span>Advice, followed through</span>
+            <span style={{ fontSize: 12, color: C.faint, marginTop: 1 }}>Advice, followed through</span>
           </div>
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
             <Link href="/judges" style={{ color: C.faint, textDecoration: "none" }}>
