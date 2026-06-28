@@ -297,7 +297,7 @@ export default function LandingPage() {
           <div className="steps-grid">
             {[
               ["1", "Provision a cohort", "A district’s farmers with their crops and languages. The engine starts watching that area’s weather."],
-              ["2", "License it", "Activate per cohort on a Starter, Growth, or Enterprise plan. Checkout runs through Stripe."],
+              ["2", "License it", "Activate per cohort on a Starter, Growth, or Scale plan. Checkout runs through Stripe."],
               ["3", "Monitor follow-through", "Watch confirmed action per cohort and per district, not message-delivery receipts."],
               ["4", "Act where it slips", "Re-nudge the farmers who haven’t acted, manually or on an automated schedule."],
             ].map(([n, title, body]) => (
@@ -324,67 +324,68 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Pricing */}
-      <section id="pricing" style={{ maxWidth: 1180, margin: "0 auto", padding: "60px 32px" }}>
-        <Eyebrow>Plans</Eyebrow>
-        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 6px", fontWeight: 500 }}>
-          Priced to scale with the programme.
-        </h2>
-        <p style={{ fontSize: 16, color: C.muted, maxWidth: 620, margin: "0 0 28px", lineHeight: 1.6 }}>
-          Every plan includes the full closed-loop engine. You license active cohorts; larger
-          programmes unlock analytics, white-label, and integrations.
-        </p>
-        <div className="arch-grid">
-          {([
-            ["Starter", "From $99", "/ month", "Small programmes and KVKs", false, ["Up to 3 active cohorts", "The full closed-loop engine", "Monthly follow-through outcomes", "Email support"]],
-            ["Growth", "From $399", "/ month", "NGOs across several districts", true, ["Up to 15 active cohorts", "District analytics + audit log", "Priority WhatsApp delivery", "Your brand colour (white-label)"]],
-            ["Enterprise", "Custom", "", "Agri-input companies and government", false, ["Unlimited cohorts and tenants", "Full white-label + SSO", "Custom integrations and API", "SLA and onboarding support"]],
-          ] as [string, string, string, string, boolean, string[]][]).map(([name, price, unit, who, popular, features]) => (
-            <div
-              key={name}
-              style={{
-                position: "relative",
-                background: C.white,
-                border: popular ? `2px solid ${C.green}` : `1px solid ${C.border}`,
-                borderRadius: 14,
-                padding: 22,
-              }}
-            >
-              {popular && (
-                <span style={{ position: "absolute", top: -11, left: 22, background: C.green, color: "#fff", fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 999 }}>
-                  Most popular
-                </span>
-              )}
-              <h3 style={{ fontFamily: SERIF, fontSize: 21, margin: "0 0 2px", fontWeight: 500 }}>{name}</h3>
-              <p style={{ fontSize: 12.5, color: C.muted, margin: "0 0 12px" }}>{who}</p>
-              <p style={{ margin: "0 0 14px" }}>
-                <span style={{ fontFamily: SERIF, fontSize: 28, color: C.ink, fontWeight: 500 }}>{price}</span>
-                {unit && <span style={{ fontSize: 13, color: C.faint }}> {unit}</span>}
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                {features.map((f) => (
-                  <span key={f} style={{ display: "flex", gap: 8, fontSize: 13.5, color: C.muted }}>
-                    <Check color={C.green} />
-                    {f}
-                  </span>
-                ))}
-              </div>
+          {/* Plans — folded under the partner section, real Stripe tiers */}
+          <div id="pricing" style={{ marginTop: 44, paddingTop: 40, borderTop: `1px solid ${C.border}` }}>
+            <h3 style={{ fontFamily: SERIF, fontSize: "clamp(22px, 3vw, 30px)", lineHeight: 1.15, margin: "0 0 6px", fontWeight: 500 }}>
+              Plans that scale with your farmers.
+            </h3>
+            <p style={{ fontSize: 15, color: C.muted, maxWidth: 640, margin: "0 0 24px", lineHeight: 1.6 }}>
+              Every plan is the full closed loop: WhatsApp advisory, audited follow-through, and the
+              monitoring dashboard. You choose the tier by how many farmers you reach, and the cost per
+              farmer falls as you grow. Each cohort activates through Stripe checkout.
+            </p>
+            <div className="arch-grid">
+              {([
+                ["Starter", "₹999", "up to 50 farmers", "≈ ₹240 / farmer / year", false],
+                ["Growth", "₹2,999", "up to 250 farmers", "≈ ₹144 / farmer / year", true],
+                ["Scale", "₹9,999", "up to 1,000 farmers", "≈ ₹120 / farmer / year", false],
+              ] as [string, string, string, string, boolean][]).map(([name, price, cap, perFarmer, popular]) => (
+                <div
+                  key={name}
+                  style={{
+                    position: "relative",
+                    background: C.white,
+                    border: popular ? `2px solid ${C.green}` : `1px solid ${C.border}`,
+                    borderRadius: 14,
+                    padding: 22,
+                  }}
+                >
+                  {popular && (
+                    <span style={{ position: "absolute", top: -11, left: 22, background: C.green, color: "#fff", fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 999 }}>
+                      Most popular
+                    </span>
+                  )}
+                  <h4 style={{ fontFamily: SERIF, fontSize: 20, margin: "0 0 2px", fontWeight: 500 }}>{name}</h4>
+                  <p style={{ fontSize: 12.5, color: C.muted, margin: "0 0 12px" }}>{cap}</p>
+                  <p style={{ margin: "0 0 4px" }}>
+                    <span style={{ fontFamily: SERIF, fontSize: 30, color: C.ink, fontWeight: 500 }}>{price}</span>
+                    <span style={{ fontSize: 13, color: C.faint }}> / month</span>
+                  </p>
+                  <p style={{ fontSize: 12.5, color: C.green, margin: "0 0 14px" }}>{perFarmer}</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {["WhatsApp agronomic advisory", "Audited follow-through", "Monitoring dashboard"].map((f) => (
+                      <span key={f} style={{ display: "flex", gap: 8, fontSize: 13, color: C.muted }}>
+                        <Check color={C.green} />
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div style={{ marginTop: 20, display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
-          <a
-            href="mailto:partners@outturn.app?subject=Outturn%20partner%20pilot"
-            style={{ background: C.green, color: C.white, fontSize: 14, fontWeight: 500, padding: "10px 18px", borderRadius: 10, textDecoration: "none" }}
-          >
-            Talk to us about a pilot
-          </a>
-          <span style={{ fontSize: 12.5, color: C.faint }}>
-            Cohorts are activated in-product via Stripe checkout. Representative pricing shown.
-          </span>
+            <div style={{ marginTop: 18, display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
+              <a
+                href="mailto:partners@outturn.app?subject=Outturn%20partner%20pilot"
+                style={{ background: C.green, color: C.white, fontSize: 14, fontWeight: 500, padding: "10px 18px", borderRadius: 10, textDecoration: "none" }}
+              >
+                Talk to us about a pilot
+              </a>
+              <span style={{ fontSize: 12.5, color: C.faint }}>
+                Live prices come from Stripe checkout. Larger or government volumes: get in touch.
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
