@@ -72,7 +72,7 @@ export function AdvisoryLoopHero({ onHowItWorks }: { onHowItWorks?: () => void }
             <p className="text-label mb-1" style={{ color: "var(--color-primary)" }}>
               Advisory loop
             </p>
-            <h2 className="text-section">From weather to proof of follow-through</h2>
+            <h2 className="text-section">From weather to confirmed follow-through</h2>
             <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
               Each active cohort is watched for the right conditions, nudged on WhatsApp, and measured by who acted.
             </p>

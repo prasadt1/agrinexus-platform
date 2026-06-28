@@ -28,7 +28,7 @@ export function SlideReceiptThread() {
         <rect x="446" y="432" width="6" height="6" fill="#0E7490" /><line x1="446" y1="435" x2="412" y2="435" stroke="#CFC8B8" />
         <text x="404" y="432"><tspan fontWeight="600" fill="#1A1714">OutcomesAggregator → SUMMARY#</tspan></text><text x="404" y="447">rolls up the 67%</text>
         <rect x="446" y="472" width="6" height="6" fill="#0E7490" /><line x1="446" y1="475" x2="412" y2="475" stroke="#CFC8B8" />
-        <text x="404" y="472"><tspan fontWeight="600" fill="#1A1714">Vercel · keyless OIDC</tspan></text><text x="404" y="487">reads the proof, no stored keys</text>
+        <text x="404" y="472"><tspan fontWeight="600" fill="#1A1714">Vercel · keyless OIDC</tspan></text><text x="404" y="487">reads the roll-up, no stored keys</text>
       </g>
 
       {/* ghost re-entry bubble */}
