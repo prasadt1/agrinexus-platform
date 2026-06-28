@@ -152,14 +152,6 @@ export function ArchitectureLoop() {
           </text>
         </svg>
       </div>
-
-      {/* Footnote: what pre-existed vs what H0 added */}
-      <p style={{ fontSize: 12.5, color: "#8A8275", margin: "14px 0 0", lineHeight: 1.5, maxWidth: 780 }}>
-        <span style={{ fontWeight: 600, color: "#5A554C" }}>Footnote.</span> The engine — and the DynamoDB
-        table it already wrote to — pre-dated H0: it&apos;s the AgriNexus accountability engine that won the
-        AWS&nbsp;AIdeas award. H0 added the Vercel control plane and extended the data plane with the
-        reporting roll-ups.
-      </p>
     </div>
   );
 }
