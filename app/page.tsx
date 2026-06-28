@@ -82,8 +82,8 @@ export default function LandingPage() {
           <a href="#why" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
             Why it matters
           </a>
-          <a href="#pricing" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
-            Plans
+          <a href="#partners" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
+            For partners
           </a>
           <a href="#architecture" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
             Architecture
@@ -289,7 +289,7 @@ export default function LandingPage() {
       </section>
 
       {/* How partners run it */}
-      <section style={{ background: C.cream2, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
+      <section id="partners" style={{ background: C.cream2, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "56px 32px" }}>
           <Eyebrow>For partners</Eyebrow>
           <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 28px", fontWeight: 500 }}>
@@ -428,11 +428,12 @@ export default function LandingPage() {
       <section id="architecture" style={{ maxWidth: 1180, margin: "0 auto", padding: "62px 32px" }}>
         <Eyebrow>How it&apos;s built</Eyebrow>
         <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 8px", fontWeight: 500 }}>
-          Three planes, one DynamoDB table.
+          One closed loop, across the whole stack.
         </h2>
-        <p style={{ fontSize: 16, color: C.muted, maxWidth: 640, margin: "0 0 28px", lineHeight: 1.6 }}>
-          A multi-tenant control plane built over an award-winning delivery engine, with an
-          event-driven analytics path. Not a dashboard bolted onto a database.
+        <p style={{ fontSize: 16, color: C.muted, maxWidth: 660, margin: "0 0 28px", lineHeight: 1.6 }}>
+          Four layers, one event flow: the Vercel control plane, the AWS engine, a single Amazon
+          DynamoDB table, and Meta&apos;s WhatsApp as the delivery channel. Follow the numbered path,
+          1 to 7. Not a dashboard bolted onto a database.
         </p>
         {/* Animated event loop */}
         <ArchitectureLoop />

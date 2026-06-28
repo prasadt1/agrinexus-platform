@@ -1,34 +1,19 @@
 /**
- * Architecture diagram: the closed loop as a numbered ring of events. A
- * sequenced highlight travels 1 -> 7 (the order of the flow), the farmer on
- * WhatsApp is its own node (the delivery channel), and everything reads/writes
- * the central Amazon DynamoDB. Pure SVG/SMIL, no JS, colour-coded by plane.
+ * Architecture diagram as stacked plane layers. Four labeled lanes — Vercel
+ * control, Amazon DynamoDB, the AWS engine, Meta WhatsApp delivery — with the
+ * numbered event flow (1 -> 7) and a pulse crossing the layers in sequence.
+ * Pure SVG/SMIL, no JS.
  */
-const NODES = [
-  { n: 1, x: 340, y: 52, title: "Weather", color: "#157347" },
-  { n: 2, x: 456, y: 108, title: "Orchestrate", color: "#157347" },
-  { n: 3, x: 484, y: 233, title: "Send nudge", color: "#157347" },
-  { n: 4, x: 404, y: 333, title: "Farmer", color: "#1DA851", wa: true },
-  { n: 5, x: 276, y: 333, title: "Reply", color: "#157347" },
-  { n: 6, x: 196, y: 233, title: "Roll up", color: "#0E7490" },
-  { n: 7, x: 224, y: 108, title: "Monitor", color: "#B45309" },
-];
+const FLOW_PATH = "M170 171 L250 171 L330 171 L410 233 L490 171 L570 109 L650 47";
 
 const SEQ: [number, string, string, string][] = [
-  [1, "Watch the weather", "Amazon EventBridge · WeatherPoller Lambda", "#157347"],
+  [1, "Watch the weather", "Amazon EventBridge · WeatherPoller λ", "#157347"],
   [2, "Orchestrate", "AWS Step Functions", "#157347"],
   [3, "Send the nudge", "NudgeSender Lambda", "#157347"],
   [4, "Deliver to the farmer", "Meta WhatsApp Cloud API", "#1DA851"],
-  [5, "Capture the reply", "Amazon API Gateway · WebhookHandler Lambda", "#157347"],
-  [6, "Detect + roll up", "ResponseDetector · OutcomesAggregator · DynamoDB Streams", "#0E7490"],
+  [5, "Capture the reply", "API Gateway · WebhookHandler λ", "#157347"],
+  [6, "Detect + roll up", "Stream Lambdas → SUMMARY#", "#0E7490"],
   [7, "Monitor + act", "Vercel dashboard · re-nudge via OIDC", "#B45309"],
-];
-
-const LEGEND: [string, string][] = [
-  ["Engine — AWS", "#157347"],
-  ["Delivery — Meta WhatsApp", "#1DA851"],
-  ["Data", "#0E7490"],
-  ["Control — Vercel", "#B45309"],
 ];
 
 export function ArchitectureLoop() {
@@ -36,71 +21,59 @@ export function ArchitectureLoop() {
     <div style={{ marginBottom: 18 }}>
       <div style={{ overflowX: "auto" }}>
         <svg
-          viewBox="0 0 680 400"
+          viewBox="0 0 720 320"
           role="img"
           aria-labelledby="archt archd"
           style={{ display: "block", width: "100%", minWidth: 600, maxWidth: 720, height: "auto", margin: "0 auto" }}
           fontFamily="var(--font-inter), system-ui, sans-serif"
         >
-          <title id="archt">Outturn closed-loop architecture</title>
+          <title id="archt">Outturn architecture as stacked plane layers</title>
           <desc id="archd">
-            Seven numbered events arranged in a ring, in order: watch weather, orchestrate, send nudge,
-            deliver to the farmer on WhatsApp, capture the reply, detect and roll up, monitor and act,
-            all reading and writing a central Amazon DynamoDB table.
+            Four stacked layers — Vercel control, Amazon DynamoDB, the AWS engine, and Meta WhatsApp
+            delivery — with a numbered event flow from 1 to 7 crossing the layers in sequence.
           </desc>
-          <rect x="0" y="0" width="680" height="400" rx="16" fill="#FBF8F2" stroke="#E6E0D4" strokeWidth="1" />
-          <ellipse cx="340" cy="200" rx="148" ry="148" fill="none" stroke="#E1DACB" strokeWidth="1.5" />
+          <rect x="118" y="20" width="592" height="54" rx="10" fill="#FBEFD8" />
+          <rect x="118" y="82" width="592" height="54" rx="10" fill="#E1F0F0" />
+          <rect x="118" y="144" width="592" height="54" rx="10" fill="#E9F1EB" />
+          <rect x="118" y="206" width="592" height="54" rx="10" fill="#E4F5E9" />
 
-          {NODES.map((nd) => (
-            <line key={`sp-${nd.n}`} x1={nd.x} y1={nd.y} x2="340" y2="200" stroke="#EAE3D5" strokeWidth="1.5" />
-          ))}
-
-          {/* central hub */}
-          <g>
-            <rect x="273" y="176" width="134" height="48" rx="11" fill="#fff" stroke="#0E7490" strokeWidth="2" />
-            <text x="340" y="197" textAnchor="middle" fontSize="12.5" fontWeight="600" fill="#0E7490">Amazon DynamoDB</text>
-            <text x="340" y="212" textAnchor="middle" fontSize="9.5" fill="#5A554C">one table · Streams · reads + writes</text>
+          <g textAnchor="start">
+            <text x="10" y="44" fontSize="12" fontWeight="600" fill="#B45309">Control</text>
+            <text x="10" y="58" fontSize="10" fill="#8A8275">Vercel</text>
+            <text x="10" y="106" fontSize="12" fontWeight="600" fill="#0E7490">Data</text>
+            <text x="10" y="120" fontSize="10" fill="#8A8275">DynamoDB</text>
+            <text x="10" y="168" fontSize="12" fontWeight="600" fill="#157347">Engine</text>
+            <text x="10" y="182" fontSize="10" fill="#8A8275">AWS</text>
+            <text x="10" y="230" fontSize="12" fontWeight="600" fill="#1DA851">Delivery</text>
+            <text x="10" y="244" fontSize="10" fill="#8A8275">Meta WhatsApp</text>
           </g>
 
-          {/* nodes with a sequenced highlight (1 -> 7) */}
-          {NODES.map((nd) => {
-            const rx = nd.x - 56;
-            const ry = nd.y - 20;
-            return (
-              <g key={nd.n}>
-                <rect x={rx - 5} y={ry - 5} width={122} height={50} rx={12} fill={nd.color} opacity={0}>
-                  <animate
-                    attributeName="opacity"
-                    values="0;0.4;0;0"
-                    keyTimes="0;0.07;0.14;1"
-                    dur="7s"
-                    begin={`${nd.n - 1}s`}
-                    repeatCount="indefinite"
-                  />
-                </rect>
-                <rect x={rx} y={ry} width={112} height={40} rx={10} fill="#fff" stroke={nd.color} strokeWidth={1.8} />
-                <circle cx={rx + 18} cy={nd.y} r={11} fill={nd.color} />
-                <text x={rx + 18} y={nd.y + 4} textAnchor="middle" fontSize="11" fontWeight="700" fill="#fff">
-                  {nd.n}
-                </text>
-                <text x={rx + 35} y={nd.y + 4} fontSize="11.5" fontWeight="600" fill="#1A1714">
-                  {nd.title}
-                </text>
-                {nd.wa && (
-                  <path
-                    transform={`translate(${rx + 88}, ${nd.y - 6})`}
-                    d="M6 0C2.7 0 0 2.7 0 6c0 1.1.3 2.1.8 3L0 12l3.1-.8c.9.5 1.9.7 2.9.7 3.3 0 6-2.7 6-6S9.3 0 6 0z"
-                    fill="#1DA851"
-                  />
-                )}
-              </g>
-            );
-          })}
+          <text x="690" y="113" textAnchor="end" fontSize="9.5" fill="#5A554C">one table · Streams</text>
+
+          <polyline points="170,171 250,171 330,171 410,233 490,171 570,109 650,47" fill="none" stroke="#CFC8B8" strokeWidth="2.5" />
+          <path d="M650 47 C 690 47 690 171 530 171" fill="none" stroke="#D9D2C4" strokeWidth="1.5" strokeDasharray="4 4" />
+          <text x="556" y="158" fontSize="8.5" fill="#A89F8E">re-nudge</text>
+
+          <circle r="5" fill="#157347">
+            <animateMotion dur="6.5s" repeatCount="indefinite" path={FLOW_PATH} />
+          </circle>
+          <circle r="5" fill="#157347" opacity="0.5">
+            <animateMotion dur="6.5s" begin="-2.2s" repeatCount="indefinite" path={FLOW_PATH} />
+          </circle>
+
+          <g fontSize="13" fontWeight="700" fill="#fff" textAnchor="middle">
+            <circle cx="170" cy="171" r="15" fill="#157347" /><text x="170" y="175">1</text>
+            <circle cx="250" cy="171" r="15" fill="#157347" /><text x="250" y="175">2</text>
+            <circle cx="330" cy="171" r="15" fill="#157347" /><text x="330" y="175">3</text>
+            <circle cx="410" cy="233" r="15" fill="#1DA851" /><text x="410" y="237">4</text>
+            <circle cx="490" cy="171" r="15" fill="#157347" /><text x="490" y="175">5</text>
+            <circle cx="570" cy="109" r="15" fill="#0E7490" /><text x="570" y="113">6</text>
+            <circle cx="650" cy="47" r="15" fill="#B45309" /><text x="650" y="51">7</text>
+          </g>
         </svg>
       </div>
 
-      {/* sequence + service tags */}
-      <ol style={{ listStyle: "none", margin: "14px 0 0", padding: 0, display: "grid", gridTemplateColumns: "1fr", gap: 8 }} className="arch-seq">
+      <ol style={{ listStyle: "none", margin: "16px 0 0", padding: 0, display: "grid", gridTemplateColumns: "1fr", gap: 8 }} className="arch-seq">
         {SEQ.map(([n, title, svc, color]) => (
           <li key={n} style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
             <span
@@ -127,15 +100,6 @@ export function ArchitectureLoop() {
           </li>
         ))}
       </ol>
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 16px", marginTop: 14, fontSize: 12, color: "#5A554C" }}>
-        {LEGEND.map(([label, color]) => (
-          <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <span style={{ width: 10, height: 10, borderRadius: 3, background: color }} />
-            {label}
-          </span>
-        ))}
-      </div>
     </div>
   );
 }
