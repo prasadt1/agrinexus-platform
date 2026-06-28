@@ -50,10 +50,7 @@ export default function NewCohortPage() {
     const sp = new URLSearchParams(window.location.search);
     const p = sp.get("plan");
     if (p === "starter" || p === "growth" || p === "enterprise") setPlan(p);
-    if (sp.get("checkout") === "1") {
-      setCheckoutIntent(true);
-      setStep(3);
-    }
+    if (sp.get("checkout") === "1") setCheckoutIntent(true);
   }, []);
 
   if (!isAdmin) {
@@ -133,6 +130,16 @@ export default function NewCohortPage() {
         title="New cohort"
         description="Set up a group of farmers in one district for WhatsApp advisory."
       />
+
+      {checkoutIntent && (
+        <div
+          className="mb-6 p-3 rounded-lg text-sm"
+          style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
+        >
+          Setting up your first cohort on the <strong>{PLANS.find((p) => p.id === plan)?.name}</strong>{" "}
+          plan — you&apos;ll continue to secure payment after this quick review.
+        </div>
+      )}
 
       {/* Step indicator */}
       <div className="flex gap-2 mb-8">
