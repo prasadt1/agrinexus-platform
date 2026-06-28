@@ -567,6 +567,23 @@ body {
   to { width: 100%; }
 }
 
+/* =============================================================================
+   Landing page responsive grids
+   ============================================================================= */
+.hero-grid, .diff-grid, .steps-grid, .stats-grid, .arch-grid { display: grid; grid-template-columns: 1fr; }
+.hero-grid { gap: 36px; align-items: center; }
+.diff-grid { gap: 16px; }
+.steps-grid { gap: 28px; }
+.stats-grid { gap: 28px; }
+.arch-grid { gap: 16px; }
+@media (min-width: 768px) {
+  .hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: 48px; }
+  .diff-grid { grid-template-columns: 1fr 1.25fr; }
+  .steps-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .arch-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 .hiw-phone {
   width: 188px;
   background: #fff;
