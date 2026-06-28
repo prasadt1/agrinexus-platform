@@ -18,6 +18,7 @@ import {
   toast,
   CropIcon,
   CropImage,
+  LanguagePills,
 } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 
@@ -180,8 +181,8 @@ export default function CohortsPage() {
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell className="text-secondary">
-                    {cohort.languages.map((l) => l.toUpperCase()).join(", ")}
+                  <TableCell>
+                    <LanguagePills languages={cohort.languages} />
                   </TableCell>
                   <TableCell>
                     <Badge status={cohort.status} />

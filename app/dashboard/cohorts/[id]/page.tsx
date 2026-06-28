@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { Card, Badge, Button, EmptyState, LineageBadge, toast, CropImage } from "@/app/components";
+import { Card, Badge, Button, EmptyState, LineageBadge, toast, CropIcon, LanguagePills, MaharashtraMap } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { parseFarmerLines } from "@/lib/parse-farmers";
 import { attentionFor } from "@/lib/attention";
@@ -277,29 +277,33 @@ export default function CohortDetailPage({
         </div>
       </div>
 
-      {/* Hero banner — large crop photo (falls back to a themed crop emblem) */}
-      <div
-        className="relative h-48 md:h-60 rounded-xl overflow-hidden mb-6"
-        style={{ background: "var(--color-primary-tint)" }}
-      >
-        <CropImage crop={(cohort.crops && cohort.crops[0]) || ""} fill priority rounded="none" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(to top, rgba(0,0,0,0.66) 0%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0) 72%)",
-          }}
-        />
-        <div className="absolute left-5 right-5 bottom-4">
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-page-title" style={{ color: "#fff" }}>
-              {cohort.district}
-            </h1>
+      {/* Hero — district on the map + its identity */}
+      <div className="mb-6 grid gap-5 md:grid-cols-[280px_1fr] items-stretch">
+        <MaharashtraMap highlight={[cohort.district]} maxWidth={280} />
+        <div className="flex flex-col justify-center">
+          <p className="text-label mb-2" style={{ color: "var(--color-primary)" }}>
+            District advisory
+          </p>
+          <div className="flex items-center gap-3 mb-3 flex-wrap">
+            <h1 className="text-page-title">{cohort.district}</h1>
             <Badge status={cohort.status} />
           </div>
-          <p style={{ color: "rgba(255,255,255,0.92)" }}>
-            {(cohort.crops || []).join(", ")} • {(cohort.languages || []).map((l) => l.toUpperCase()).join(", ")}
-          </p>
+          {(cohort.crops || []).length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap mb-3">
+              {(cohort.crops || []).map((crop) => (
+                <span key={crop} className="chip inline-flex items-center gap-1.5 capitalize">
+                  <CropIcon crop={crop} size={15} />
+                  {crop}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+              Reaching farmers in
+            </span>
+            <LanguagePills languages={cohort.languages || []} />
+          </div>
         </div>
       </div>
 
