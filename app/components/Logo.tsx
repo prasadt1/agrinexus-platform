@@ -8,7 +8,7 @@ export function AgriNexusLogo({ size = 32 }: { size?: number }) {
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/agrinexus-mark.png"
-      alt="Outturn"
+      alt="Outturn Advisory"
       width={size}
       height={size}
       style={{ display: "block", objectFit: "contain" }}
@@ -41,6 +41,15 @@ export function AgriNexusWordmark({ light }: { light?: boolean }) {
         }}
       >
         Out<span style={{ color: light ? "#6EE7A8" : "var(--color-primary)" }}>turn</span>
+        <span
+          style={{
+            fontWeight: 500,
+            marginLeft: 6,
+            color: light ? "rgba(249,250,251,0.66)" : "var(--color-text-muted)",
+          }}
+        >
+          Advisory
+        </span>
       </span>
     </div>
   );
