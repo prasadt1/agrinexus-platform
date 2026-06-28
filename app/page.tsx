@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { HowItWorks } from "@/app/components/HowItWorks";
 import { TryDemoButton } from "@/app/components/TryDemoButton";
-import { AgriNexusLogo } from "@/app/components/Logo";
+import { OutturnMark } from "@/app/components/OutturnMark";
 
 const WA_LINK =
   "https://wa.me/4915120105731?text=Hi%20Outturn%2C%20show%20me%20the%20advisory%20demo";
@@ -11,7 +11,7 @@ const C = {
   cream2: "#FBF8F2",
   ink: "#1A1714",
   muted: "#5A554C",
-  faint: "#8A8275",
+  faint: "#726A5C",
   green: "#157347",
   greenD: "#0F5132",
   greenTint: "#E9F1EB",
@@ -64,7 +64,7 @@ export default function LandingPage() {
         }}
       >
         <a href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 11 }}>
-          <AgriNexusLogo size={40} />
+          <OutturnMark size={46} />
           <span style={{ display: "inline-flex", flexDirection: "column", lineHeight: 1.1 }}>
             <span style={{ fontFamily: SERIF, fontSize: 24, color: C.ink, fontWeight: 500 }}>
               Out<span style={{ color: C.green }}>turn</span>
@@ -80,6 +80,9 @@ export default function LandingPage() {
           </a>
           <a href="#why" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
             Why it matters
+          </a>
+          <a href="#pricing" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
+            Plans
           </a>
           <a href="#architecture" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
             Architecture
@@ -324,6 +327,67 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing */}
+      <section id="pricing" style={{ maxWidth: 1180, margin: "0 auto", padding: "60px 32px" }}>
+        <Eyebrow>Plans</Eyebrow>
+        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 6px", fontWeight: 500 }}>
+          Priced to scale with the programme.
+        </h2>
+        <p style={{ fontSize: 16, color: C.muted, maxWidth: 620, margin: "0 0 28px", lineHeight: 1.6 }}>
+          Every plan includes the full closed-loop engine. You license active cohorts; larger
+          programmes unlock analytics, white-label, and integrations.
+        </p>
+        <div className="arch-grid">
+          {([
+            ["Starter", "From $99", "/ month", "Small programmes and KVKs", false, ["Up to 3 active cohorts", "The full closed-loop engine", "Monthly follow-through outcomes", "Email support"]],
+            ["Growth", "From $399", "/ month", "NGOs across several districts", true, ["Up to 15 active cohorts", "District analytics + audit log", "Priority WhatsApp delivery", "Your brand colour (white-label)"]],
+            ["Enterprise", "Custom", "", "Agri-input companies and government", false, ["Unlimited cohorts and tenants", "Full white-label + SSO", "Custom integrations and API", "SLA and onboarding support"]],
+          ] as [string, string, string, string, boolean, string[]][]).map(([name, price, unit, who, popular, features]) => (
+            <div
+              key={name}
+              style={{
+                position: "relative",
+                background: C.white,
+                border: popular ? `2px solid ${C.green}` : `1px solid ${C.border}`,
+                borderRadius: 14,
+                padding: 22,
+              }}
+            >
+              {popular && (
+                <span style={{ position: "absolute", top: -11, left: 22, background: C.green, color: "#fff", fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 999 }}>
+                  Most popular
+                </span>
+              )}
+              <h3 style={{ fontFamily: SERIF, fontSize: 21, margin: "0 0 2px", fontWeight: 500 }}>{name}</h3>
+              <p style={{ fontSize: 12.5, color: C.muted, margin: "0 0 12px" }}>{who}</p>
+              <p style={{ margin: "0 0 14px" }}>
+                <span style={{ fontFamily: SERIF, fontSize: 28, color: C.ink, fontWeight: 500 }}>{price}</span>
+                {unit && <span style={{ fontSize: 13, color: C.faint }}> {unit}</span>}
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                {features.map((f) => (
+                  <span key={f} style={{ display: "flex", gap: 8, fontSize: 13.5, color: C.muted }}>
+                    <Check color={C.green} />
+                    {f}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 20, display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
+          <a
+            href="mailto:partners@outturn.app?subject=Outturn%20partner%20pilot"
+            style={{ background: C.green, color: C.white, fontSize: 14, fontWeight: 500, padding: "10px 18px", borderRadius: 10, textDecoration: "none" }}
+          >
+            Talk to us about a pilot
+          </a>
+          <span style={{ fontSize: 12.5, color: C.faint }}>
+            Cohorts are activated in-product via Stripe checkout. Representative pricing shown.
+          </span>
+        </div>
+      </section>
+
       {/* Why it matters — dark punctuation */}
       <section id="why" style={{ background: C.dark }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "62px 32px" }}>
@@ -534,7 +598,7 @@ export default function LandingPage() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <AgriNexusLogo size={26} />
+            <OutturnMark size={28} />
             <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
               <span style={{ fontFamily: SERIF, fontSize: 17, color: C.ink, fontWeight: 500 }}>
                 Out<span style={{ color: C.green }}>turn</span>
