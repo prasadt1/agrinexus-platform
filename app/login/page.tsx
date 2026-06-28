@@ -81,7 +81,7 @@ export default function LoginPage() {
           </p>
         </div>
         <p className="text-xs" style={{ color: "var(--color-sidebar-text)" }}>
-          Outturn — advice on WhatsApp, follow-through you can see.
+          AgriNexus AI — winner of the AWS AIdeas Innovation Award.
         </p>
       </div>
 
