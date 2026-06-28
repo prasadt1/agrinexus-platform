@@ -133,7 +133,7 @@ export function ArchitectureLoop() {
           <text x="64" y="149" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff" letterSpacing="0.4">CONTROL</text>
           <text x="64" y="165" textAnchor="middle" fontSize="9" fill="#fff" opacity="0.9">Vercel · Next.js</text>
           <Row labels={["Multi-tenant, white-label dashboard", "Cohort provisioning", "Stripe licensing"]} cy={126} h={40} stroke={GREEN} allGreen />
-          <Row labels={["Follow-through roll-ups", "Re-nudge / activate", "Reports · Audit · Leads"]} cy={182} h={40} stroke={GREEN} allGreen />
+          <Row labels={["Follow-through roll-ups", "Re-nudge / activate", "Reports · Activity · Leads"]} cy={182} h={40} stroke={GREEN} allGreen />
 
           {/* ================= DATA PLANE (green — H0 owns the schema) ================= */}
           <rect x="128" y="236" width="736" height="128" rx="12" fill="#E9F1EB" stroke={GREEN} strokeOpacity="0.45" strokeWidth="1.4" />
