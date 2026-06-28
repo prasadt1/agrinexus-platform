@@ -455,9 +455,9 @@ const STEPS: Step[] = [
     stage: () => <RollupStage />,
   },
   {
-    key: "proof",
-    short: "Proof",
-    title: "5 · The partner sees the proof",
+    key: "view",
+    short: "Visibility",
+    title: "5 · The partner sees follow-through",
     plain:
       "The sponsoring partner sees real follow-through: outcomes, not just messages sent.",
     tech: "The Vercel-hosted dashboard reads the pre-computed SUMMARY# record, so loads stay fast and cheap.",
