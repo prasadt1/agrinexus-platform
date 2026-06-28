@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Card, Badge, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, CropImage } from "@/app/components";
+import { Card, EmptyState, AdvisoryLoopHero, LineageBadge, HowItWorks, Term, CropImage, MaharashtraMap } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 import { attentionFor } from "@/lib/attention";
 
@@ -79,6 +79,8 @@ export default function OverviewPage() {
       }),
     }))
     .filter((x) => x.flag.needsAttention);
+  const activeDistricts = Array.from(new Set(activeCohorts.map((c) => c.district)));
+  const listCohorts = (topCohorts.length > 0 ? topCohorts : activeCohorts).slice(0, 6);
 
   return (
     <div className="py-10 px-8">
@@ -273,65 +275,90 @@ export default function OverviewPage() {
         </section>
       )}
 
-      {/* Needs attention — where to act */}
+      {/* Needs attention — a loud, act-now call to action */}
       {attentionCohorts.length > 0 && (
         <section className="mb-8">
-          <Card>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-card-title">Needs attention</h2>
+          <div
+            className="rounded-xl p-6"
+            style={{
+              background: "var(--color-warning-bg)",
+              border: "1px solid var(--color-warning)",
+              borderLeft: "5px solid var(--color-warning)",
+            }}
+          >
+            <div className="flex items-center gap-3 mb-1">
               <span
-                className="text-sm px-2 py-1 rounded"
-                style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)" }}
+                className="inline-flex items-center justify-center w-7 h-7 rounded-full shrink-0"
+                style={{ background: "var(--color-warning)", color: "#fff" }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
+                </svg>
+              </span>
+              <h2 className="text-card-title" style={{ color: "var(--color-warning)" }}>
+                Needs attention
+              </h2>
+              <span
+                className="ml-auto text-sm font-semibold px-2.5 py-1 rounded-full"
+                style={{ background: "var(--color-warning)", color: "#fff" }}
               >
                 {attentionCohorts.length} cohort{attentionCohorts.length === 1 ? "" : "s"}
               </span>
             </div>
             <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
-              These cohorts are underperforming. Open one to send a fresh nudge to the farmers who
-              haven&apos;t acted.
+              These cohorts are slipping. Open one to re-send a reminder to the farmers who
+              haven&apos;t acted yet.
             </p>
-            <div className="space-y-2">
+            <div className="grid sm:grid-cols-2 gap-3">
               {attentionCohorts.map(({ c, flag }) => (
                 <Link
                   key={c.cohortId}
                   href={`/dashboard/cohorts/${c.cohortId}`}
-                  className="flex items-center justify-between gap-4 p-3 rounded-lg hover:bg-opacity-50 transition-colors"
-                  style={{ border: "1px solid var(--color-border)" }}
+                  className="flex items-center justify-between gap-4 p-3 rounded-lg transition-shadow hover:shadow-md"
+                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ background: "var(--color-warning)" }}
-                    />
-                    <div className="min-w-0">
-                      <p className="font-medium truncate">{c.district}</p>
-                      <p className="text-xs truncate" style={{ color: "var(--color-text-muted)" }}>
-                        {(c.crops || []).join(", ")}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-sm" style={{ color: "var(--color-warning)" }}>
+                  <div className="min-w-0">
+                    <p className="font-semibold truncate">{c.district}</p>
+                    <p className="text-xs truncate" style={{ color: "var(--color-warning)" }}>
                       {flag.label}
-                    </span>
-                    <span className="text-sm font-medium" style={{ color: "var(--color-primary)" }}>
-                      Review →
-                    </span>
+                    </p>
                   </div>
+                  <span className="text-sm font-semibold shrink-0" style={{ color: "var(--color-primary)" }}>
+                    Re-nudge →
+                  </span>
                 </Link>
               ))}
             </div>
-          </Card>
+          </div>
         </section>
       )}
 
-      {/* Two Column: Top Cohorts + Quick Stats */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Top Performing Cohorts */}
+      {/* Coverage + cohorts — one consolidated view */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Coverage map */}
+        <div className="lg:col-span-1">
+          <Card>
+            <h2 className="text-card-title mb-4">Where you work</h2>
+            {loading ? (
+              <div className="h-56 rounded-xl animate-pulse" style={{ background: "var(--color-page-bg)" }} />
+            ) : activeDistricts.length > 0 ? (
+              <MaharashtraMap highlight={activeDistricts} showLabels={activeDistricts.length <= 8} />
+            ) : (
+              <MaharashtraMap highlight={[]} showLabels={false} />
+            )}
+            <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+              <CoverageStat value={activeDistricts.length} label="Districts" loading={loading} />
+              <CoverageStat value={activeCohorts.length} label="Active cohorts" loading={loading} />
+              <CoverageStat value={totals?.farmers || 0} label="Farmers" loading={loading} />
+            </div>
+          </Card>
+        </div>
+
+        {/* Cohorts — ranked, the single source for "which cohorts" */}
         <div className="lg:col-span-2">
           <Card>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-card-title">Top Performing Cohorts</h2>
+              <h2 className="text-card-title">Your cohorts</h2>
               <Link
                 href="/dashboard/cohorts"
                 className="text-sm font-medium"
@@ -347,119 +374,47 @@ export default function OverviewPage() {
                   <div key={i} className="h-16 rounded-lg" style={{ background: "var(--color-border)" }} />
                 ))}
               </div>
-            ) : topCohorts.length > 0 ? (
+            ) : listCohorts.length > 0 ? (
               <div className="space-y-3">
-                {topCohorts.map((cohort, idx) => (
+                {listCohorts.map((cohort, idx) => (
                   <CohortRow key={cohort.cohortId} cohort={cohort} rank={idx + 1} />
                 ))}
               </div>
             ) : (
               <EmptyState
-                title="No activity yet"
-                description="Advisories will appear here once farmers start receiving them."
+                title="No active cohorts yet"
+                description="Activate a cohort to start monitoring farmer follow-through."
+                action={
+                  <Link href="/dashboard/cohorts">
+                    <button className="btn btn-primary">Manage cohorts</button>
+                  </Link>
+                }
               />
             )}
           </Card>
         </div>
-
-        {/* Quick Stats */}
-        <div>
-          <Card>
-            <h2 className="text-card-title mb-6">Cohort Summary</h2>
-            <div className="space-y-4">
-              <QuickStatRow
-                label="Total Cohorts"
-                value={totals?.cohorts || 0}
-                loading={loading}
-              />
-              <QuickStatRow
-                label="Active"
-                value={totals?.activeCohorts || 0}
-                loading={loading}
-                color="var(--color-status-active)"
-              />
-              <QuickStatRow
-                label="Draft"
-                value={(totals?.cohorts || 0) - (totals?.activeCohorts || 0)}
-                loading={loading}
-                color="var(--color-text-muted)"
-              />
-              <div className="border-t pt-4" style={{ borderColor: "var(--color-border)" }}>
-                <QuickStatRow
-                  label="Expired Nudges"
-                  value={totals?.nudgesExpired || 0}
-                  loading={loading}
-                  color="var(--color-chart-3)"
-                />
-              </div>
-            </div>
-          </Card>
-        </div>
       </section>
+    </div>
+  );
+}
 
-      {/* Active Cohorts List */}
-      <section>
-        <Card>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-card-title">Active Cohorts</h2>
-            <span
-              className="text-sm px-2 py-1 rounded"
-              style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
-            >
-              {activeCohorts.length} active
-            </span>
-          </div>
+// =============================================================================
+// Coverage Stat (small figure under the map)
+// =============================================================================
 
-          {loading ? (
-            <div className="animate-pulse space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-14 rounded" style={{ background: "var(--color-border)" }} />
-              ))}
-            </div>
-          ) : activeCohorts.length > 0 ? (
-            <div className="divide-y" style={{ borderColor: "var(--color-border)" }}>
-              {activeCohorts.map((cohort) => (
-                <Link
-                  key={cohort.cohortId}
-                  href={`/dashboard/cohorts/${cohort.cohortId}`}
-                  className="flex items-center justify-between py-4 transition-colors hover:bg-opacity-50"
-                  style={{ background: "transparent" }}
-                >
-                  <div className="flex items-center gap-4">
-                    <CropImage crop={cohort.crops[0] || ""} size={48} className="shrink-0" />
-                    <div>
-                      <p className="font-medium">{cohort.district}</p>
-                      <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                        {cohort.crops.join(", ")} · {cohort.memberCount} farmer
-                        {cohort.memberCount === 1 ? "" : "s"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <div className="text-right">
-                      <p className="text-sm font-medium">{cohort.nudgesSent} reminders</p>
-                      <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                        {cohort.nudgesCompleted} acted
-                      </p>
-                    </div>
-                    <Badge status={cohort.status} />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              title="No active cohorts"
-              description="Activate a cohort to start monitoring farmer engagement."
-              action={
-                <Link href="/dashboard/cohorts">
-                  <button className="btn btn-primary">Manage Cohorts</button>
-                </Link>
-              }
-            />
-          )}
-        </Card>
-      </section>
+function CoverageStat({ value, label, loading }: { value: number; label: string; loading?: boolean }) {
+  return (
+    <div className="rounded-lg py-2.5" style={{ background: "var(--color-page-bg)" }}>
+      {loading ? (
+        <div className="h-6 w-8 mx-auto rounded animate-pulse" style={{ background: "var(--color-border)" }} />
+      ) : (
+        <p className="text-kpi-sm" style={{ fontSize: 22, lineHeight: 1.1 }}>
+          {value.toLocaleString()}
+        </p>
+      )}
+      <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+        {label}
+      </p>
     </div>
   );
 }
@@ -612,33 +567,3 @@ function MiniSparkline({ rate }: { rate: number }) {
   );
 }
 
-// =============================================================================
-// Quick Stat Row Component
-// =============================================================================
-
-function QuickStatRow({
-  label,
-  value,
-  loading,
-  color,
-}: {
-  label: string;
-  value: number;
-  loading?: boolean;
-  color?: string;
-}) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-        {label}
-      </span>
-      {loading ? (
-        <div className="h-5 w-8 rounded animate-pulse" style={{ background: "var(--color-page-bg)" }} />
-      ) : (
-        <span className="font-medium" style={{ color: color || "var(--color-text-primary)" }}>
-          {value}
-        </span>
-      )}
-    </div>
-  );
-}
