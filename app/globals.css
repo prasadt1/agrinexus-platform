@@ -781,6 +781,18 @@ body {
   .btn:hover:not(:disabled) { transform: none; }
 }
 
+/* Architecture gallery — hide the scroll-snap track's scrollbar (scroll still works) */
+.arch-gallery-track { scrollbar-width: none; -ms-overflow-style: none; }
+.arch-gallery-track::-webkit-scrollbar { display: none; }
+
+/* In-panel preview fits the slide width so the carousel (not the diagram) scrolls.
+   Full detail is available via the Expand button. */
+.arch-slide-fit { width: 100%; }
+.arch-slide-fit svg { width: 100% !important; min-width: 0 !important; height: auto; }
+
+/* Expanded view: let the diagram fill the wide modal (scrolls if still wider). */
+.arch-modal-fit svg { width: 100% !important; min-width: 0 !important; height: auto; }
+
 /* Lineage badge */
 .lineage-badge {
   display: inline-flex;

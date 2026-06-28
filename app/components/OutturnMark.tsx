@@ -1,8 +1,10 @@
 /**
- * Outturn brand mark — a bold vector: a circle (the closed loop), a checkmark
- * (accountability / done), and the check's tip growing into a leaf (agriculture).
- * Vector so it stays crisp and legible at any size, with no PNG square behind it.
- * `tone="light"` is for dark surfaces (the dashboard sidebar).
+ * Outturn brand mark — the generated mark (ring + checkmark sprouting leaves)
+ * shipped as a single transparent PNG at /public/outturn-mark.png.
+ *
+ * Rendered as a CSS mask filled with the brand colour so the ONE asset recolours
+ * itself: deep green (#157347) on light surfaces, light green (#6EE7A8) on the
+ * dark dashboard sidebar (`tone="light"`). Stays crisp at any size.
  */
 export function OutturnMark({
   size = 32,
@@ -13,24 +15,23 @@ export function OutturnMark({
 }) {
   const color = tone === "light" ? "#6EE7A8" : "#157347";
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      fill="none"
+    <span
       role="img"
       aria-label="Outturn"
-      style={{ color, display: "block" }}
-    >
-      <circle cx="22" cy="25" r="15" stroke="currentColor" strokeWidth="3.4" />
-      <path
-        d="M13 25l6 6L33 12"
-        stroke="currentColor"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M33 12c1-5 4-7 9-8 0 5-3 8-9 8z" fill="currentColor" />
-    </svg>
+      style={{
+        display: "inline-block",
+        width: size,
+        height: size,
+        backgroundColor: color,
+        WebkitMaskImage: "url(/outturn-mark.png)",
+        maskImage: "url(/outturn-mark.png)",
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+      }}
+    />
   );
 }
