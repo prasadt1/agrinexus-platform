@@ -240,99 +240,44 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* What it does — the capability suite */}
+      {/* What it does — the accountability layer (the H0 contribution) */}
       <section style={{ maxWidth: 1180, margin: "0 auto", padding: "4px 32px 60px" }}>
         <Eyebrow>What it does</Eyebrow>
-        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(26px, 4vw, 38px)", lineHeight: 1.12, margin: "12px 0 8px", fontWeight: 500 }}>
-          A full advisory engine on WhatsApp — that closes the loop.
+        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(26px, 4vw, 38px)", lineHeight: 1.12, margin: "12px 0 10px", fontWeight: 500 }}>
+          The accountability layer for farm advice.
         </h2>
-        <p style={{ fontSize: 16, color: C.muted, maxWidth: 690, margin: "0 0 20px", lineHeight: 1.6 }}>
-          Built on AgriNexus AI —{" "}
-          <a
-            href="https://builder.aws.com/content/3C8hBRTcsRuQrHzE3Pq243yhXTF/aideas-finalist-agrinexus-ai"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: C.green, textDecoration: "underline", textUnderlineOffset: 2 }}
-          >
-            winner of the AWS AIdeas Innovation Award
-          </a>{" "}
-          — a multimodal farm-advisory engine. Farmers get far more than a reminder; partners get proof
-          it worked.
+        <p style={{ fontSize: 16.5, color: C.ink, maxWidth: 705, margin: "0 0 30px", lineHeight: 1.6 }}>
+          Outturn runs on a multi-modal, closed-loop advisory engine — it reaches farmers by text,
+          voice and photo. The layer we built is what makes every piece of that advice{" "}
+          <strong style={{ fontWeight: 600 }}>accountable</strong>: tracked, rolled up, audited, and
+          re-sent when it slips.
         </p>
-        {/* Proof — walk the talk */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 30 }}>
-          {(
-            [
-              ["Watch the full demo", "https://www.youtube.com/watch?v=Hr9EcblzkwI", <path key="i" d="M8 5v14l11-7z" fill="currentColor" stroke="none" />],
-              ["AWS AIdeas write-up", "https://builder.aws.com/content/3C8hBRTcsRuQrHzE3Pq243yhXTF/aideas-finalist-agrinexus-ai", <path key="i" strokeLinecap="round" strokeLinejoin="round" d="M14 3v5h5M15 3H7a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V8l-5-5z" />],
-              ["Engine on GitHub", "https://github.com/prasadt1/agrinexus-ai", <path key="i" strokeLinecap="round" strokeLinejoin="round" d="M16 18l6-6-6-6M8 6l-6 6 6 6" />],
-              ["Try it on WhatsApp", WA_LINK, <path key="i" strokeLinecap="round" strokeLinejoin="round" d="M21 11.5a8.38 8.38 0 01-9 8.5 8.5 8.5 0 01-3.8-.9L3 21l1.9-5.2A8.38 8.38 0 014 11.5 8.5 8.5 0 0112 3a8.38 8.38 0 019 8.5z" />],
-            ] as [string, string, React.ReactNode][]
-          ).map(([label, href, icon]) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                fontSize: 13.5,
-                fontWeight: 500,
-                color: C.ink,
-                textDecoration: "none",
-                padding: "9px 15px",
-                borderRadius: 999,
-                border: `1px solid ${C.border}`,
-                background: C.white,
-              }}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} style={{ color: C.green }} aria-hidden="true">
-                {icon}
-              </svg>
-              {label}
-            </a>
-          ))}
-        </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16 }}>
           {(
             [
               [
-                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M7 18a4 4 0 01-.5-7.97A6 6 0 0118 9.5a3.5 3.5 0 01-.5 8.5H7z" />,
-                "Weather-timed advice",
-                "Spray and irrigation windows from live weather, per district.",
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M9 11l3 3L20 5M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" />,
+                "Tracked to the last farmer",
+                "Every nudge resolves to Done or not — per farmer, per cohort.",
                 false,
               ],
               [
-                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M21 11.5a8.38 8.38 0 01-9 8.5 8.5 8.5 0 01-3.8-.9L3 21l1.9-5.2A8.38 8.38 0 014 11.5 8.5 8.5 0 0112 3a8.38 8.38 0 019 8.5z" />,
-                "Two-way on WhatsApp",
-                "Farmers reply Done or Not yet — no app to install.",
-                false,
-              ],
-              [
-                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zM19 10v2a7 7 0 01-14 0v-2M12 19v3" />,
-                "Voice notes",
-                "Farmers can answer by voice; advice can go out as audio.",
-                false,
-              ],
-              [
-                <g key="p"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8a2 2 0 012-2h1.5L8 4h8l1.5 2H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" /><circle cx="12" cy="13" r="3.2" /></g>,
-                "Photo diagnosis",
-                "Send a crop photo — the engine flags pest or disease.",
-                false,
-              ],
-              [
-                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
-                "Ask anything",
-                "Farmers ask questions in their own language and get answers.",
-                false,
-              ],
-              [
-                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M20 12a8 8 0 11-2.3-5.6M20 4v4h-4M9 12l2 2 4-4" />,
-                "Follow-through + re-nudge",
-                "Tracked to done — and re-nudged if not. This is the differentiator.",
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M12 3l9 4.5-9 4.5-9-4.5L12 3zM3 12l9 4.5 9-4.5M3 16.5l9 4.5 9-4.5" />,
+                "Live roll-ups, no batch jobs",
+                "DynamoDB Streams aggregate every reply into per-district follow-through summaries, in real time.",
                 true,
+              ],
+              [
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4" />,
+                "An audit trail",
+                "Every cohort, license and reminder cycle recorded — and not editable after the fact.",
+                false,
+              ],
+              [
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M20 12a8 8 0 11-2.3-5.6M20 4v4h-4" />,
+                "Act on what slips",
+                "Re-nudge the farmers who haven't acted — by hand or on a schedule.",
+                false,
               ],
             ] as [React.ReactNode, string, string, boolean][]
           ).map(([icon, title, desc, hero]) => (
@@ -366,6 +311,53 @@ export default function LandingPage() {
               <p style={{ fontSize: 13.5, color: C.muted, margin: 0, lineHeight: 1.5 }}>{desc}</p>
             </div>
           ))}
+        </div>
+        {/* Powered-by footnote — the engine + the award, demoted to a credibility line */}
+        <div
+          style={{
+            marginTop: 24,
+            padding: "13px 18px",
+            borderRadius: 12,
+            border: `1px solid ${C.border}`,
+            background: C.cream2,
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: "8px 16px",
+          }}
+        >
+          <span style={{ fontSize: 13.5, color: C.muted }}>
+            Powered by <strong style={{ color: C.ink, fontWeight: 600 }}>AgriNexus AI</strong> — a
+            multi-modal advisory engine,{" "}
+            <a
+              href="https://builder.aws.com/content/3C8hBRTcsRuQrHzE3Pq243yhXTF/aideas-finalist-agrinexus-ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: C.green, textDecoration: "underline", textUnderlineOffset: 2 }}
+            >
+              winner of the AWS AIdeas Innovation Award
+            </a>
+            .
+          </span>
+          <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 16, marginLeft: "auto", fontSize: 13, fontWeight: 500 }}>
+            {(
+              [
+                ["▶ Demo", "https://www.youtube.com/watch?v=Hr9EcblzkwI"],
+                ["Code", "https://github.com/prasadt1/agrinexus-ai"],
+                ["Write-up", "https://builder.aws.com/content/3C8hBRTcsRuQrHzE3Pq243yhXTF/aideas-finalist-agrinexus-ai"],
+              ] as [string, string][]
+            ).map(([label, href]) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: C.ink, textDecoration: "none", borderBottom: `1px solid ${C.border}` }}
+              >
+                {label}
+              </a>
+            ))}
+          </span>
         </div>
       </section>
 
