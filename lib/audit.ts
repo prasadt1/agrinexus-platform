@@ -43,7 +43,9 @@ export type AuditEventType =
   | "cohort.created"
   | "cohort.activated"
   | "cycle.run"
-  | "license.issued";
+  | "license.issued"
+  | "cohort.renudged"
+  | "lead.received";
 
 export interface AuditEventInput {
   tenantId: string;

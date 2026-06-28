@@ -50,7 +50,7 @@ export default function NewCohortPage() {
         <Card>
           <p className="font-medium">Admin access required</p>
           <p className="mt-2 text-sm" style={{ color: "var(--color-text-muted)" }}>
-            Sign in with an admin demo persona to provision cohorts.
+            You need an admin account to create cohorts. Ask your team&apos;s admin, or switch to an admin login.
           </p>
           <Link href="/dashboard/cohorts" className="btn btn-secondary mt-4 inline-flex">
             Back to cohorts
@@ -104,7 +104,7 @@ export default function NewCohortPage() {
 
       {/* Step indicator */}
       <div className="flex gap-2 mb-8">
-        {["Location & crops", "Nudge rules", "Plan & review"].map((label, i) => (
+        {["Location & crops", "Reminder settings", "Plan & review"].map((label, i) => (
           <div
             key={label}
             className="flex-1 text-center py-2 rounded-lg text-xs font-medium"
@@ -122,7 +122,7 @@ export default function NewCohortPage() {
         {step === 1 && (
           <div className="space-y-6">
             <div>
-              <label className="text-label block mb-2">District → GSI1 LOCATION#</label>
+              <label className="text-label block mb-2">District</label>
               <select value={district} onChange={(e) => setDistrict(e.target.value)} className="input select">
                 <option value="">Select district…</option>
                 {SUPPORTED_DISTRICTS.map((d) => (
@@ -171,7 +171,7 @@ export default function NewCohortPage() {
               </div>
             </div>
             <Button onClick={() => setStep(2)} disabled={!district || selectedCrops.length === 0}>
-              Next: Nudge rules
+              Next: Reminder settings
             </Button>
           </div>
         )}
@@ -179,8 +179,8 @@ export default function NewCohortPage() {
         {step === 2 && (
           <div className="space-y-6">
             <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              The safe-spray window for this cohort — the weather conditions under which farmers are
-              nudged to spray.
+              These limits decide when this cohort&apos;s farmers are nudged to spray, and how
+              reminders are paced.
             </p>
             <div className="grid grid-cols-2 gap-4">
               {[
@@ -245,12 +245,12 @@ export default function NewCohortPage() {
               <p><strong>District:</strong> {district}</p>
               <p><strong>Crops:</strong> {selectedCrops.join(", ")}</p>
               <p><strong>Languages:</strong> {selectedLangs.join(", ")}</p>
-              <p><strong>Status:</strong> draft (activate after creation)</p>
+              <p><strong>Status:</strong> Not yet live — you&apos;ll activate it after it&apos;s created</p>
             </div>
             <div className="flex gap-3">
               <Button variant="secondary" onClick={() => setStep(2)}>Back</Button>
               <Button onClick={handleSubmit} disabled={submitting}>
-                {submitting ? "Creating…" : "Create cohort (draft)"}
+                {submitting ? "Creating…" : "Create cohort"}
               </Button>
             </div>
           </div>

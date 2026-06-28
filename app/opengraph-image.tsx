@@ -33,7 +33,7 @@ export default async function Image() {
           <div style={{ fontSize: 46, fontWeight: 700 }}>Outturn</div>
         </div>
         <div style={{ fontSize: 30, opacity: 0.92, maxWidth: 860, lineHeight: 1.35 }}>
-          Proof of what your advisory program produced. Powered by AgriNexus AI.
+          Timely crop advice on WhatsApp — and a clear view of who acts on it.
         </div>
         <div style={{ fontSize: 18, marginTop: 34, opacity: 0.72 }}>
           Vercel + Amazon DynamoDB · H0 Hackathon

@@ -59,11 +59,29 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   },
 ];
 
-export const DEMO_TENANTS = [
-  { tenantId: 'demo-tenant-001', name: 'GreenHarvest NGO' },
-  { tenantId: 'demo-tenant-002', name: 'AgriInput Corp' },
-  { tenantId: 'demo-tenant-003', name: 'Maharashtra KVK Network' },
+/**
+ * Demo tenants double as white-label partners: each carries a brand colour that
+ * re-themes the whole dashboard when you switch tenant. (In production this
+ * would live on the tenant record; for the persona-based demo it's the source
+ * of truth.) No generated logos — the brand mark is a colour + monogram.
+ */
+export interface DemoTenant {
+  tenantId: string;
+  name: string;
+  brandColor: string;
+}
+
+export const DEMO_TENANTS: DemoTenant[] = [
+  { tenantId: 'demo-tenant-001', name: 'GreenHarvest NGO', brandColor: '#157347' },
+  { tenantId: 'demo-tenant-002', name: 'AgriInput Corp', brandColor: '#1D4ED8' },
+  { tenantId: 'demo-tenant-003', name: 'Maharashtra KVK Network', brandColor: '#7C3AED' },
 ];
+
+const DEFAULT_BRAND_COLOR = '#157347';
+
+export function brandColorFor(tenantId: string): string {
+  return DEMO_TENANTS.find((t) => t.tenantId === tenantId)?.brandColor ?? DEFAULT_BRAND_COLOR;
+}
 
 export function findPersona(id: string): DemoPersona | undefined {
   return DEMO_PERSONAS.find((p) => p.id === id);

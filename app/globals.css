@@ -57,10 +57,10 @@
   --color-chart-4: #667085;
 
   /* Shadows */
-  --shadow-card: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
-  --shadow-card-hover: 0 4px 12px rgba(16, 24, 40, 0.08);
-  --shadow-elevated: 0 8px 24px rgba(16, 24, 40, 0.1);
-  --shadow-modal: 0 12px 40px rgba(16, 24, 40, 0.15);
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.05);
+  --shadow-card-hover: 0 4px 16px -2px rgba(16, 24, 40, 0.10), 0 2px 6px -2px rgba(16, 24, 40, 0.05);
+  --shadow-elevated: 0 12px 32px -8px rgba(16, 24, 40, 0.14), 0 4px 12px -4px rgba(16, 24, 40, 0.08);
+  --shadow-modal: 0 24px 56px -12px rgba(16, 24, 40, 0.22);
 
   /* Radii */
   --radius-sm: 4px;
@@ -114,24 +114,37 @@ body {
    Typography Classes
    ============================================================================= */
 
-.text-page-title {
-  font-size: 28px;
+.text-display {
+  font-size: clamp(40px, 6vw, 60px);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+}
+
+.text-page-title {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
   color: var(--color-text-primary);
 }
 
 .text-section {
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.3;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   color: var(--color-text-primary);
 }
 
 .text-card-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.4;
+  letter-spacing: -0.005em;
   color: var(--color-text-primary);
 }
 
@@ -167,16 +180,19 @@ body {
 }
 
 .text-kpi {
-  font-size: 32px;
-  font-weight: 600;
-  line-height: 1.1;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
 }
 
 .text-kpi-sm {
+  font-family: var(--font-serif), Georgia, serif;
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
@@ -197,7 +213,7 @@ body {
   line-height: 1.4;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color 150ms ease, border-color 150ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 120ms ease, box-shadow 150ms ease;
   outline: none;
 }
 
@@ -215,10 +231,17 @@ body {
   background-color: var(--color-primary);
   color: #FFFFFF;
   border: none;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12);
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -4px rgba(21, 115, 71, 0.4);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn-secondary {
@@ -285,7 +308,8 @@ body {
 }
 
 .card-kpi {
-  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-primary-tint) 120%);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card), inset 0 2px 0 var(--color-primary);
 }
 
 .card-no-padding {
@@ -544,6 +568,35 @@ body {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes hiw-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+/* =============================================================================
+   Landing page responsive grids
+   ============================================================================= */
+.hero-grid, .diff-grid, .steps-grid, .stats-grid, .arch-grid { display: grid; grid-template-columns: 1fr; }
+.hero-grid { gap: 36px; align-items: center; }
+.diff-grid { gap: 16px; }
+.steps-grid { gap: 28px; }
+.stats-grid { gap: 28px; }
+.arch-grid { gap: 16px; }
+@media (min-width: 768px) {
+  .hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: 48px; }
+  .diff-grid { grid-template-columns: 1fr 1.25fr; }
+  .steps-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .arch-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.flow-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (min-width: 640px) { .flow-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1000px) { .flow-grid { grid-template-columns: repeat(6, 1fr); } }
+.hiw-2col { display: grid; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .hiw-2col { grid-template-columns: minmax(376px, 0.9fr) 1.1fr; } }
+.arch-seq { grid-template-columns: 1fr; }
+@media (min-width: 720px) { .arch-seq { grid-template-columns: 1fr 1fr; } }
+
 .hiw-phone {
   width: 188px;
   background: #fff;
@@ -647,8 +700,24 @@ body {
    ============================================================================= */
 .term {
   border-bottom: 1px dashed var(--color-text-muted);
-  cursor: help;
+  cursor: pointer;
   position: relative;
+}
+
+.term-q {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: super;
+  color: var(--color-primary);
+  background: var(--color-primary-tint);
+  border-radius: 999px;
 }
 
 .term:focus-visible {
@@ -680,7 +749,8 @@ body {
 }
 
 .term:hover .term-tip,
-.term:focus-visible .term-tip {
+.term:focus-visible .term-tip,
+.term-open .term-tip {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -708,7 +778,20 @@ body {
   .skeleton { animation: none; }
   .hiw-anim { animation: none; opacity: 1; transform: none; }
   .term-tip { transition: none; }
+  .btn:hover:not(:disabled) { transform: none; }
 }
+
+/* Architecture gallery — hide the scroll-snap track's scrollbar (scroll still works) */
+.arch-gallery-track { scrollbar-width: none; -ms-overflow-style: none; }
+.arch-gallery-track::-webkit-scrollbar { display: none; }
+
+/* In-panel preview fits the slide width so the carousel (not the diagram) scrolls.
+   Full detail is available via the Expand button. */
+.arch-slide-fit { width: 100%; }
+.arch-slide-fit svg { width: 100% !important; min-width: 0 !important; height: auto; }
+
+/* Expanded view: let the diagram fill the wide modal (scrolls if still wider). */
+.arch-modal-fit svg { width: 100% !important; min-width: 0 !important; height: auto; }
 
 /* Lineage badge */
 .lineage-badge {

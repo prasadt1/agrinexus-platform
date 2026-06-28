@@ -15,6 +15,28 @@ type LicenseRow = {
   isDemo: boolean;
 };
 
+// Monthly price per plan tier (₹), matching the landing-page Stripe tiers.
+const PLAN_PRICE: Record<string, number> = {
+  starter: 999,
+  growth: 2999,
+  enterprise: 9999,
+};
+
+// The "enterprise" tier is presented as "Scale" everywhere customer-facing.
+const PLAN_LABEL: Record<string, string> = {
+  starter: "Starter",
+  growth: "Growth",
+  enterprise: "Scale",
+};
+
+function planLabel(plan: string): string {
+  return PLAN_LABEL[plan] ?? plan.charAt(0).toUpperCase() + plan.slice(1);
+}
+
+function inr(amount: number): string {
+  return `₹${new Intl.NumberFormat("en-IN").format(amount)}`;
+}
+
 export default function BillingPage() {
   const { authHeaders } = useAuth();
   const [licenses, setLicenses] = useState<LicenseRow[]>([]);
@@ -36,12 +58,32 @@ export default function BillingPage() {
     fetchBilling();
   }, [fetchBilling]);
 
+  const activeLicenses = licenses.filter((l) => l.licenseStatus === "active");
+  const mrr = activeLicenses.reduce((sum, l) => sum + (PLAN_PRICE[l.plan] ?? 0), 0);
+
   return (
     <div className="py-10 px-8">
       <PageHeader
         title="Billing"
-        description="Cohort licenses and subscription state (Stripe + demo)"
+        description="Your cohort licenses and renewal dates."
       />
+
+      {!loading && licenses.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <Card>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>Active subscriptions</p>
+            <p className="text-2xl font-semibold mt-1">{activeLicenses.length}</p>
+          </Card>
+          <Card>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>Monthly recurring</p>
+            <p className="text-2xl font-semibold mt-1">{inr(mrr)}</p>
+          </Card>
+          <Card>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>Annualised</p>
+            <p className="text-2xl font-semibold mt-1">{inr(mrr * 12)}</p>
+          </Card>
+        </div>
+      )}
 
       <Card noPadding className="overflow-hidden">
         {loading ? (
@@ -49,7 +91,7 @@ export default function BillingPage() {
         ) : licenses.length === 0 ? (
           <EmptyState
             title="No licenses yet"
-            description="Activate a cohort to create a license record in DynamoDB."
+            description="Activate a cohort and its license will appear here."
           />
         ) : (
           <table className="w-full">
@@ -58,8 +100,9 @@ export default function BillingPage() {
                 <th className="data-table-th">District</th>
                 <th className="data-table-th">Plan</th>
                 <th className="data-table-th">Cohort status</th>
-                <th className="data-table-th">Period end</th>
-                <th className="data-table-th text-right">Type</th>
+                <th className="data-table-th text-right">Amount</th>
+                <th className="data-table-th">Renews</th>
+                <th className="data-table-th text-right">Billing</th>
               </tr>
             </thead>
             <tbody>
@@ -74,9 +117,12 @@ export default function BillingPage() {
                       {l.district}
                     </Link>
                   </td>
-                  <td className="data-table-td capitalize">{l.plan}</td>
+                  <td className="data-table-td">{planLabel(l.plan)}</td>
                   <td className="data-table-td">
                     <Badge status={l.status as "active" | "draft"} />
+                  </td>
+                  <td className="data-table-td text-right text-sm">
+                    {PLAN_PRICE[l.plan] ? `${inr(PLAN_PRICE[l.plan])} / mo` : "—"}
                   </td>
                   <td className="data-table-td text-sm">
                     {new Date(l.periodEnd).toLocaleDateString()}
@@ -85,11 +131,19 @@ export default function BillingPage() {
                     <span
                       className="text-xs px-2 py-1 rounded-full"
                       style={{
-                        background: l.isDemo ? "var(--color-page-bg)" : "var(--color-primary-tint)",
-                        color: l.isDemo ? "var(--color-text-muted)" : "var(--color-primary)",
+                        background:
+                          l.licenseStatus === "active"
+                            ? "var(--color-primary-tint)"
+                            : "var(--color-page-bg)",
+                        color:
+                          l.licenseStatus === "active"
+                            ? "var(--color-primary)"
+                            : "var(--color-text-muted)",
                       }}
                     >
-                      {l.isDemo ? "Demo" : "Stripe"}
+                      {l.licenseStatus === "active"
+                        ? "Paid"
+                        : l.licenseStatus.charAt(0).toUpperCase() + l.licenseStatus.slice(1)}
                     </span>
                   </td>
                 </tr>
@@ -100,7 +154,8 @@ export default function BillingPage() {
       </Card>
 
       <p className="mt-6 text-sm" style={{ color: "var(--color-text-muted)" }}>
-        Stripe branding: upload the Outturn logo in Stripe Dashboard → Settings → Branding.
+        Each district cohort is licensed monthly through Stripe checkout. Figures shown here are
+        sample data for the demo workspace.
       </p>
     </div>
   );

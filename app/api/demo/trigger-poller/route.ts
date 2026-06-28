@@ -9,7 +9,7 @@
  * Flow:
  * 1. Query GSI2 for STATUS#active cohorts
  * 2. Fetch weather for each cohort's coordinates
- * 3. If favorable, trigger the existing Step Functions nudge workflow
+ * 3. If conditions are favorable (per-cohort rules), trigger the nudge workflow
  *
  * Safety:
  * - Production WeatherPoller remains untouched (different code, different trigger)
@@ -21,135 +21,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthContext, AuthError } from '@/lib/api/auth';
 import { listActiveCohorts, type ActiveCohortProjection } from '@/lib/entities';
 import { logAuditEvent } from '@/lib/audit';
-import { getWeatherApiKey } from '@/lib/secrets';
-import {
-  SFNClient,
-  StartExecutionCommand,
-} from '@aws-sdk/client-sfn';
+import { isFavorable } from '@/lib/nudge-policy';
+import { fetchWeather, triggerCohortNudge, type WeatherData } from '@/lib/nudge-trigger';
 
-// Weather API configuration
-const WEATHER_API_BASE = 'https://api.openweathermap.org/data/2.5/weather';
-
-// Step Functions configuration
-const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
-const AWS_ACCOUNT_ID = process.env.AWS_ACCOUNT_ID || '043624892076';
-const ENVIRONMENT = process.env.AGRINEXUS_ENV || 'dev';
-const STATE_MACHINE_ARN = `arn:aws:states:${AWS_REGION}:${AWS_ACCOUNT_ID}:stateMachine:agrinexus-nudge-workflow-${ENVIRONMENT}`;
-
-// Initialize Step Functions client
-const sfnClient = new SFNClient({ region: AWS_REGION });
-
-interface WeatherData {
-  location: string;
-  coordinates: { lat: number; lon: number };
-  wind_speed: number;
-  rain: number;
-  temperature: number;
-  humidity: number;
-  favorable: boolean;
-  mock: boolean;
-}
-
-/**
- * Fetch weather from OpenWeatherMap API
- */
-async function fetchWeather(
-  district: string,
-  lat: number,
-  lon: number
-): Promise<WeatherData> {
-  const apiKey = await getWeatherApiKey();
-
-  // If no API key, return mock favorable conditions
-  if (!apiKey) {
-    console.log(`Weather: No API key, using mock for ${district}`);
-    return {
-      location: district,
-      coordinates: { lat, lon },
-      wind_speed: 8.5,
-      rain: 0,
-      temperature: 28,
-      humidity: 65,
-      favorable: true,
-      mock: true,
-    };
-  }
-
-  try {
-    const url = new URL(WEATHER_API_BASE);
-    url.searchParams.set('lat', lat.toString());
-    url.searchParams.set('lon', lon.toString());
-    url.searchParams.set('appid', apiKey);
-    url.searchParams.set('units', 'metric');
-
-    const response = await fetch(url.toString(), {
-      headers: { Accept: 'application/json' },
-      signal: AbortSignal.timeout(5000),
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenWeatherMap returned ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    const wind_mps = data.wind?.speed ?? 0;
-    const wind_kmh = wind_mps * 3.6;
-    const rain = data.rain?.['1h'] ?? data.rain?.['3h'] ?? 0;
-    const temperature = data.main?.temp ?? 0;
-    const humidity = data.main?.humidity ?? 0;
-
-    // Favorable: wind < 10 km/h and no rain
-    const favorable = wind_kmh < 10 && rain === 0;
-
-    return {
-      location: district,
-      coordinates: { lat, lon },
-      wind_speed: wind_kmh,
-      rain,
-      temperature,
-      humidity,
-      favorable,
-      mock: false,
-    };
-  } catch (error) {
-    console.error(`Weather API error for ${district}:`, error);
-    // Fallback to mock on error
-    return {
-      location: district,
-      coordinates: { lat, lon },
-      wind_speed: 8.5,
-      rain: 0,
-      temperature: 28,
-      humidity: 65,
-      favorable: true,
-      mock: true,
-    };
-  }
-}
-
-/**
- * Trigger the nudge workflow via Step Functions
- */
-async function triggerNudgeWorkflow(
-  location: string,
-  weather: WeatherData
-): Promise<{ executionArn: string }> {
-  const input = JSON.stringify({
-    location,
-    weather,
-    activity: 'spray',
-  });
-
-  const command = new StartExecutionCommand({
-    stateMachineArn: STATE_MACHINE_ARN,
-    input,
-  });
-
-  const response = await sfnClient.send(command);
-
-  return { executionArn: response.executionArn! };
-}
+// Weather lookup + Step Functions nudge trigger live in lib/nudge-trigger.ts
+// (shared with the cohort-scoped re-nudge action).
 
 export async function POST(request: NextRequest) {
   try {
@@ -197,9 +73,9 @@ export async function POST(request: NextRequest) {
       let triggered = false;
       let executionArn: string | undefined;
 
-      if (weather.favorable) {
+      if (isFavorable(weather, cohort.nudgeRules?.sprayConditions)) {
         try {
-          const result = await triggerNudgeWorkflow(cohort.district, weather);
+          const result = await triggerCohortNudge(cohort, weather);
           triggered = true;
           executionArn = result.executionArn;
           console.log(

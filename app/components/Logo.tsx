@@ -1,3 +1,5 @@
+import { OutturnMark } from "./OutturnMark";
+
 /**
  * AgriNexus brand mark — single source of truth so the sidebar, landing page,
  * login, and judges page all share one asset (public/agrinexus-mark.png).
@@ -7,7 +9,7 @@ export function AgriNexusLogo({ size = 32 }: { size?: number }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/agrinexus-mark.png"
+      src="/outturn-mark.png"
       alt="Outturn"
       width={size}
       height={size}
@@ -19,19 +21,7 @@ export function AgriNexusLogo({ size = 32 }: { size?: number }) {
 export function AgriNexusWordmark({ light }: { light?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <div
-        className="flex items-center justify-center"
-        style={{
-          background: "#FFFFFF",
-          border: "1px solid rgba(16,24,40,0.08)",
-          boxShadow: "0 1px 2px rgba(16,24,40,0.10)",
-          width: 40,
-          height: 40,
-          borderRadius: 11,
-        }}
-      >
-        <AgriNexusLogo size={30} />
-      </div>
+      <OutturnMark size={34} tone={light ? "light" : "green"} />
       <span
         style={{
           fontSize: "18px",

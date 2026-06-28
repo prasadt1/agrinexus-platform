@@ -2,8 +2,11 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { Card, Badge, Button, EmptyState, LineageBadge } from "@/app/components";
+import { Card, Badge, Button, EmptyState, LineageBadge, toast, CropIcon, LanguagePills, MaharashtraMap } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
+import { parseFarmerLines } from "@/lib/parse-farmers";
+import { attentionFor } from "@/lib/attention";
+import { Term } from "@/app/components/Term";
 
 type Cohort = {
   cohortId: string;
@@ -35,6 +38,7 @@ type Summary = {
 
 type Member = {
   phone: string;
+  name?: string;
   enrolledAt: string;
   nudgesSent: number;
   nudgesCompleted: number;
@@ -48,13 +52,17 @@ export default function CohortDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { tenantName, authHeaders } = useAuth();
+  const { tenantName, authHeaders, isAdmin } = useAuth();
   const [cohort, setCohort] = useState<Cohort | null>(null);
   const [license, setLicense] = useState<License>(null);
   const [summaries, setSummaries] = useState<Summary[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [membersLoading, setMembersLoading] = useState(true);
+  const [showAddFarmers, setShowAddFarmers] = useState(false);
+  const [addFarmersText, setAddFarmersText] = useState("");
+  const [enrolling, setEnrolling] = useState(false);
+  const [renudging, setRenudging] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -96,6 +104,75 @@ export default function CohortDetailPage({
       console.error("Failed to fetch members:", err);
     } finally {
       setMembersLoading(false);
+    }
+  }
+
+  async function handleEnrollFarmers() {
+    const farmers = parseFarmerLines(addFarmersText);
+    if (farmers.length === 0) {
+      toast("Add at least one valid phone number (10+ digits)", "error");
+      return;
+    }
+    setEnrolling(true);
+    try {
+      const res = await fetch(`/api/cohorts/${id}/members`, {
+        method: "POST",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ farmers }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast(`Enrolled ${data.enrolled} farmer${data.enrolled === 1 ? "" : "s"}`, "success");
+        setAddFarmersText("");
+        setShowAddFarmers(false);
+        setMembersLoading(true);
+        fetchMembers();
+      } else {
+        toast(data.error || "Failed to enroll farmers", "error");
+      }
+    } catch {
+      toast("Request failed", "error");
+    } finally {
+      setEnrolling(false);
+    }
+  }
+
+  async function handleRenudge() {
+    setRenudging(true);
+    try {
+      const res = await fetch(`/api/cohorts/${id}/nudge`, {
+        method: "POST",
+        headers: authHeaders(),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const sent = Number(data.sent) || 0;
+        const skipped = Number(data.skipped) || 0;
+        const skippedNote =
+          skipped > 0 ? ` · ${skipped} skipped (already have a pending reminder)` : "";
+        if (data.status === "RUNNING") {
+          toast("Nudge cycle started — results will appear in a moment.", "info");
+        } else if (sent > 0) {
+          toast(`Sent ${sent} reminder${sent === 1 ? "" : "s"}${skippedNote}`, "success");
+        } else if (skipped > 0) {
+          toast(
+            `No new reminders — all ${skipped} eligible farmer${skipped === 1 ? "" : "s"} already have a pending reminder.`,
+            "info"
+          );
+        } else {
+          toast("No farmers were due for a reminder right now.", "info");
+        }
+        // Reflect the new send in the KPIs and farmer table.
+        fetchCohort();
+        setMembersLoading(true);
+        fetchMembers();
+      } else {
+        toast(data.error || "Failed to send nudge", "error");
+      }
+    } catch {
+      toast("Request failed", "error");
+    } finally {
+      setRenudging(false);
     }
   }
 
@@ -143,68 +220,146 @@ export default function CohortDetailPage({
   }
 
   const hasOutcomes = summaries.length > 0 && totalNudgesSent > 0;
+  const attention = attentionFor({
+    status: cohort.status,
+    outcomes: hasOutcomes
+      ? {
+          followThroughRate: overallResponseRate,
+          nudgesSent: totalNudgesSent,
+          nudgesCompleted: totalNudgesCompleted,
+        }
+      : null,
+  });
+
+  // One plain-language sentence that tells the partner what's happening here,
+  // so the page leads with meaning before the numbers.
+  const cropLabel = (cohort.crops || []).join(", ") || "the crop";
+  const storyLine =
+    cohort.status === "draft"
+      ? "This cohort is in draft. Activate it to start sending weather-timed reminders to enrolled farmers."
+      : cohort.status === "paused"
+      ? "This cohort is paused. No reminders go out until you resume it."
+      : cohort.status === "expired"
+      ? "This cohort's license has expired. Renew it to resume sending reminders."
+      : !hasOutcomes
+      ? `Active. Reminders go out automatically when the weather is right for ${cropLabel}.`
+      : `${totalNudgesSent} reminder${totalNudgesSent === 1 ? "" : "s"} sent to ${farmersReached} farmer${farmersReached === 1 ? "" : "s"}. ${totalNudgesCompleted} confirmed they acted, a ${Math.round(overallResponseRate * 100)}% follow-through.`;
 
   return (
     <div className="py-10 px-8">
-      {/* Breadcrumb */}
-      <nav className="mb-6">
-        <ol className="flex items-center gap-2 text-sm">
-          <li>
-            <Link
-              href="/dashboard/cohorts"
-              className="hover:underline"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              Cohorts
-            </Link>
-          </li>
-          <li style={{ color: "var(--color-text-muted)" }}>/</li>
-          <li style={{ color: "var(--color-text-secondary)" }}>{cohort.district}</li>
-        </ol>
-      </nav>
+      {/* Breadcrumb + partner */}
+      <div className="flex items-center justify-between gap-4 mb-5">
+        <nav>
+          <ol className="flex items-center gap-2 text-sm">
+            <li>
+              <Link
+                href="/dashboard/cohorts"
+                className="hover:underline"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                Cohorts
+              </Link>
+            </li>
+            <li style={{ color: "var(--color-text-muted)" }}>/</li>
+            <li style={{ color: "var(--color-text-secondary)" }}>{cohort.district}</li>
+          </ol>
+        </nav>
+        <div className="text-right shrink-0">
+          <p className="text-label">Partner</p>
+          <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>
+            {tenantName || "Partner"}
+          </p>
+          {license && (
+            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+              {license.plan} plan
+            </p>
+          )}
+        </div>
+      </div>
 
-      {/* Header */}
-      <header className="mb-8">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-page-title">{cohort.district}</h1>
-              <Badge status={cohort.status} />
-            </div>
-            <p style={{ color: "var(--color-text-secondary)" }}>
-              {(cohort.crops || []).join(", ")} • {(cohort.languages || []).map((l) => l.toUpperCase()).join(", ")}
-            </p>
+      {/* Hero — district on the map + its identity */}
+      <div className="mb-6 grid gap-5 md:grid-cols-[280px_1fr] items-stretch">
+        <MaharashtraMap highlight={[cohort.district]} maxWidth={280} />
+        <div className="flex flex-col justify-center">
+          <p className="text-label mb-2" style={{ color: "var(--color-primary)" }}>
+            District advisory
+          </p>
+          <div className="flex items-center gap-3 mb-3 flex-wrap">
+            <h1 className="text-page-title">{cohort.district}</h1>
+            <Badge status={cohort.status} />
           </div>
-          <div className="text-right">
-            <p className="text-label">Partner</p>
-            <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>
-              {tenantName || "Partner"}
-            </p>
-            {license && (
-              <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
-                {license.plan} plan {license.isDemo && "(demo)"}
-              </p>
-            )}
+          {(cohort.crops || []).length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap mb-3">
+              {(cohort.crops || []).map((crop) => (
+                <span key={crop} className="chip inline-flex items-center gap-1.5 capitalize">
+                  <CropIcon crop={crop} size={15} />
+                  {crop}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+              Reaching farmers in
+            </span>
+            <LanguagePills languages={cohort.languages || []} />
           </div>
         </div>
-      </header>
+      </div>
+
+      {/* Plain-language summary: what's happening in this cohort, in one line. */}
+      <p className="mb-8 max-w-2xl" style={{ color: "var(--color-text-secondary)" }}>
+        {storyLine}
+      </p>
+
+      {/* Action loop: detect (attention banner) + act (re-nudge) */}
+      {isAdmin && cohort.status === "active" && (
+        attention.needsAttention ? (
+          <div
+            className="mb-8 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            style={{ background: "var(--color-warning-bg)", border: "1px solid rgba(181,71,8,0.25)" }}
+          >
+            <div>
+              <p className="font-medium" style={{ color: "var(--color-warning)" }}>
+                Needs attention · {attention.label}
+              </p>
+              <p className="text-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
+                Follow-through is lagging. Send a fresh WhatsApp nudge to the farmers who haven&apos;t
+                acted yet.
+              </p>
+            </div>
+            <Button onClick={handleRenudge} disabled={renudging} className="shrink-0">
+              {renudging ? "Sending…" : "Re-nudge cohort"}
+            </Button>
+          </div>
+        ) : (
+          <div className="mb-8 flex justify-end">
+            <Button variant="secondary" onClick={handleRenudge} disabled={renudging}>
+              {renudging ? "Sending…" : "Re-nudge cohort"}
+            </Button>
+          </div>
+        )
+      )}
 
       {/* KPI Cards - Always show, with zeros when no data */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <KPICard
-          label="Farmers Reached"
+          label="Farmers reached"
+          term="farmers reached"
           value={farmersReached}
           format="number"
-          empty={!hasOutcomes}
+          empty={false}
         />
         <KPICard
-          label="Advisories Sent"
+          label="Reminders sent"
+          term="reminders sent"
           value={totalNudgesSent}
           format="number"
           empty={!hasOutcomes}
         />
         <KPICard
-          label="Response Rate"
+          label="Follow-through"
+          term="follow-through"
           value={overallResponseRate}
           format="percent"
           highlight
@@ -212,11 +367,11 @@ export default function CohortDetailPage({
         />
       </section>
 
-      {/* Response Breakdown Chart */}
+      {/* Follow-through breakdown Chart */}
       <section className="mb-8">
         <Card>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-card-title">Response Breakdown</h2>
+            <h2 className="text-card-title">Follow-through breakdown</h2>
             <LineageBadge />
           </div>
           {hasOutcomes ? (
@@ -284,6 +439,10 @@ export default function CohortDetailPage({
                     </span>
                   </div>
                 </div>
+                <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
+                  Done = farmer confirmed they acted · Pending = reminder sent, awaiting reply ·
+                  Expired = no reply before the window closed
+                </p>
               </div>
               {/* Big number */}
               <div
@@ -294,7 +453,7 @@ export default function CohortDetailPage({
                   {Math.round(overallResponseRate * 100)}%
                 </p>
                 <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  Response Rate
+                  Follow-through
                 </p>
               </div>
             </div>
@@ -315,7 +474,7 @@ export default function CohortDetailPage({
       {hasOutcomes && summaries.length > 1 && (
         <section className="mb-8">
           <Card>
-            <h2 className="text-card-title mb-6">Response Rate Over Time</h2>
+            <h2 className="text-card-title mb-6">Follow-through over time</h2>
             <ResponseTrendChart summaries={summaries} />
           </Card>
         </section>
@@ -333,7 +492,7 @@ export default function CohortDetailPage({
             </div>
           ) : (
             <EmptyState
-              title="No advisories sent"
+              title="No reminders sent yet"
               description={
                 cohort.status === "draft"
                   ? "Activate this cohort to begin sending weather-based advisories to farmers."
@@ -349,13 +508,50 @@ export default function CohortDetailPage({
         <Card>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-card-title">Enrolled Farmers</h2>
-            <span
-              className="text-sm px-2 py-1 rounded"
-              style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
-            >
-              {members.length} farmers
-            </span>
+            <div className="flex items-center gap-3">
+              <span
+                className="text-sm px-2 py-1 rounded"
+                style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
+              >
+                {members.length} farmers
+              </span>
+              {isAdmin && (
+                <Button variant="secondary" onClick={() => setShowAddFarmers((v) => !v)}>
+                  {showAddFarmers ? "Cancel" : "Add farmers"}
+                </Button>
+              )}
+            </div>
           </div>
+
+          {showAddFarmers && isAdmin && (
+            <div
+              className="mb-6 p-4 rounded-lg"
+              style={{ background: "var(--color-page-bg)", border: "1px solid var(--color-border)" }}
+            >
+              <label className="text-label block mb-2">
+                Paste one farmer per line —{" "}
+                <span style={{ color: "var(--color-text-muted)" }}>phone, name (name optional)</span>
+              </label>
+              <textarea
+                className="input w-full font-mono text-sm"
+                rows={5}
+                placeholder={"+91 98765 43210, Ramesh Patil\n+91 91234 56789, Sita Devi"}
+                value={addFarmersText}
+                onChange={(e) => setAddFarmersText(e.target.value)}
+              />
+              <div className="flex items-center gap-3 mt-3">
+                <Button onClick={handleEnrollFarmers} disabled={enrolling || !addFarmersText.trim()}>
+                  {enrolling ? "Enrolling…" : "Enroll farmers"}
+                </Button>
+                <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  {parseFarmerLines(addFarmersText).length} valid
+                </span>
+              </div>
+              <p className="text-sm mt-2" style={{ color: "var(--color-text-muted)" }}>
+                Enrolled farmers join with consent pending — they start receiving advisories after they opt in on WhatsApp.
+              </p>
+            </div>
+          )}
           {membersLoading ? (
             <div className="animate-pulse space-y-3">
               {[1, 2, 3].map((i) => (
@@ -367,11 +563,9 @@ export default function CohortDetailPage({
               <table className="w-full">
                 <thead>
                   <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
+                    <th className="text-left py-3 px-4 text-label font-medium">Farmer</th>
                     <th className="text-left py-3 px-4 text-label font-medium">Phone</th>
-                    <th className="text-center py-3 px-4 text-label font-medium">Nudges</th>
-                    <th className="text-center py-3 px-4 text-label font-medium">Completed</th>
-                    <th className="text-center py-3 px-4 text-label font-medium">Expired</th>
-                    <th className="text-right py-3 px-4 text-label font-medium">Response Rate</th>
+                    <th className="text-left py-3 px-4 text-label font-medium">Enrolled</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -393,20 +587,11 @@ export default function CohortDetailPage({
       {/* Cohort Details */}
       <section>
         <Card>
-          <h2 className="text-card-title mb-6">Cohort Configuration</h2>
-          <dl className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div>
-              <dt className="text-label">Cohort ID</dt>
-              <dd className="mt-1 font-mono text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                {cohort.cohortId.slice(0, 8)}…
-              </dd>
-            </div>
-            <div>
-              <dt className="text-label">Location</dt>
-              <dd className="mt-1 text-sm">
-                {cohort.lat?.toFixed(2)}°N, {cohort.lon?.toFixed(2)}°E
-              </dd>
-            </div>
+          <h2 className="text-card-title mb-1">Cohort details</h2>
+          <p className="text-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
+            When this cohort was set up.
+          </p>
+          <dl className="grid grid-cols-2 gap-6">
             <div>
               <dt className="text-label">Created</dt>
               <dd className="mt-1 text-sm">
@@ -442,12 +627,14 @@ export default function CohortDetailPage({
 
 function KPICard({
   label,
+  term,
   value,
   format,
   highlight,
   empty,
 }: {
   label: string;
+  term?: string;
   value: number;
   format: "number" | "percent";
   highlight?: boolean;
@@ -461,7 +648,7 @@ function KPICard({
 
   return (
     <Card>
-      <p className="text-label mb-2">{label}</p>
+      <p className="text-label mb-2">{term ? <Term term={term}>{label}</Term> : label}</p>
       <p
         className="text-kpi"
         style={{
@@ -613,7 +800,7 @@ function AuditRow({ summary }: { summary: Summary }) {
           {Math.round(responseRate * 100)}%
         </p>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          response rate
+          follow-through
         </p>
       </div>
     </div>
@@ -625,24 +812,19 @@ function AuditRow({ summary }: { summary: Summary }) {
 // =============================================================================
 
 function MemberRow({ member }: { member: Member }) {
-  // Responsiveness indicator
-  const getResponsivenessColor = (rate: number) => {
-    if (rate >= 0.7) return "var(--color-success)";
-    if (rate >= 0.4) return "var(--color-warning)";
-    return "var(--color-text-muted)";
-  };
+  // Mask the middle digits for display.
+  const maskedPhone =
+    member.phone.length > 6
+      ? `${member.phone.slice(0, 3)}***${member.phone.slice(-3)}`
+      : member.phone;
 
-  const getResponsivenessLabel = (rate: number) => {
-    if (rate >= 0.7) return "High";
-    if (rate >= 0.4) return "Medium";
-    if (rate > 0) return "Low";
-    return "No data";
-  };
+  const initials = member.name
+    ? member.name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+    : member.phone.slice(-2);
 
-  // Format phone for display (mask middle digits)
-  const maskedPhone = member.phone.length > 6
-    ? `${member.phone.slice(0, 3)}***${member.phone.slice(-3)}`
-    : member.phone;
+  const enrolled = member.enrolledAt
+    ? new Date(member.enrolledAt).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+    : "—";
 
   return (
     <tr
@@ -653,46 +835,18 @@ function MemberRow({ member }: { member: Member }) {
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium"
-            style={{
-              background: "var(--color-primary-tint)",
-              color: "var(--color-primary)",
-            }}
+            style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
           >
-            {member.phone.slice(-2)}
+            {initials}
           </div>
-          <span className="font-mono text-sm">{maskedPhone}</span>
+          <span className="text-sm font-medium">{member.name || "Farmer"}</span>
         </div>
       </td>
-      <td className="py-3 px-4 text-center">
-        <span style={{ color: "var(--color-text-secondary)" }}>
-          {member.nudgesSent}
-        </span>
+      <td className="py-3 px-4 font-mono text-sm" style={{ color: "var(--color-text-muted)" }}>
+        {maskedPhone}
       </td>
-      <td className="py-3 px-4 text-center">
-        <span style={{ color: "var(--color-success)" }}>
-          {member.nudgesCompleted}
-        </span>
-      </td>
-      <td className="py-3 px-4 text-center">
-        <span style={{ color: "var(--color-text-muted)" }}>
-          {member.nudgesExpired}
-        </span>
-      </td>
-      <td className="py-3 px-4 text-right">
-        <div className="flex items-center justify-end gap-2">
-          <span
-            className="text-xs px-2 py-0.5 rounded-full"
-            style={{
-              background: `${getResponsivenessColor(member.responseRate)}20`,
-              color: getResponsivenessColor(member.responseRate),
-            }}
-          >
-            {getResponsivenessLabel(member.responseRate)}
-          </span>
-          <span className="font-medium" style={{ color: getResponsivenessColor(member.responseRate) }}>
-            {member.nudgesSent > 0 ? `${Math.round(member.responseRate * 100)}%` : "—"}
-          </span>
-        </div>
+      <td className="py-3 px-4 text-sm" style={{ color: "var(--color-text-muted)" }}>
+        {enrolled}
       </td>
     </tr>
   );

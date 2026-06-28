@@ -16,6 +16,9 @@ import {
   Button,
   EmptyState,
   toast,
+  CropIcon,
+  DistrictThumb,
+  LanguagePills,
 } from "@/app/components";
 import { useAuth } from "@/lib/context/AuthProvider";
 
@@ -73,7 +76,11 @@ export default function CohortsPage() {
           window.location.href = data.checkoutUrl;
           return;
         }
-        toast(data.error || data.hint || "Stripe checkout unavailable — use demo activate", "error");
+        if (res.status === 503) {
+          toast('Card checkout isn’t available right now — use Activate to go live.', "error");
+          return;
+        }
+        toast(data.error || "Activation with card isn’t available right now — use Activate.", "error");
         return;
       }
 
@@ -82,7 +89,7 @@ export default function CohortsPage() {
         headers: authHeaders(),
       });
       if (res.ok) {
-        toast("Cohort activated (demo mode)", "success");
+        toast("Cohort activated", "success");
         await fetchCohorts();
       } else {
         const data = await res.json();
@@ -106,7 +113,7 @@ export default function CohortsPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              New Cohort
+              New cohort
             </Button>
           ) : undefined
         }
@@ -151,26 +158,31 @@ export default function CohortsPage() {
               cohorts.map((cohort) => (
                 <TableRow key={cohort.cohortId}>
                   <TableCell>
-                    <Link
-                      href={`/dashboard/cohorts/${cohort.cohortId}`}
-                      className="font-medium hover:underline"
-                      style={{ color: "var(--color-primary)" }}
-                    >
-                      {cohort.district}
-                    </Link>
-                    <p className="text-xs mt-0.5 font-mono text-muted">
-                      {cohort.cohortId.slice(0, 8)}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <DistrictThumb district={cohort.district} size={44} className="shrink-0" />
+                      <div>
+                        <Link
+                          href={`/dashboard/cohorts/${cohort.cohortId}`}
+                          className="font-medium hover:underline"
+                          style={{ color: "var(--color-primary)" }}
+                        >
+                          {cohort.district}
+                        </Link>
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {cohort.crops.map((crop) => (
-                        <span key={crop} className="chip">{crop}</span>
+                        <span key={crop} className="chip inline-flex items-center gap-1.5">
+                          <CropIcon crop={crop} size={14} />
+                          {crop}
+                        </span>
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell className="text-secondary">
-                    {cohort.languages.map((l) => l.toUpperCase()).join(", ")}
+                  <TableCell>
+                    <LanguagePills languages={cohort.languages} />
                   </TableCell>
                   <TableCell>
                     <Badge status={cohort.status} />
@@ -183,7 +195,7 @@ export default function CohortsPage() {
                         </span>
                         <span className="ml-1 text-muted">follow-through</span>
                         <p className="text-xs text-muted">
-                          {cohort.outcomes.nudgesCompleted}/{cohort.outcomes.nudgesSent} advisories
+                          {cohort.outcomes.nudgesCompleted}/{cohort.outcomes.nudgesSent} reminders
                         </p>
                       </div>
                     ) : (
@@ -196,17 +208,17 @@ export default function CohortsPage() {
                         <Button
                           onClick={() => activateCohort(cohort.cohortId, "demo")}
                           disabled={activatingId === cohort.cohortId}
-                          variant="secondary"
                           className="text-sm py-1.5"
                         >
-                          {activatingId === cohort.cohortId ? "…" : "Demo activate"}
+                          {activatingId === cohort.cohortId ? "…" : "Activate"}
                         </Button>
                         <Button
                           onClick={() => activateCohort(cohort.cohortId, "stripe", "growth")}
                           disabled={activatingId === cohort.cohortId}
+                          variant="secondary"
                           className="text-sm py-1.5"
                         >
-                          Pay & activate
+                          Pay with card
                         </Button>
                       </div>
                     )}

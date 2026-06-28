@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AgriNexusWordmark } from "@/app/components/Logo";
 import { useAuth } from "@/lib/context/AuthProvider";
-import { DEMO_TENANTS } from "@/lib/auth/demo-personas";
+import { DEMO_TENANTS, brandColorFor } from "@/lib/auth/demo-personas";
+import { brandCssVars } from "@/lib/brand-theme";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: "grid", exact: true },
@@ -57,9 +58,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ? tenantName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
     : "??";
 
+  // White-label: re-theme the whole dashboard from the tenant's brand colour.
+  const themeVars = brandCssVars(brandColorFor(tenantId)) as React.CSSProperties;
+
   if (loading) {
     return (
-      <div className="min-h-screen flex" role="status" aria-label="Loading dashboard">
+      <div className="h-screen flex overflow-hidden" role="status" aria-label="Loading dashboard">
         <aside className="w-64 sidebar flex flex-col shrink-0">
           <div className="p-5" style={{ borderBottom: "1px solid var(--color-sidebar-border)" }}>
             <div className="skeleton" style={{ width: 124, height: 30, opacity: 0.22 }} />
@@ -86,15 +90,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen flex">
-      <aside className="w-64 sidebar flex flex-col shrink-0">
+    <div className="h-screen flex overflow-hidden" style={themeVars}>
+      <aside className="w-64 sidebar flex flex-col shrink-0 h-full">
         <div className="p-5" style={{ borderBottom: "1px solid var(--color-sidebar-border)" }}>
-          <Link href="/dashboard">
+          <Link href="/" aria-label="Outturn home" title="Back to home">
             <AgriNexusWordmark light />
           </Link>
         </div>
 
-        <nav className="flex-1 p-3">
+        <nav className="flex-1 p-3 overflow-y-auto">
           <ul className="space-y-1">
             {navItems.map((item) => {
               const isActive = item.exact
@@ -142,8 +146,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="p-4" style={{ borderTop: "1px solid var(--color-sidebar-border)" }}>
           <div className="flex items-center gap-3 px-2 mb-3">
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium"
-              style={{ background: "var(--color-sidebar-active)", color: "var(--color-primary-muted)" }}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold"
+              style={{ background: "var(--color-primary)", color: "#fff" }}
+              title={`${tenantName} brand mark`}
             >
               {initials}
             </div>

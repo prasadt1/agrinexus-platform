@@ -45,6 +45,7 @@ function buildPhonePK(phone: string): `PHONE#${string}` {
 function toCohortMembership(item: CohortMembershipItem): CohortMembership {
   return {
     phone: item.phone,
+    name: item.name,
     tenantId: item.tenantId,
     cohortId: item.cohortId,
     enrolledAt: item.enrolledAt,
@@ -59,10 +60,12 @@ function toCohortMembership(item: CohortMembershipItem): CohortMembership {
 export async function enrollFarmer(
   tenantId: string,
   cohortId: string,
-  phone: string
+  phone: string,
+  name?: string
 ): Promise<CohortMembership> {
   const now = new Date().toISOString();
   const normalized = phone.replace(/\s+/g, '').replace(/^\+?/, '');
+  const trimmedName = name?.trim();
 
   const item: CohortMembershipItem = {
     PK: buildPhonePK(phone),
@@ -71,6 +74,7 @@ export async function enrollFarmer(
     GSI1PK: `COHORT#${cohortId}` as `COHORT#${string}`,
     GSI1SK: `MEMBER#${normalized}` as `MEMBER#${string}`,
     phone: normalized,
+    ...(trimmedName ? { name: trimmedName } : {}),
     tenantId,
     cohortId,
     enrolledAt: now,
@@ -120,7 +124,7 @@ export async function getMembership(
 export async function bulkEnrollFarmers(
   tenantId: string,
   cohortId: string,
-  phones: string[]
+  farmers: Array<{ phone: string; name?: string }>
 ): Promise<{ enrolled: number; phones: string[] }> {
   const results: string[] = [];
 
@@ -130,8 +134,8 @@ export async function bulkEnrollFarmers(
   // consent gate keeps them un-nudged until they opt in over WhatsApp.
   const cohort = await getCohort(tenantId, cohortId);
 
-  for (const phone of phones) {
-    await enrollFarmer(tenantId, cohortId, phone);
+  for (const { phone, name } of farmers) {
+    await enrollFarmer(tenantId, cohortId, phone, name);
     if (cohort) {
       await upsertPendingProfile(phone, cohort);
     }
@@ -223,6 +227,7 @@ export async function getMemberStats(
 
     stats.push({
       phone: member.phone,
+      name: member.name,
       tenantId: member.tenantId,
       cohortId: member.cohortId,
       enrolledAt: member.enrolledAt,

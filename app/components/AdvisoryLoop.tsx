@@ -8,7 +8,7 @@ import { toast } from "@/app/components/Toast";
 type PollerResult = {
   cohortId: string;
   district: string;
-  weather: { favorable: boolean; wind_speed: number; rain: number; mock?: boolean };
+  weather: { wind_speed: number; rain: number; mock?: boolean };
   triggered: boolean;
   executionArn?: string;
 };
@@ -21,20 +21,19 @@ type PollerResponse = {
 };
 
 const LOOP_STEPS = [
-  { id: "provision", label: "Set up", plain: "Add a district cohort", tech: "COHORT# → DynamoDB" },
-  { id: "activate", label: "Go live", plain: "License & activate", tech: "GSI2 active + LICENSE#" },
-  { id: "poll", label: "Check weather", plain: "Watch each district", tech: "Per-cohort coordinates" },
-  { id: "nudge", label: "Send reminders", plain: "WhatsApp nudges", tech: "Step Functions → WhatsApp" },
-  { id: "stream", label: "Collect replies", plain: "Roll up responses", tech: "OutcomesAggregator λ" },
-  { id: "dashboard", label: "See results", plain: "Follow-through rate", tech: "SUMMARY# read" },
+  { id: "provision", label: "Set up", plain: "Add a district" },
+  { id: "activate", label: "Go live", plain: "Activate the group" },
+  { id: "poll", label: "Check weather", plain: "Watch each district" },
+  { id: "nudge", label: "Send reminders", plain: "WhatsApp reminders" },
+  { id: "stream", label: "Collect replies", plain: "Tally responses" },
+  { id: "dashboard", label: "See results", plain: "Follow-through rate" },
 ];
 
-export function AdvisoryLoopHero() {
+export function AdvisoryLoopHero({ onHowItWorks }: { onHowItWorks?: () => void } = {}) {
   const { isAdmin, authHeaders } = useAuth();
   const [running, setRunning] = useState(false);
   const [activeStep, setActiveStep] = useState<string | null>(null);
   const [result, setResult] = useState<PollerResponse | null>(null);
-  const [showTech, setShowTech] = useState(false);
 
   async function runCycle() {
     setRunning(true);
@@ -73,19 +72,24 @@ export function AdvisoryLoopHero() {
             <p className="text-label mb-1" style={{ color: "var(--color-primary)" }}>
               Advisory loop
             </p>
-            <h2 className="text-section">From weather to proof of follow-through</h2>
+            <h2 className="text-section">From weather to confirmed follow-through</h2>
             <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
               Each active cohort is watched for the right conditions, nudged on WhatsApp, and measured by who acted.
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={() => setShowTech((t) => !t)}
-              className="btn btn-secondary"
-              style={{ fontSize: 13 }}
-            >
-              {showTech ? "Hide technical detail" : "Show technical detail"}
-            </button>
+            {onHowItWorks && (
+              <button
+                onClick={onHowItWorks}
+                className="btn btn-secondary inline-flex items-center gap-1.5"
+                style={{ fontSize: 13 }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                How it works
+              </button>
+            )}
             {isAdmin && (
               <Button onClick={runCycle} disabled={running}>
                 {running ? "Running cycle…" : "Run advisory cycle"}
@@ -109,7 +113,7 @@ export function AdvisoryLoopHero() {
                   }}
                 >
                   <p className="text-xs font-semibold">{step.label}</p>
-                  <p className="text-[10px] opacity-80 mt-0.5">{showTech ? step.tech : step.plain}</p>
+                  <p className="text-[10px] opacity-80 mt-0.5">{step.plain}</p>
                 </div>
                 {i < LOOP_STEPS.length - 1 && (
                   <span style={{ color: "var(--color-text-muted)" }}>→</span>
@@ -119,9 +123,25 @@ export function AdvisoryLoopHero() {
           })}
         </div>
 
+        {isAdmin && !result && !running && (
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+            <strong style={{ color: "var(--color-text-secondary)" }}>Run advisory cycle</strong> checks
+            live weather for every active cohort and sends real WhatsApp spray reminders where
+            conditions are right. It is a live action, not a simulation.
+          </p>
+        )}
+
         {result && (
           <div className="space-y-2 pt-4 border-t" style={{ borderColor: "var(--color-border)" }}>
-            <p className="text-sm font-medium">{result.message}</p>
+            <p className="text-sm font-medium">
+              Checked {result.cohorts_checked} active cohort{result.cohorts_checked === 1 ? "" : "s"}
+              {" · "}
+              <span style={{ color: "var(--color-success)" }}>
+                {result.nudges_triggered} reminder{result.nudges_triggered === 1 ? "" : "s"} sent
+              </span>
+              {result.cohorts_checked - result.nudges_triggered > 0 &&
+                ` · ${result.cohorts_checked - result.nudges_triggered} skipped (weather not right)`}
+            </p>
             {result.results.map((r) => (
               <div
                 key={r.cohortId}
@@ -140,7 +160,7 @@ export function AdvisoryLoopHero() {
                     color: r.triggered ? "var(--color-success)" : "var(--color-text-muted)",
                   }}
                 >
-                  {r.triggered ? "Nudge fired" : "Not favorable"}
+                  {r.triggered ? "Reminder sent" : "Weather not right"}
                 </span>
               </div>
             ))}
@@ -153,11 +173,11 @@ export function AdvisoryLoopHero() {
 
 export function LineageBadge() {
   return (
-    <span className="lineage-badge" title="Counters updated by OutcomesAggregator Lambda via DynamoDB Streams">
+    <span className="lineage-badge" title="These numbers update on their own as farmers reply — you never refresh or import anything.">
       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>
-      DynamoDB Streams
+      Updated automatically
     </span>
   );
 }
