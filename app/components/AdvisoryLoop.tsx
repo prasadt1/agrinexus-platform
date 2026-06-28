@@ -29,7 +29,7 @@ const LOOP_STEPS = [
   { id: "dashboard", label: "See results", plain: "Follow-through rate" },
 ];
 
-export function AdvisoryLoopHero() {
+export function AdvisoryLoopHero({ onHowItWorks }: { onHowItWorks?: () => void } = {}) {
   const { isAdmin, authHeaders } = useAuth();
   const [running, setRunning] = useState(false);
   const [activeStep, setActiveStep] = useState<string | null>(null);
@@ -77,13 +77,25 @@ export function AdvisoryLoopHero() {
               Each active cohort is watched for the right conditions, nudged on WhatsApp, and measured by who acted.
             </p>
           </div>
-          {isAdmin && (
-            <div className="shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
+            {onHowItWorks && (
+              <button
+                onClick={onHowItWorks}
+                className="btn btn-secondary inline-flex items-center gap-1.5"
+                style={{ fontSize: 13 }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                How it works
+              </button>
+            )}
+            {isAdmin && (
               <Button onClick={runCycle} disabled={running}>
                 {running ? "Running cycle…" : "Run advisory cycle"}
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Loop steps */}
