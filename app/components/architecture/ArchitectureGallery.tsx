@@ -15,9 +15,9 @@ type Slide = { id: string; title: string; caption: string; node: React.ReactNode
 const SLIDES: Slide[] = [
   {
     id: "planes",
-    title: "Three planes, one system",
+    title: "The engine, and the green layer H0 built on it",
     caption:
-      "Control (Vercel), Data (one Amazon DynamoDB table), Engine (AWS + WhatsApp). The engine and its table pre-dated H0 — it's the AgriNexus accountability engine that won the AWS AIdeas Innovation Award; H0 added the Vercel control plane and the reporting roll-ups.",
+      "Green is what H0 added; grey is the AgriNexus engine that pre-dated it — a deep, all-serverless AWS stack (9 Lambdas, Step Functions, Bedrock, the lot) that won the AWS AIdeas Innovation Award. H0 owns two green planes: the Vercel control plane (multi-tenant dashboard, Stripe licensing, re-nudge) and the Amazon DynamoDB data layer — the single-table schema, Streams→Aggregator with DEDUPE# idempotency, the SUMMARY# roll-ups and a separate Marketplace-provisioned audit table. Vercel reads it all over keyless OIDC.",
     node: <SlideThreePlanes />,
   },
   {
