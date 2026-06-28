@@ -33,7 +33,11 @@ export function SlideTeardown() {
         <tspan x="352" dy="15">dry through evening.</tspan>
         <tspan x="352" dy="15">Reply <tspan fontWeight="700">Done</tspan> once sprayed.</tspan>
       </text>
-      <text x="490" y="272" fontSize="9" fill="#6b7a5e" textAnchor="end">06:12 ✓✓</text>
+      <text x="476" y="273" fontSize="9" fill="#6b7a5e" textAnchor="end">06:12</text>
+      <g transform="translate(480 268.5)" stroke="#34B7F1" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M0 2.4 L2.2 4.6 L7 -1.2" />
+        <path d="M4 2.4 L6.2 4.6 L11 -1.2" />
+      </g>
       <rect x="372" y="300" width="128" height="40" rx="13" fill="#FFFFFF" stroke="#E6E0D4" />
       <text x="436" y="325" fontSize="13" fill="#157347" fontWeight="700" textAnchor="middle">Done ✓</text>
       <text x="490" y="356" fontSize="9" fill="#9aa18d" textAnchor="end">06:48</text>
@@ -44,13 +48,13 @@ export function SlideTeardown() {
       <text x="796" y="186" fontSize="10.5" fill="#726A5C" letterSpacing="1.2">LATUR COTTON COHORT · THIS MONTH</text>
       <text x="796" y="240" fontSize="48" fontFamily="Georgia, serif" fontWeight="500" fill="#157347">67%</text>
       <text x="900" y="238" fontSize="14" fill="#5A554C">follow-through</text>
-      <rect x="796" y="258" width="207" height="14" rx="7" fill="#157347" />
-      <rect x="1006" y="258" width="37" height="14" fill="#0E7490" />
-      <rect x="1046" y="258" width="64" height="14" rx="7" fill="#B54708" />
+      <rect x="796" y="258" width="314" height="14" rx="7" fill="#EADFCB" />
+      <rect x="796" y="258" width="209" height="14" rx="7" fill="#157347" />
+      <rect x="1003" y="258" width="107" height="14" rx="7" fill="#B54708" />
       <text x="796" y="298" fontSize="13.5" fill="#1A1714">28 of 42 farmers acted</text>
       <rect x="796" y="312" width="134" height="32" rx="16" fill="#157347" />
       <text x="863" y="333" fontSize="12.5" fill="#FFFFFF" fontWeight="600" textAnchor="middle">Re-nudge cohort</text>
-      <text x="946" y="333" fontSize="12" fill="#B54708">7 haven&apos;t acted</text>
+      <text x="946" y="333" fontSize="12" fill="#B54708">14 haven&apos;t acted</text>
       <text x="952" y="408" fontSize="11" fill="#726A5C" textAnchor="middle" letterSpacing="1">THE PARTNER · OUTTURN DASHBOARD (VERCEL)</text>
 
       {/* RIGHT MARGIN — proof / data / control */}
@@ -68,7 +72,7 @@ export function SlideTeardown() {
       {/* THE CLOSED LOOP — pill → back into the advice bubble (a circuit, not a halo) */}
       <path d="M830 330 C 760 500, 560 548, 420 548 C 300 548, 250 470, 250 380 C 250 300, 292 250, 338 232"
         fill="none" stroke="#157347" strokeWidth="2.5" strokeDasharray="2 7" strokeLinecap="round" markerEnd="url(#td-ah)" />
-      <text x="600" y="588" fontSize="13" fill="#157347" fontWeight="600" textAnchor="middle">The loop: re-nudge re-fires a fresh WhatsApp advice to the 7 who didn&apos;t act</text>
+      <text x="600" y="588" fontSize="13" fill="#157347" fontWeight="600" textAnchor="middle">The loop: re-nudge re-fires a fresh WhatsApp advice to the 14 who didn&apos;t act</text>
     </svg>
   );
 }
