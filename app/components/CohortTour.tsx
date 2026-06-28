@@ -1,9 +1,12 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { driver, type Driver, type DriveStep } from "driver.js";
 import "driver.js/dist/driver.css";
 import "./tour/tour-theme.css";
+
+const SEEN_KEY = "outturn_cohort_tour_seen";
+const START_EVENT = "outturn:start-tour";
 
 /** Keep only steps whose anchor is in the DOM (e.g. re-nudge is admin-only). */
 function presentSteps(steps: DriveStep[]): DriveStep[] {
@@ -13,8 +16,9 @@ function presentSteps(steps: DriveStep[]): DriveStep[] {
   );
 }
 
-export function CohortTour() {
+export function CohortTour({ loading = false }: { loading?: boolean }) {
   const driverRef = useRef<Driver | null>(null);
+  const autoStartedRef = useRef(false);
 
   const startTour = useCallback(() => {
     const steps = presentSteps([
@@ -22,8 +26,7 @@ export function CohortTour() {
         element: '[data-tour="cohort-followthrough"]',
         popover: {
           title: "Follow-through for this cohort",
-          description:
-            "Rolled up from real farmer replies, not delivery receipts.",
+          description: "Rolled up from real farmer replies, not delivery receipts.",
         },
       },
       {
@@ -56,11 +59,42 @@ export function CohortTour() {
       nextBtnText: "Next",
       prevBtnText: "Back",
       doneBtnText: "Done",
+      onDestroyed: () => {
+        try {
+          localStorage.setItem(SEEN_KEY, "1");
+        } catch {
+          /* storage blocked — tour just won't persist */
+        }
+      },
       steps,
     });
     driverRef.current = d;
     d.drive();
   }, []);
+
+  // Auto-start once on a partner's first cohort visit, desktop only, after data loads.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (loading || autoStartedRef.current) return;
+    let seen = "0";
+    try {
+      seen = localStorage.getItem(SEEN_KEY) || "0";
+    } catch {
+      seen = "1"; // storage blocked → don't nag
+    }
+    if (seen === "1") return;
+    if (window.innerWidth < 768) return;
+    autoStartedRef.current = true;
+    const t = window.setTimeout(() => startTour(), 600);
+    return () => window.clearTimeout(t);
+  }, [loading, startTour]);
+
+  // Global "Take a tour" trigger (sidebar) — explicit action ignores the seen flag.
+  useEffect(() => {
+    const handler = () => startTour();
+    window.addEventListener(START_EVENT, handler);
+    return () => window.removeEventListener(START_EVENT, handler);
+  }, [startTour]);
 
   return (
     <button

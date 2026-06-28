@@ -6,6 +6,7 @@ import "driver.js/dist/driver.css";
 import "./tour/tour-theme.css";
 
 const SEEN_KEY = "outturn_tour_seen";
+const START_EVENT = "outturn:start-tour";
 
 /** Keep only steps whose anchor is actually in the DOM (centered steps have no element). */
 function presentSteps(steps: DriveStep[]): DriveStep[] {
@@ -150,6 +151,13 @@ export function DashboardTour({
     const t = window.setTimeout(() => startTour(), 600);
     return () => window.clearTimeout(t);
   }, [loading, startTour]);
+
+  // Global "Take a tour" trigger (sidebar) — explicit action ignores the seen flag.
+  useEffect(() => {
+    const handler = () => startTour();
+    window.addEventListener(START_EVENT, handler);
+    return () => window.removeEventListener(START_EVENT, handler);
+  }, [startTour]);
 
   return (
     <button

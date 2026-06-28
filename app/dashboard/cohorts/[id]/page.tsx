@@ -265,7 +265,7 @@ export default function CohortDetailPage({
           </ol>
         </nav>
         <div className="flex items-center gap-4 shrink-0">
-          <CohortTour />
+          <CohortTour loading={loading} />
           <div className="text-right">
             <p className="text-label">Partner</p>
             <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>

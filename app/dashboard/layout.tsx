@@ -52,6 +52,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { tenantId, tenantName, role, loading, logout, switchTenant, authHeaders } = useAuth();
   const [tenantInfo, setTenantInfo] = useState<{ plan?: string } | null>(null);
 
+  // A guided tour exists on the overview and on a cohort-detail page only.
+  const tourAvailable =
+    pathname === "/dashboard" ||
+    (pathname.startsWith("/dashboard/cohorts/") && pathname !== "/dashboard/cohorts/new");
+
   useEffect(() => {
     if (!tenantId) return;
     fetch("/api/overview", { headers: authHeaders() })
@@ -168,6 +173,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </p>
             </div>
           </div>
+          {tourAvailable && (
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent("outturn:start-tour"))}
+              className="w-full flex items-center gap-2 text-xs px-2 py-1 mb-1 rounded hover:opacity-80"
+              style={{ color: "var(--color-sidebar-text)" }}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.8}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Take a tour
+            </button>
+          )}
           <button
             onClick={() => logout()}
             className="w-full text-left text-xs px-2 py-1 rounded hover:opacity-80"
