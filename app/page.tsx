@@ -109,7 +109,7 @@ export default function LandingPage() {
       <section style={{ maxWidth: 1180, margin: "0 auto", padding: "40px 32px 64px" }}>
         <div className="hero-grid">
           <div>
-            <Eyebrow>WhatsApp crop advisory · for the organisations that advise farmers</Eyebrow>
+            <Eyebrow>WhatsApp crop advisory, built for follow-through</Eyebrow>
             <h1
               style={{
                 fontFamily: SERIF,
@@ -123,12 +123,12 @@ export default function LandingPage() {
               From advice to action.
             </h1>
             <p style={{ fontSize: 19, lineHeight: 1.55, color: C.ink, maxWidth: 520, margin: "0 0 14px", fontWeight: 500 }}>
-              Timely crop advice for farmers on WhatsApp — and proof of follow-through for the
-              partners who serve them.
+              Timely crop advice for farmers on WhatsApp — and, for the partners who serve them, a
+              clear view of who&apos;s acting on it.
             </p>
             <p style={{ fontSize: 16, lineHeight: 1.6, color: C.muted, maxWidth: 515, margin: "0 0 28px" }}>
-              Outturn sends weather-based guidance, then tracks which farmers actually acted on it — so
-              partners see real results by district, and re-nudge the ones who haven&apos;t.
+              Outturn sends weather-based guidance, sees who follows through by district, and helps
+              partners follow up with the rest — so no farmer slips through the cracks.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
               <TryDemoButton
@@ -219,7 +219,7 @@ export default function LandingPage() {
                 <span style={{ background: C.green, color: C.white, fontSize: 13, padding: "8px 14px", borderRadius: 9 }}>
                   Re-nudge cohort
                 </span>
-                <span style={{ fontSize: 13, color: C.faint }}>7 haven&apos;t acted</span>
+                <span style={{ fontSize: 13, color: C.faint }}>14 haven&apos;t acted</span>
               </div>
             </div>
             <span
@@ -428,7 +428,16 @@ export default function LandingPage() {
             <strong style={{ color: C.ink, fontWeight: 600 }}>agri-input company</strong> (seed,
             fertiliser, crop-protection), a{" "}
             <strong style={{ color: C.ink, fontWeight: 600 }}>co-operative or FPO</strong>, or a{" "}
-            <strong style={{ color: C.ink, fontWeight: 600 }}>government extension body (KVK)</strong>.
+            <strong style={{ color: C.ink, fontWeight: 600 }}>government extension body</strong> — a{" "}
+            <a
+              href="https://en.wikipedia.org/wiki/Krishi_Vigyan_Kendra"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: C.green, textDecoration: "underline", textUnderlineOffset: 2 }}
+            >
+              KVK
+            </a>{" "}
+            (Krishi Vigyan Kendra, the farm-science centres that carry advice to India&apos;s villages).
             Each gets its own branded, licensed workspace; the farmers just use plain WhatsApp.
           </p>
           <p style={{ fontSize: 11, letterSpacing: "0.13em", textTransform: "uppercase", color: C.faint, margin: "0 0 18px" }}>
@@ -439,7 +448,7 @@ export default function LandingPage() {
               ["1", "Add a cohort", "Group a district’s farmers by crop and language — say an NGO’s 26 cotton growers in Latur. The engine starts watching that district’s weather."],
               ["2", "Activate it", "Switch the cohort live on a Starter, Growth, or Scale plan. Checkout runs through Stripe."],
               ["3", "Watch follow-through", "See confirmed action, not delivery receipts — Latur at 67%, 28 of 42 nudges acted on."],
-              ["4", "Act where it slips", "Re-nudge the farmers who haven’t acted — the 7 in Latur who didn’t — by hand or on a schedule."],
+              ["4", "Act where it slips", "Re-nudge the farmers who haven’t acted — the 14 in Latur who didn’t — by hand or on a schedule."],
             ].map(([n, title, body]) => (
               <div key={n}>
                 <span
@@ -621,7 +630,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "40px 32px", display: "flex", flexWrap: "wrap", gap: 18, alignItems: "center" }}>
           <Eyebrow>What&apos;s next</Eyebrow>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {["Gamification + scorecards", "Mandi price alerts", "Adverse-weather prep", "Partner integrations"].map((r) => (
+            {["Gamification + scorecards", "Mandi price alerts", "Adverse-weather prep", "Micro-finance & input-credit partners", "Partner integrations"].map((r) => (
               <span key={r} style={{ fontSize: 13.5, color: C.muted, background: C.white, border: `1px solid ${C.border}`, padding: "6px 12px", borderRadius: 999 }}>
                 {r}
               </span>
