@@ -63,7 +63,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen flex" role="status" aria-label="Loading dashboard">
+      <div className="h-screen flex overflow-hidden" role="status" aria-label="Loading dashboard">
         <aside className="w-64 sidebar flex flex-col shrink-0">
           <div className="p-5" style={{ borderBottom: "1px solid var(--color-sidebar-border)" }}>
             <div className="skeleton" style={{ width: 124, height: 30, opacity: 0.22 }} />
@@ -90,15 +90,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen flex" style={themeVars}>
-      <aside className="w-64 sidebar flex flex-col shrink-0">
+    <div className="h-screen flex overflow-hidden" style={themeVars}>
+      <aside className="w-64 sidebar flex flex-col shrink-0 h-full">
         <div className="p-5" style={{ borderBottom: "1px solid var(--color-sidebar-border)" }}>
           <Link href="/" aria-label="Outturn home" title="Back to home">
             <AgriNexusWordmark light />
           </Link>
         </div>
 
-        <nav className="flex-1 p-3">
+        <nav className="flex-1 p-3 overflow-y-auto">
           <ul className="space-y-1">
             {navItems.map((item) => {
               const isActive = item.exact

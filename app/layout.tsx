@@ -12,12 +12,12 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://outturn.vercel.app"),
-  title: "Outturn — Agricultural Accountability Engine",
+  title: "Outturn Advisory — Agricultural Accountability Engine",
   description:
-    "Outturn is the control plane that proves what your advisory program produced — tracking farmer follow-through across districts and surfacing where to act. Powered by AgriNexus AI.",
+    "Outturn Advisory is the accountability layer for farmer advisory programs: it sends weather-timed WhatsApp reminders, tracks which farmers actually acted, and shows funders the real follow-through per district. Powered by AgriNexus AI.",
   openGraph: {
-    title: "Outturn",
-    description: "Proof of what your advisory program produced.",
+    title: "Outturn Advisory",
+    description: "Send the advice. Prove it was acted on.",
     type: "website",
   },
 };
