@@ -123,12 +123,12 @@ export default function LandingPage() {
               From advice to action.
             </h1>
             <p style={{ fontSize: 19, lineHeight: 1.55, color: C.ink, maxWidth: 520, margin: "0 0 14px", fontWeight: 500 }}>
-              Outturn sends farmers timely, weather-based crop advice over WhatsApp — and shows
-              partners who actually acted on it, district by district.
+              Timely crop advice for farmers on WhatsApp — and proof of follow-through for the
+              partners who serve them.
             </p>
-            <p style={{ fontSize: 16, lineHeight: 1.6, color: C.muted, maxWidth: 500, margin: "0 0 28px" }}>
-              So advice doesn&apos;t just go out — you can see it followed through, and re-send a reminder
-              to the few who haven&apos;t acted.
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: C.muted, maxWidth: 515, margin: "0 0 28px" }}>
+              Outturn sends weather-based guidance, then tracks which farmers actually acted on it — so
+              partners see real results by district, and re-nudge the ones who haven&apos;t.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
               <TryDemoButton
@@ -237,6 +237,90 @@ export default function LandingPage() {
               +9% this month
             </span>
           </div>
+        </div>
+      </section>
+
+      {/* What it does — the capability suite */}
+      <section style={{ maxWidth: 1180, margin: "0 auto", padding: "4px 32px 60px" }}>
+        <Eyebrow>What it does</Eyebrow>
+        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(26px, 4vw, 38px)", lineHeight: 1.12, margin: "12px 0 8px", fontWeight: 500 }}>
+          A full advisory engine on WhatsApp — that closes the loop.
+        </h2>
+        <p style={{ fontSize: 16, color: C.muted, maxWidth: 670, margin: "0 0 30px", lineHeight: 1.6 }}>
+          Built on the award-winning AgriNexus engine. Farmers get far more than a reminder; partners
+          get proof it worked.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16 }}>
+          {(
+            [
+              [
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M7 18a4 4 0 01-.5-7.97A6 6 0 0118 9.5a3.5 3.5 0 01-.5 8.5H7z" />,
+                "Weather-timed advice",
+                "Spray and irrigation windows from live weather, per district.",
+                false,
+              ],
+              [
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M21 11.5a8.38 8.38 0 01-9 8.5 8.5 8.5 0 01-3.8-.9L3 21l1.9-5.2A8.38 8.38 0 014 11.5 8.5 8.5 0 0112 3a8.38 8.38 0 019 8.5z" />,
+                "Two-way on WhatsApp",
+                "Farmers reply Done or Not yet — no app to install.",
+                false,
+              ],
+              [
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zM19 10v2a7 7 0 01-14 0v-2M12 19v3" />,
+                "Voice notes",
+                "Farmers can answer by voice; advice can go out as audio.",
+                false,
+              ],
+              [
+                <g key="p"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8a2 2 0 012-2h1.5L8 4h8l1.5 2H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" /><circle cx="12" cy="13" r="3.2" /></g>,
+                "Photo diagnosis",
+                "Send a crop photo — the engine flags pest or disease.",
+                false,
+              ],
+              [
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
+                "Ask anything",
+                "Farmers ask questions in their own language and get answers.",
+                false,
+              ],
+              [
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M20 12a8 8 0 11-2.3-5.6M20 4v4h-4M9 12l2 2 4-4" />,
+                "Follow-through + re-nudge",
+                "Tracked to done — and re-nudged if not. This is the differentiator.",
+                true,
+              ],
+            ] as [React.ReactNode, string, string, boolean][]
+          ).map(([icon, title, desc, hero]) => (
+            <div
+              key={title}
+              style={{
+                background: hero ? C.greenTint : C.white,
+                border: `${hero ? 2 : 1}px solid ${hero ? C.green : C.border}`,
+                borderRadius: 14,
+                padding: 20,
+              }}
+            >
+              <div
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 10,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: hero ? C.green : C.greenTint,
+                  color: hero ? C.white : C.green,
+                  marginBottom: 12,
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} aria-hidden="true">
+                  {icon}
+                </svg>
+              </div>
+              <h3 style={{ fontFamily: SERIF, fontSize: 18, margin: "0 0 4px", fontWeight: 500 }}>{title}</h3>
+              <p style={{ fontSize: 13.5, color: C.muted, margin: 0, lineHeight: 1.5 }}>{desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
