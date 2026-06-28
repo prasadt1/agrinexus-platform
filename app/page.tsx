@@ -28,18 +28,20 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="px-8 pt-24 pb-16 max-w-3xl mx-auto text-center">
         <p className="text-label mb-5" style={{ color: "var(--color-primary)" }}>
-          Advisory accountability · WhatsApp-native
+          WhatsApp advisory accountability for agriculture
         </p>
         <h1 className="text-display mb-5">
-          Proof of what your advisory program produced.
+          Send farmers the right advice at the right moment, and prove they acted on it.
         </h1>
         <p
-          className="text-lg md:text-xl max-w-xl mx-auto mb-9"
+          className="text-lg md:text-xl max-w-2xl mx-auto mb-9"
           style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}
         >
-          Farmers get a timely <Term term="nudge">WhatsApp nudge</Term> when conditions are right.
-          Outturn tracks <Term term="follow-through">who acted</Term>, then shows you where
-          follow-through is slipping, so field teams know exactly where to go.
+          Outturn Advisory is the control plane for WhatsApp farming advisory. When the weather is
+          right, it sends each farmer a <Term term="nudge">timely nudge</Term> in their own language
+          to spray, irrigate, or scout, then tracks who actually did it and rolls it up per district.
+          So the NGOs, agri-input firms, and government programs that fund the advice can measure{" "}
+          <Term term="follow-through">follow-through</Term>, not just delivery.
         </p>
         <div className="flex flex-wrap justify-center items-center gap-3">
           <Link href="/login" className="btn btn-primary text-base px-6 py-3">
@@ -64,65 +66,180 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* How it works */}
-      <section className="px-8 pb-16 max-w-4xl mx-auto">
+      {/* The problem */}
+      <section className="px-8 py-16" style={{ background: "var(--color-page-bg)" }}>
+        <div className="max-w-4xl mx-auto">
+          <p className="text-label mb-2 text-center" style={{ color: "var(--color-primary)" }}>
+            The gap
+          </p>
+          <h2 className="text-section text-center mb-3">Advice without accountability</h2>
+          <p
+            className="text-center max-w-2xl mx-auto mb-10"
+            style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}
+          >
+            Extension programs send farmers good advice, when to spray, when to irrigate, when to
+            scout for pests. But once the message goes out, no one knows if it was acted on. The
+            people who fund these programs are judged on impact, yet the only thing most advisory
+            tools can show them is that a message was delivered.
+          </p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="card">
+              <p className="text-label mb-2" style={{ color: "var(--color-text-muted)" }}>
+                What most tools show
+              </p>
+              <p className="text-card-title mb-1">Messages delivered</p>
+              <p style={{ color: "var(--color-text-secondary)" }}>
+                A broadcast count. It says the advice was sent, not whether a single farmer changed
+                what they did in the field.
+              </p>
+            </div>
+            <div className="card" style={{ borderColor: "var(--color-primary)" }}>
+              <p className="text-label mb-2" style={{ color: "var(--color-primary)" }}>
+                What actually matters
+              </p>
+              <p className="text-card-title mb-1">Farmers who acted</p>
+              <p style={{ color: "var(--color-text-secondary)" }}>
+                Confirmed follow-through, per village and per district, so a partner can prove real
+                outcomes and find where to help.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How the loop works */}
+      <section className="px-8 py-16 max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-section">How it works</h2>
-          <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
-            From weather to proof to re-nudge — the whole loop, shown in the real product. Tap a step
-            or watch it play.
+          <p className="text-label mb-2" style={{ color: "var(--color-primary)" }}>
+            How it works
+          </p>
+          <h2 className="text-section">The closed advisory loop</h2>
+          <p
+            className="mt-2 max-w-2xl mx-auto"
+            style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}
+          >
+            A <Term term="nudge">nudge</Term> is one timely WhatsApp message telling a farmer to act
+            now. Timing is the point: a spray window is open for hours, not days. Outturn watches each
+            district&apos;s weather and only sends when conditions are right, then follows up until the
+            farmer confirms or the window closes. Tap a step or watch it play.
           </p>
         </div>
         <HowItWorks />
       </section>
 
-      {/* Who it's for / value props */}
+      {/* Why track who acted */}
       <section className="px-8 py-16" style={{ background: "var(--color-page-bg)" }}>
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-section text-center mb-2">Built for the people who fund advice</h2>
-          <p className="text-center mb-10" style={{ color: "var(--color-text-secondary)" }}>
-            NGOs, agri-input companies, and government extension programmes (such as India&apos;s{" "}
-            <a
-              href="https://en.wikipedia.org/wiki/Krishi_Vigyan_Kendra"
-              className="underline"
-              style={{ color: "var(--color-primary)" }}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Krishi Vigyan Kendras
-            </a>
-            , the district farm-science centres).
+        <div className="max-w-4xl mx-auto">
+          <p className="text-label mb-2 text-center" style={{ color: "var(--color-primary)" }}>
+            Why it matters
           </p>
-          <div className="grid md:grid-cols-3 gap-8">
+          <h2 className="text-section text-center mb-3">Every reply becomes proof</h2>
+          <p
+            className="text-center max-w-2xl mx-auto mb-10"
+            style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}
+          >
+            When a farmer replies &ldquo;done,&rdquo; the loop closes and the reminders stop. When a
+            cohort goes quiet, that silence is a signal. This is the accountability engine: the same
+            reusable loop of trigger, send, confirm, remind, detect, and measure, no matter the crop
+            or the advice.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                title: "Set up in minutes",
+                title: "Capture every reply",
+                body: "Each farmer confirmation is recorded with consent, in the language they replied in.",
+              },
+              {
+                title: "Roll it up per district",
                 body: (
                   <>
-                    Create a <Term term="cohort">cohort</Term> — a district&apos;s farmers, their crops and
-                    languages — and the advice engine starts watching that area&apos;s weather.
+                    Replies are <Term term="aggregate">aggregated</Term> into a follow-through rate
+                    you can act on, not a list of receipts.
                   </>
                 ),
               },
               {
-                title: "Measure outcomes, not sends",
-                body: (
-                  <>
-                    See <Term term="follow-through">follow-through</Term>, not just delivery. Replies are{" "}
-                    <Term term="aggregate">rolled up</Term> per village into a number you can act on.
-                  </>
-                ),
-              },
-              {
-                title: "Fund what works",
-                body: "Compare districts side by side, double down on the cohorts that respond, and show funders real impact.",
+                title: "Act where it slips",
+                body: "Cohorts that go quiet surface automatically, so field teams know exactly where to go.",
               },
             ].map((item) => (
               <div key={item.title} className="card">
-                <h3 className="text-card-title mb-3">{item.title}</h3>
+                <h3 className="text-card-title mb-2">{item.title}</h3>
                 <p style={{ color: "var(--color-text-secondary)" }}>{item.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Who it's for */}
+      <section className="px-8 py-16 max-w-5xl mx-auto">
+        <h2 className="text-section text-center mb-2">Built for the people who fund advice</h2>
+        <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: "var(--color-text-secondary)" }}>
+          NGOs, agri-input companies, and government extension programmes such as India&apos;s{" "}
+          <a
+            href="https://en.wikipedia.org/wiki/Krishi_Vigyan_Kendra"
+            className="underline"
+            style={{ color: "var(--color-primary)" }}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Krishi Vigyan Kendras
+          </a>
+          , the district farm-science centres.
+        </p>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              title: "Set up in minutes",
+              body: (
+                <>
+                  Create a <Term term="cohort">cohort</Term>, a district&apos;s farmers with their crops
+                  and languages, and the engine starts watching that area&apos;s weather.
+                </>
+              ),
+            },
+            {
+              title: "Measure outcomes, not sends",
+              body: (
+                <>
+                  See <Term term="follow-through">follow-through</Term>, not just delivery. Replies are
+                  rolled up per village into a number you can act on.
+                </>
+              ),
+            },
+            {
+              title: "Fund what works",
+              body: "Compare districts side by side, double down on the cohorts that respond, and show funders real impact.",
+            },
+          ].map((item) => (
+            <div key={item.title} className="card">
+              <h3 className="text-card-title mb-3">{item.title}</h3>
+              <p style={{ color: "var(--color-text-secondary)" }}>{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Data + credibility */}
+      <section className="px-8 py-16" style={{ background: "var(--color-page-bg)" }}>
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-10 items-start">
+          <div>
+            <h2 className="text-section mb-3">What we collect, and why</h2>
+            <p style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+              Outturn records who was nudged, when, on what advice, and whether they confirmed,
+              always with the farmer&apos;s consent and isolated per partner. That record is the only
+              way to turn advice into a measurable outcome instead of a hopeful broadcast.
+            </p>
+          </div>
+          <div>
+            <h2 className="text-section mb-3">Production-grade, not a prototype</h2>
+            <p style={{ color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+              Outturn is the control plane; the delivery engine is{" "}
+              <span style={{ color: "var(--color-text-primary)", fontWeight: 600 }}>AgriNexus AI</span>,
+              an AWS AIdeas award winner running in production at about $0.54 per farmer per year, on
+              Amazon DynamoDB and Vercel.
+            </p>
           </div>
         </div>
       </section>
@@ -131,7 +248,8 @@ export default function LandingPage() {
       <section className="px-8 py-16 max-w-3xl mx-auto text-center">
         <h2 className="text-section mb-3">See the loop run on live data</h2>
         <p className="mb-8" style={{ color: "var(--color-text-secondary)" }}>
-          Open the demo dashboard, switch between partner organisations, and run a full advisory cycle yourself.
+          Open the demo dashboard, switch between partner organisations, and run a full advisory cycle
+          yourself.
         </p>
         <Link href="/login" className="btn btn-primary text-base px-6 py-3">
           Open demo dashboard
@@ -142,7 +260,7 @@ export default function LandingPage() {
         className="px-8 py-8 text-center text-sm border-t"
         style={{ color: "var(--color-text-muted)", borderColor: "var(--color-border)" }}
       >
-        Powered by AgriNexus AI · AWS AIdeas award winner ·{" "}
+        Outturn Advisory · Powered by AgriNexus AI · AWS AIdeas award winner ·{" "}
         <Link href="/judges" className="underline">
           For hackathon judges
         </Link>{" "}
