@@ -19,12 +19,12 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://outturn.vercel.app"),
-  title: "Outturn — Advice, followed through",
+  title: "Outturn — Advice that closes the loop",
   description:
-    "Outturn is the accountability control plane for closed-loop farm advisory. A WhatsApp engine nudges each farmer until they act; Outturn shows partners follow-through per district and the lever to act where it slips.",
+    "Outturn is the accountability layer for WhatsApp crop advisory. It sends farmers weather-timed advice, tracks which farmers act on it, and lets partners — NGOs, agri-input companies, co-ops and government extension — see follow-through by district and re-nudge the rest.",
   openGraph: {
-    title: "Outturn — Advice, followed through",
-    description: "Closed-loop farm advisory: from advice to action.",
+    title: "Outturn — Advice that closes the loop",
+    description: "WhatsApp crop advisory that closes the loop — advice tracked all the way to done.",
     type: "website",
   },
 };

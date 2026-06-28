@@ -71,7 +71,7 @@ export default function LandingPage() {
               Out<span style={{ color: C.green }}>turn</span>
             </span>
             <span style={{ fontSize: 11.5, color: C.faint, marginTop: 2, letterSpacing: "0.01em" }}>
-              Advice, followed through
+              Advice that closes the loop
             </span>
           </span>
         </a>
@@ -109,7 +109,7 @@ export default function LandingPage() {
       <section style={{ maxWidth: 1180, margin: "0 auto", padding: "40px 32px 64px" }}>
         <div className="hero-grid">
           <div>
-            <Eyebrow>WhatsApp crop advisory · for agri NGOs &amp; input companies</Eyebrow>
+            <Eyebrow>WhatsApp crop advisory · for the organisations that advise farmers</Eyebrow>
             <h1
               style={{
                 fontFamily: SERIF,
@@ -419,15 +419,27 @@ export default function LandingPage() {
       <section id="partners" style={{ background: C.cream2, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "56px 32px" }}>
           <Eyebrow>For partners</Eyebrow>
-          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 28px", fontWeight: 500 }}>
-            Provision, license, monitor, act.
+          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 12px", fontWeight: 500 }}>
+            Built for the teams that advise farmers.
           </h2>
+          <p style={{ fontSize: 16.5, color: C.muted, maxWidth: 730, margin: "0 0 28px", lineHeight: 1.6 }}>
+            A partner is any organisation that advises farmers at scale — an{" "}
+            <strong style={{ color: C.ink, fontWeight: 600 }}>NGO</strong>, an{" "}
+            <strong style={{ color: C.ink, fontWeight: 600 }}>agri-input company</strong> (seed,
+            fertiliser, crop-protection), a{" "}
+            <strong style={{ color: C.ink, fontWeight: 600 }}>co-operative or FPO</strong>, or a{" "}
+            <strong style={{ color: C.ink, fontWeight: 600 }}>government extension body (KVK)</strong>.
+            Each gets its own branded, licensed workspace; the farmers just use plain WhatsApp.
+          </p>
+          <p style={{ fontSize: 11, letterSpacing: "0.13em", textTransform: "uppercase", color: C.faint, margin: "0 0 18px" }}>
+            How a partner runs it
+          </p>
           <div className="steps-grid">
             {[
-              ["1", "Provision a cohort", "A district’s farmers with their crops and languages. The engine starts watching that area’s weather."],
-              ["2", "License it", "Activate per cohort on a Starter, Growth, or Scale plan. Checkout runs through Stripe."],
-              ["3", "Monitor follow-through", "Watch confirmed action per cohort and per district, not message-delivery receipts."],
-              ["4", "Act where it slips", "Re-nudge the farmers who haven’t acted, manually or on an automated schedule."],
+              ["1", "Add a cohort", "Group a district’s farmers by crop and language — say an NGO’s 26 cotton growers in Latur. The engine starts watching that district’s weather."],
+              ["2", "Activate it", "Switch the cohort live on a Starter, Growth, or Scale plan. Checkout runs through Stripe."],
+              ["3", "Watch follow-through", "See confirmed action, not delivery receipts — Latur at 67%, 28 of 42 nudges acted on."],
+              ["4", "Act where it slips", "Re-nudge the farmers who haven’t acted — the 7 in Latur who didn’t — by hand or on a schedule."],
             ].map(([n, title, body]) => (
               <div key={n}>
                 <span
@@ -683,7 +695,7 @@ export default function LandingPage() {
               <span style={{ fontFamily: SERIF, fontSize: 17, color: C.ink, fontWeight: 500 }}>
                 Out<span style={{ color: C.green }}>turn</span>
               </span>
-              <span style={{ fontSize: 12, color: C.faint, marginTop: 1 }}>Advice, followed through</span>
+              <span style={{ fontSize: 12, color: C.faint, marginTop: 1 }}>Advice that closes the loop</span>
             </div>
           </div>
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
