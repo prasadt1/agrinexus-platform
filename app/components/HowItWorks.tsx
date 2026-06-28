@@ -172,8 +172,8 @@ function NudgeStage({ withReply }: { withReply?: boolean }) {
     <PhoneFrame>
       <div style={bubble("in")}>
         <div style={{ color: "#111", fontWeight: 500 }}>
-          Good weather to spray cotton in Latur today — wind 8 km/h, no rain. Reply &ldquo;Done&rdquo;
-          once sprayed. 🌾
+          Good conditions to spray your cotton in Latur today: wind 8 km/h, no rain. Reply
+          &ldquo;Done&rdquo; once you&rsquo;ve sprayed. 🌾
         </div>
         <div style={nativeStyle}>आज लातूर में कपास पर छिड़काव के लिए मौसम अच्छा है।</div>
         <div style={metaStyle}>9:24 AM</div>
@@ -191,7 +191,7 @@ function NudgeStage({ withReply }: { withReply?: boolean }) {
             </div>
           </div>
           <div className="hiw-anim" style={bubble("in")}>
-            <div style={{ color: "#111" }}>Great — marked complete. Thank you! 🎉</div>
+            <div style={{ color: "#111" }}>Great, that&rsquo;s logged. Thank you! 🎉</div>
             <div style={nativeStyle}>बहुत अच्छा! आपका काम पूरा हो गया।</div>
             <div style={metaStyle}>9:51 AM</div>
           </div>
@@ -430,18 +430,18 @@ const STEPS: Step[] = [
     short: "Reminder",
     title: "2 · Send a WhatsApp reminder",
     plain:
-      "When conditions are right, every farmer gets a plain-language WhatsApp reminder — in their own language, no app to install.",
-    tech: "Step Functions invokes the NudgeSender Lambda, which sends an interactive WhatsApp message (Done / Not Yet) via the WhatsApp Cloud API.",
-    services: ["AWS Step Functions", "AWS Lambda · NudgeSender", "WhatsApp Cloud API"],
+      "When conditions are right, every farmer gets a plain-language WhatsApp reminder, in their own language, no app to install.",
+    tech: "Step Functions invokes the NudgeSender Lambda, which sends an interactive WhatsApp message (Done / Not Yet) via Meta's WhatsApp Cloud API.",
+    services: ["AWS Step Functions", "AWS Lambda · NudgeSender", "Meta WhatsApp Cloud API"],
     stage: () => <NudgeStage />,
   },
   {
     key: "reply",
     short: "Reply",
     title: "3 · Farmers reply",
-    plain: "Farmers reply 'Done' right inside WhatsApp the moment they act — in the language they speak.",
-    tech: "The reply hits the WhatsApp webhook (API Gateway, then a WebhookHandler Lambda), which records it in the single-table, tenant-scoped DynamoDB design.",
-    services: ["WhatsApp Cloud API", "Amazon API Gateway", "AWS Lambda · WebhookHandler", "Amazon DynamoDB"],
+    plain: "Farmers reply 'Done' right inside WhatsApp the moment they act, in the language they speak.",
+    tech: "The reply hits the WhatsApp webhook (Meta to API Gateway, then a WebhookHandler Lambda), which records it in the single-table, tenant-scoped DynamoDB design.",
+    services: ["Meta WhatsApp Cloud API", "Amazon API Gateway", "AWS Lambda · WebhookHandler", "Amazon DynamoDB"],
     stage: () => <NudgeStage withReply />,
   },
   {
@@ -449,7 +449,7 @@ const STEPS: Step[] = [
     short: "Roll-up",
     title: "4 · Roll up the cohort",
     plain:
-      "Replies are tallied across the whole cohort, so follow-through is measured — not guessed.",
+      "Replies are tallied across the whole cohort, so follow-through is measured, not guessed.",
     tech: "A ResponseDetector Lambda flips the nudge to done via DynamoDB Streams; the OutcomesAggregator Lambda then rolls outcomes into a SUMMARY# record.",
     services: ["Amazon DynamoDB Streams", "AWS Lambda · ResponseDetector", "AWS Lambda · OutcomesAggregator"],
     stage: () => <RollupStage />,
@@ -459,9 +459,9 @@ const STEPS: Step[] = [
     short: "Proof",
     title: "5 · The partner sees the proof",
     plain:
-      "The sponsoring partner sees real follow-through — outcomes, not just messages sent.",
-    tech: "The dashboard reads the pre-computed SUMMARY# record, so loads are fast and cheap.",
-    services: ["Amazon DynamoDB · SUMMARY#", "Next.js on Vercel"],
+      "The sponsoring partner sees real follow-through: outcomes, not just messages sent.",
+    tech: "The Vercel-hosted dashboard reads the pre-computed SUMMARY# record, so loads stay fast and cheap.",
+    services: ["Vercel · Next.js", "Amazon DynamoDB · SUMMARY#"],
     stage: () => <ProofStage />,
   },
   {
@@ -470,8 +470,8 @@ const STEPS: Step[] = [
     title: "6 · Close the loop",
     plain:
       "Where farmers haven't acted, the partner re-nudges them in one click. Outturn skips anyone who still has a pending reminder, then reports exactly how many were reached.",
-    tech: "Re-nudge starts a Step Functions execution; NudgeSender re-sends only to farmers without an open nudge.",
-    services: ["AWS Step Functions · StartExecution", "AWS Lambda · NudgeSender", "DynamoDB · open-nudge gate"],
+    tech: "From the Vercel control plane (keyless via OIDC), re-nudge starts a Step Functions execution; NudgeSender re-sends only to farmers without an open nudge, and the action is written to an audit log.",
+    services: ["Vercel · OIDC → AWS", "AWS Step Functions · StartExecution", "Audit log · DynamoDB"],
     stage: () => <ActionStage />,
   },
 ];
@@ -499,169 +499,165 @@ export function HowItWorks() {
         overflow: "hidden",
       }}
     >
-      {/* Stage — real UI screens on the product's own dark surface */}
-      <div
-        style={{
-          position: "relative",
-          minHeight: 348,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background:
-            "radial-gradient(130% 90% at 50% -10%, rgba(110,231,168,0.10), transparent 55%), #0B1F17",
-          padding: 32,
-        }}
-      >
-        {/* per-step progress, so it reads like a short demo reel */}
-        {playing && (
-          <div
-            key={`prog-${index}`}
-            style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.12)" }}
-          >
-            <div
-              style={{ height: "100%", background: "#6EE7A8", animation: `hiw-progress ${STEP_MS}ms linear forwards` }}
-            />
-          </div>
-        )}
-
+      <div className="hiw-2col">
+        {/* LEFT — the device on a contained dark surface */}
         <div
-          key={`${step.key}-${tech}`}
-          className="hiw-anim"
-          style={{ width: "100%", display: "flex", justifyContent: "center" }}
-        >
-          {step.stage()}
-        </div>
-
-        <button
-          onClick={() => setTech((t) => !t)}
           style={{
-            position: "absolute",
-            top: 14,
-            right: 12,
-            background: "rgba(255,255,255,0.16)",
-            color: "#fff",
-            fontSize: 12,
-            fontWeight: 500,
-            padding: "5px 11px",
-            borderRadius: 8,
-            border: "1px solid rgba(255,255,255,0.25)",
-            cursor: "pointer",
+            position: "relative",
+            minHeight: 360,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background:
+              "radial-gradient(130% 90% at 50% -10%, rgba(110,231,168,0.10), transparent 55%), #14110D",
+            padding: 22,
           }}
         >
-          {tech ? "Hide the tech" : "Show the tech"}
-        </button>
-      </div>
-
-      {/* Caption */}
-      <div style={{ padding: 24 }}>
-        <div key={`${step.key}-${tech}-cap`} className="hiw-anim" style={{ minHeight: 104 }}>
-          <h3 className="text-card-title" style={{ marginBottom: 6 }}>
-            {step.title}
-          </h3>
-          <p style={{ color: "var(--color-text-secondary)" }}>{tech ? step.tech : step.plain}</p>
-          {tech && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
-              {step.services.map((s) => (
-                <span
-                  key={s}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 7,
-                    fontSize: 12.5,
-                    fontWeight: 600,
-                    padding: "5px 11px",
-                    borderRadius: 8,
-                    background: "var(--color-primary-tint)",
-                    color: "var(--color-primary-hover)",
-                    border: "1px solid rgba(21,115,71,0.25)",
-                  }}
-                >
-                  <span style={{ width: 6, height: 6, borderRadius: 999, background: C.primary }} />
-                  {s}
-                </span>
-              ))}
+          {playing && (
+            <div
+              key={`prog-${index}`}
+              style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.12)" }}
+            >
+              <div
+                style={{ height: "100%", background: "#6EE7A8", animation: `hiw-progress ${STEP_MS}ms linear forwards` }}
+              />
             </div>
           )}
+          <div key={`${step.key}-${tech}`} className="hiw-anim" style={{ display: "flex", justifyContent: "center" }}>
+            {step.stage()}
+          </div>
+          <button
+            onClick={() => setTech((t) => !t)}
+            style={{
+              position: "absolute",
+              top: 14,
+              right: 12,
+              background: "rgba(255,255,255,0.16)",
+              color: "#fff",
+              fontSize: 12,
+              fontWeight: 500,
+              padding: "5px 11px",
+              borderRadius: 8,
+              border: "1px solid rgba(255,255,255,0.25)",
+              cursor: "pointer",
+            }}
+          >
+            {tech ? "Hide the tech" : "Show the tech"}
+          </button>
         </div>
 
-        {/* Stepper */}
-        <div style={{ display: "flex", gap: 8, marginTop: 18 }}>
-          {STEPS.map((s, i) => {
-            const active = i === index;
-            return (
-              <button
-                key={s.key}
-                onClick={() => {
-                  setIndex(i);
-                  setPlaying(false);
-                }}
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "9px 10px",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  textAlign: "left",
-                  background: active ? C.primary : "var(--color-surface)",
-                  border: `1px solid ${active || i < index ? C.primary : "var(--color-border)"}`,
-                  transition: "all 160ms ease",
-                }}
-              >
-                <span
+        {/* RIGHT — caption + vertical stepper + controls */}
+        <div style={{ padding: 24, display: "flex", flexDirection: "column" }}>
+          <div key={`${step.key}-${tech}-cap`} className="hiw-anim" style={{ minHeight: 92 }}>
+            <h3 className="text-card-title" style={{ marginBottom: 6 }}>
+              {step.title}
+            </h3>
+            <p style={{ color: "var(--color-text-secondary)", fontSize: 14, lineHeight: 1.55 }}>
+              {tech ? step.tech : step.plain}
+            </p>
+            {tech && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginTop: 12 }}>
+                {step.services.map((s) => (
+                  <span
+                    key={s}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 7,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      padding: "5px 10px",
+                      borderRadius: 8,
+                      background: "var(--color-primary-tint)",
+                      color: "var(--color-primary-hover)",
+                      border: "1px solid rgba(21,115,71,0.25)",
+                    }}
+                  >
+                    <span style={{ width: 6, height: 6, borderRadius: 999, background: C.primary }} />
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Vertical stepper */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginTop: 16 }}>
+            {STEPS.map((s, i) => {
+              const active = i === index;
+              const done = i < index;
+              return (
+                <button
+                  key={s.key}
+                  onClick={() => {
+                    setIndex(i);
+                    setPlaying(false);
+                  }}
                   style={{
-                    flexShrink: 0,
-                    width: 22,
-                    height: 22,
-                    borderRadius: 999,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 12,
-                    fontWeight: 700,
-                    background: active ? "rgba(255,255,255,0.22)" : "var(--color-primary-tint)",
-                    color: active ? "#fff" : C.primary,
+                    gap: 10,
+                    padding: "8px 10px",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    textAlign: "left",
+                    background: active ? "var(--color-primary-tint)" : "transparent",
+                    border: `1px solid ${active ? C.primary : "transparent"}`,
+                    transition: "all 160ms ease",
                   }}
                 >
-                  {i + 1}
-                </span>
-                <span
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: active ? "#fff" : "var(--color-text-secondary)",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {s.short}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      width: 22,
+                      height: 22,
+                      borderRadius: 999,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      background: active || done ? C.primary : "var(--color-border)",
+                      color: active || done ? "#fff" : "var(--color-text-muted)",
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 13.5,
+                      fontWeight: active ? 600 : 500,
+                      color: active ? C.primary : "var(--color-text-secondary)",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {s.short}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 16 }}>
-          <button onClick={() => setPlaying((p) => !p)} className="btn btn-secondary" style={{ fontSize: 13 }}>
-            {playing ? "Pause" : "Play"}
-          </button>
-          <button
-            onClick={() => {
-              setIndex(0);
-              setPlaying(true);
-            }}
-            className="btn btn-secondary"
-            style={{ fontSize: 13 }}
-          >
-            Replay
-          </button>
-          <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--color-text-muted)" }}>
-            This is the live product — the same loop runs in the demo dashboard.
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: "auto", paddingTop: 16 }}>
+            <button onClick={() => setPlaying((p) => !p)} className="btn btn-secondary" style={{ fontSize: 13 }}>
+              {playing ? "Pause" : "Play"}
+            </button>
+            <button
+              onClick={() => {
+                setIndex(0);
+                setPlaying(true);
+              }}
+              className="btn btn-secondary"
+              style={{ fontSize: 13 }}
+            >
+              Replay
+            </button>
+            <span style={{ marginLeft: "auto", fontSize: 11.5, color: "var(--color-text-muted)" }}>
+              The same loop runs in the live demo.
+            </span>
+          </div>
         </div>
       </div>
     </div>
