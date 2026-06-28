@@ -15,7 +15,7 @@ type Plan = {
 // Mirrors the public landing-page tiers. "enterprise" is shown as "Scale".
 const PLANS: Plan[] = [
   { id: "starter", name: "Starter", price: "₹999", perFarmer: "≈ ₹240 / farmer / year", reach: "up to 50 farmers" },
-  { id: "growth", name: "Growth", price: "₹2,999", perFarmer: "≈ ₹150 / farmer / year", reach: "up to 200 farmers", popular: true },
+  { id: "growth", name: "Growth", price: "₹2,999", perFarmer: "≈ ₹144 / farmer / year", reach: "up to 250 farmers", popular: true },
   { id: "enterprise", name: "Scale", price: "₹9,999", perFarmer: "≈ ₹120 / farmer / year", reach: "up to 1,000 farmers" },
 ];
 
