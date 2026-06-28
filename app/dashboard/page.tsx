@@ -136,7 +136,7 @@ export default function OverviewPage() {
               </button>
             </div>
             <div className="px-6 pb-6">
-              <HowItWorks />
+              <HowItWorks allowTech={false} />
             </div>
           </div>
         </div>

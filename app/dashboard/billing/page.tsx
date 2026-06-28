@@ -40,7 +40,7 @@ export default function BillingPage() {
     <div className="py-10 px-8">
       <PageHeader
         title="Billing"
-        description="Cohort licenses and subscription state (Stripe + demo)"
+        description="Your cohort licenses and renewal dates."
       />
 
       <Card noPadding className="overflow-hidden">
@@ -49,7 +49,7 @@ export default function BillingPage() {
         ) : licenses.length === 0 ? (
           <EmptyState
             title="No licenses yet"
-            description="Activate a cohort to create a license record in DynamoDB."
+            description="Activate a cohort and its license will appear here."
           />
         ) : (
           <table className="w-full">
@@ -59,7 +59,7 @@ export default function BillingPage() {
                 <th className="data-table-th">Plan</th>
                 <th className="data-table-th">Cohort status</th>
                 <th className="data-table-th">Period end</th>
-                <th className="data-table-th text-right">Type</th>
+                <th className="data-table-th text-right">Billing</th>
               </tr>
             </thead>
             <tbody>
@@ -89,7 +89,7 @@ export default function BillingPage() {
                         color: l.isDemo ? "var(--color-text-muted)" : "var(--color-primary)",
                       }}
                     >
-                      {l.isDemo ? "Demo" : "Stripe"}
+                      {l.isDemo ? "Trial" : "Active"}
                     </span>
                   </td>
                 </tr>
@@ -100,8 +100,8 @@ export default function BillingPage() {
       </Card>
 
       <p className="mt-6 text-sm" style={{ color: "var(--color-text-muted)" }}>
-        Each district cohort is licensed monthly. Rows marked <span className="chip">Demo</span> were
-        activated without payment for evaluation; production cohorts are billed via Stripe.
+        Each district cohort is licensed monthly. A <span className="chip">Trial</span> license is
+        active for evaluation.
       </p>
     </div>
   );

@@ -271,7 +271,7 @@ export default function CohortDetailPage({
           </p>
           {license && (
             <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-              {license.plan} plan {license.isDemo && "(demo)"}
+              {license.plan} plan
             </p>
           )}
         </div>
@@ -587,19 +587,9 @@ export default function CohortDetailPage({
         <Card>
           <h2 className="text-card-title mb-1">Cohort details</h2>
           <p className="text-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
-            Reference information for this district advisory.
+            When this cohort was set up.
           </p>
-          <dl className="grid grid-cols-2 md:grid-cols-3 gap-6">
-            <div>
-              <dt className="text-label">Reference ID</dt>
-              <dd
-                className="mt-1 font-mono text-sm"
-                style={{ color: "var(--color-text-secondary)" }}
-                title={cohort.cohortId}
-              >
-                {cohort.cohortId.slice(0, 12)}…
-              </dd>
-            </div>
+          <dl className="grid grid-cols-2 gap-6">
             <div>
               <dt className="text-label">Created</dt>
               <dd className="mt-1 text-sm">

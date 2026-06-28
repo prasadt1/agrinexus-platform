@@ -76,10 +76,10 @@ export default function CohortsPage() {
           return;
         }
         if (res.status === 503) {
-          toast('Card checkout isn’t enabled in this demo — use “Demo activate” to go live.', "error");
+          toast('Card checkout isn’t available right now — use Activate to go live.', "error");
           return;
         }
-        toast(data.error || "Stripe checkout unavailable — use demo activate", "error");
+        toast(data.error || "Activation with card isn’t available right now — use Activate.", "error");
         return;
       }
 
@@ -88,7 +88,7 @@ export default function CohortsPage() {
         headers: authHeaders(),
       });
       if (res.ok) {
-        toast("Cohort activated (demo mode)", "success");
+        toast("Cohort activated", "success");
         await fetchCohorts();
       } else {
         const data = await res.json();
@@ -167,9 +167,6 @@ export default function CohortsPage() {
                         >
                           {cohort.district}
                         </Link>
-                        <p className="text-xs mt-0.5 font-mono text-muted">
-                          {cohort.cohortId.slice(0, 8)}
-                        </p>
                       </div>
                     </div>
                   </TableCell>
@@ -210,17 +207,17 @@ export default function CohortsPage() {
                         <Button
                           onClick={() => activateCohort(cohort.cohortId, "demo")}
                           disabled={activatingId === cohort.cohortId}
-                          variant="secondary"
                           className="text-sm py-1.5"
                         >
-                          {activatingId === cohort.cohortId ? "…" : "Demo activate"}
+                          {activatingId === cohort.cohortId ? "…" : "Activate"}
                         </Button>
                         <Button
                           onClick={() => activateCohort(cohort.cohortId, "stripe", "growth")}
                           disabled={activatingId === cohort.cohortId}
+                          variant="secondary"
                           className="text-sm py-1.5"
                         >
-                          Pay & activate
+                          Pay with card
                         </Button>
                       </div>
                     )}

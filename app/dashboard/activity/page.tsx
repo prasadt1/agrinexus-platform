@@ -23,7 +23,7 @@ const EVENT_META: Record<
   "cohort.created": { label: "Cohort created", color: "#1570EF", tint: "#EFF8FF" },
   "cohort.activated": { label: "Activated", color: "#157347", tint: "#E6F4EC" },
   "license.issued": { label: "License issued", color: "#6938EF", tint: "#F4F3FF" },
-  "cycle.run": { label: "Cycle run", color: "#B54708", tint: "#FFFAEB" },
+  "cycle.run": { label: "Reminders sent", color: "#B54708", tint: "#FFFAEB" },
   "cohort.renudged": { label: "Re-nudged", color: "#0E7490", tint: "#ECFEFF" },
 };
 
@@ -66,7 +66,7 @@ export default function ActivityPage() {
     <div className="py-10 px-8">
       <PageHeader
         title="Activity"
-        description="Partner audit log — cohorts, licenses, and advisory cycles, recorded to a Vercel-provisioned Amazon DynamoDB table."
+        description="A running record of everything that's happened — cohorts created and activated, licenses, and reminder cycles."
       />
 
       <Card noPadding className="overflow-hidden">
@@ -74,8 +74,8 @@ export default function ActivityPage() {
           <p className="p-8 text-center text-muted">Loading activity…</p>
         ) : !configured ? (
           <EmptyState
-            title="Audit log not connected yet"
-            description="Provision the Amazon DynamoDB audit table from Vercel → Storage to start recording partner activity here."
+            title="No activity recorded yet"
+            description="Once you create or activate a cohort, or run a reminder cycle, it will show up here."
           />
         ) : events.length === 0 ? (
           <EmptyState
@@ -180,8 +180,7 @@ export default function ActivityPage() {
       </Card>
 
       <p className="mt-6 text-sm" style={{ color: "var(--color-text-muted)" }}>
-        Stored in a dedicated Amazon DynamoDB table provisioned through Vercel Marketplace,
-        accessed keyless via Vercel OIDC federation.
+        Every action here is recorded automatically and can&apos;t be edited after the fact.
       </p>
     </div>
   );

@@ -476,7 +476,7 @@ const STEPS: Step[] = [
   },
 ];
 
-export function HowItWorks() {
+export function HowItWorks({ allowTech = true }: { allowTech?: boolean }) {
   const [index, setIndex] = useState(0);
   const [tech, setTech] = useState(false);
   const [playing, setPlaying] = useState(true);
@@ -526,24 +526,26 @@ export function HowItWorks() {
           <div key={`${step.key}-${tech}`} className="hiw-anim" style={{ display: "flex", justifyContent: "center" }}>
             {step.stage()}
           </div>
-          <button
-            onClick={() => setTech((t) => !t)}
-            style={{
-              position: "absolute",
-              top: 14,
-              right: 12,
-              background: "rgba(255,255,255,0.16)",
-              color: "#fff",
-              fontSize: 12,
-              fontWeight: 500,
-              padding: "5px 11px",
-              borderRadius: 8,
-              border: "1px solid rgba(255,255,255,0.25)",
-              cursor: "pointer",
-            }}
-          >
-            {tech ? "Hide the tech" : "Show the tech"}
-          </button>
+          {allowTech && (
+            <button
+              onClick={() => setTech((t) => !t)}
+              style={{
+                position: "absolute",
+                top: 14,
+                right: 12,
+                background: "rgba(255,255,255,0.16)",
+                color: "#fff",
+                fontSize: 12,
+                fontWeight: 500,
+                padding: "5px 11px",
+                borderRadius: 8,
+                border: "1px solid rgba(255,255,255,0.25)",
+                cursor: "pointer",
+              }}
+            >
+              {tech ? "Hide the tech" : "Show the tech"}
+            </button>
+          )}
         </div>
 
         {/* RIGHT — caption + vertical stepper + controls */}
