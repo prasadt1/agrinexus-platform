@@ -15,19 +15,19 @@ export function SlideReceiptThread() {
 
       {/* LEFT MARGIN — the whole stack as footnotes */}
       <g fontSize="12" fill="#5A554C" textAnchor="end">
-        <rect x="446" y="118" width="6" height="6" fill="#157347" /><line x1="446" y1="121" x2="412" y2="121" stroke="#CFC8B8" />
+        <rect x="446" y="118" width="6" height="6" fill="#6B655C" /><line x1="446" y1="121" x2="412" y2="121" stroke="#CFC8B8" />
         <text x="404" y="118"><tspan fontWeight="600" fill="#1A1714">Amazon EventBridge</tspan></text><text x="404" y="133">6-hour schedule fires</text>
-        <rect x="446" y="158" width="6" height="6" fill="#157347" /><line x1="446" y1="161" x2="412" y2="161" stroke="#CFC8B8" />
+        <rect x="446" y="158" width="6" height="6" fill="#6B655C" /><line x1="446" y1="161" x2="412" y2="161" stroke="#CFC8B8" />
         <text x="404" y="158"><tspan fontWeight="600" fill="#1A1714">WeatherPoller</tspan> λ → OpenWeatherMap</text><text x="404" y="173">dry spray window detected</text>
-        <rect x="446" y="198" width="6" height="6" fill="#157347" /><line x1="446" y1="201" x2="412" y2="201" stroke="#CFC8B8" />
+        <rect x="446" y="198" width="6" height="6" fill="#6B655C" /><line x1="446" y1="201" x2="412" y2="201" stroke="#CFC8B8" />
         <text x="404" y="198"><tspan fontWeight="600" fill="#1A1714">Step Functions → NudgeSender</tspan></text><text x="404" y="213">→ Meta WhatsApp Cloud API</text>
-        <rect x="446" y="300" width="6" height="6" fill="#0E7490" /><line x1="446" y1="303" x2="412" y2="303" stroke="#CFC8B8" />
+        <rect x="446" y="300" width="6" height="6" fill="#6B655C" /><line x1="446" y1="303" x2="412" y2="303" stroke="#CFC8B8" />
         <text x="404" y="300"><tspan fontWeight="600" fill="#1A1714">API Gateway → WebhookHandler</tspan></text><text x="404" y="315">the &quot;Done&quot; reply lands</text>
-        <rect x="446" y="392" width="6" height="6" fill="#0E7490" /><line x1="446" y1="395" x2="412" y2="395" stroke="#CFC8B8" />
+        <rect x="446" y="392" width="6" height="6" fill="#6B655C" /><line x1="446" y1="395" x2="412" y2="395" stroke="#CFC8B8" />
         <text x="404" y="392"><tspan fontWeight="600" fill="#1A1714">DynamoDB Streams → ResponseDetector</tspan></text><text x="404" y="407">flips the nudge to done</text>
-        <rect x="446" y="432" width="6" height="6" fill="#0E7490" /><line x1="446" y1="435" x2="412" y2="435" stroke="#CFC8B8" />
+        <rect x="446" y="432" width="6" height="6" fill="#157347" /><line x1="446" y1="435" x2="412" y2="435" stroke="#CFC8B8" />
         <text x="404" y="432"><tspan fontWeight="600" fill="#1A1714">OutcomesAggregator → SUMMARY#</tspan></text><text x="404" y="447">rolls up the 67%</text>
-        <rect x="446" y="472" width="6" height="6" fill="#0E7490" /><line x1="446" y1="475" x2="412" y2="475" stroke="#CFC8B8" />
+        <rect x="446" y="472" width="6" height="6" fill="#157347" /><line x1="446" y1="475" x2="412" y2="475" stroke="#CFC8B8" />
         <text x="404" y="472"><tspan fontWeight="600" fill="#1A1714">Vercel · keyless OIDC</tspan></text><text x="404" y="487">reads the roll-up, no stored keys</text>
       </g>
 
