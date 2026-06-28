@@ -89,6 +89,9 @@ export default function LandingPage() {
           <a href="#architecture" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
             Architecture
           </a>
+          <Link href="/login" style={{ color: C.muted, textDecoration: "none" }} className="hidden sm:inline">
+            Sign in
+          </Link>
           <TryDemoButton
             style={{
               background: C.green,
