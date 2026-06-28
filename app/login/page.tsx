@@ -92,9 +92,18 @@ export default function LoginPage() {
             <AgriNexusWordmark />
           </div>
 
-          <h2 className="text-page-title mb-2">Sign in</h2>
+          <div className="flex items-center gap-2 mb-2">
+            <h2 className="text-page-title">Sign in</h2>
+            <span
+              className="text-xs px-2 py-0.5 rounded-full"
+              style={{ background: "var(--color-primary-tint)", color: "var(--color-primary)" }}
+            >
+              Passwordless
+            </span>
+          </div>
           <p className="mb-8" style={{ color: "var(--color-text-secondary)" }}>
-            Demo access for judges — select a partner persona below.
+            Demo access for judges — pick a partner persona for instant, no-password sign-in.
+            Admin and Viewer roles are real and enforced server-side.
           </p>
 
           {error && (
@@ -137,6 +146,28 @@ export default function LoginPage() {
                 )}
               </button>
             ))}
+          </div>
+
+          {/* Production auth affordance — makes the passwordless demo read as a deliberate choice, not a gap */}
+          <div className="mt-6 pt-6" style={{ borderTop: "1px solid var(--color-border)" }}>
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              title="Production uses SSO — disabled in the demo"
+              className="w-full p-3 rounded-lg border cursor-not-allowed"
+              style={{
+                background: "var(--color-page-bg)",
+                borderColor: "var(--color-border)",
+                color: "var(--color-text-muted)",
+                opacity: 0.7,
+              }}
+            >
+              <span className="text-sm font-medium">Continue with email / SSO</span>
+            </button>
+            <p className="mt-2 text-center text-xs" style={{ color: "var(--color-text-muted)" }}>
+              Production uses SSO. Disabled here so judges get instant access.
+            </p>
           </div>
 
           <p className="mt-8 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
