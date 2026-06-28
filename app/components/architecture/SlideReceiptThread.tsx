@@ -33,7 +33,7 @@ export function SlideReceiptThread() {
 
       {/* ghost re-entry bubble */}
       <rect x="458" y="76" width="210" height="30" rx="12" fill="#DCF8C6" opacity="0.4" stroke="#157347" strokeDasharray="3 4" strokeOpacity="0.6" />
-      <text x="468" y="96" fontSize="11" fill="#157347" opacity="0.85" fontStyle="italic">…and again, for the 7 who slipped</text>
+      <text x="468" y="96" fontSize="11" fill="#157347" opacity="0.85" fontStyle="italic">…and again, for the 14 who slipped</text>
 
       {/* THE SPINE */}
       <rect x="452" y="112" width="226" height="104" rx="14" fill="#DCF8C6" />
@@ -42,7 +42,11 @@ export function SlideReceiptThread() {
         <tspan x="466" dy="15">Latur today — dry through evening.</tspan>
         <tspan x="466" dy="15">Reply <tspan fontWeight="700">Done</tspan> once you&apos;ve sprayed.</tspan>
       </text>
-      <text x="668" y="208" fontSize="9" fill="#6b7a5e" textAnchor="end">06:12 ✓✓</text>
+      <text x="654" y="209" fontSize="9" fill="#6b7a5e" textAnchor="end">06:12</text>
+      <g transform="translate(658 204.5)" stroke="#34B7F1" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M0 2.4 L2.2 4.6 L7 -1.2" />
+        <path d="M4 2.4 L6.2 4.6 L11 -1.2" />
+      </g>
       <text x="565" y="244" fontSize="15" fontFamily="Georgia, serif" fontStyle="italic" fill="#726A5C" textAnchor="middle">the farmer sprays, then replies —</text>
       <rect x="556" y="262" width="122" height="42" rx="14" fill="#FFFFFF" stroke="#E6E0D4" />
       <text x="617" y="288" fontSize="13" fill="#157347" fontWeight="700" textAnchor="middle">Done ✓</text>
@@ -51,16 +55,16 @@ export function SlideReceiptThread() {
       <rect x="448" y="330" width="230" height="168" rx="14" fill="#FFFFFF" stroke="#E6E0D4" />
       <text x="468" y="360" fontSize="10" fill="#726A5C" letterSpacing="1">FOLLOW-THROUGH · THIS MONTH</text>
       <text x="468" y="404" fontSize="40" fontFamily="Georgia, serif" fontWeight="500" fill="#157347">67%</text>
-      <rect x="468" y="418" width="190" height="12" rx="6" fill="#157347" />
-      <rect x="601" y="418" width="22" height="12" fill="#0E7490" />
-      <rect x="625" y="418" width="33" height="12" rx="6" fill="#B54708" />
+      <rect x="468" y="418" width="190" height="12" rx="6" fill="#EADFCB" />
+      <rect x="468" y="418" width="127" height="12" rx="6" fill="#157347" />
+      <rect x="592" y="418" width="66" height="12" rx="6" fill="#B54708" />
       <text x="468" y="452" fontSize="12.5" fill="#1A1714">28 of 42 farmers acted</text>
       <rect x="468" y="464" width="120" height="26" rx="13" fill="#157347" />
       <text x="528" y="481" fontSize="11.5" fill="#FFFFFF" fontWeight="600" textAnchor="middle">Re-nudge cohort</text>
 
       {/* THE LOOP — right gutter, proof → fresh advice */}
       <path d="M678 477 C 880 470, 880 120, 672 104" fill="none" stroke="#157347" strokeWidth="2" strokeDasharray="2 6" strokeLinecap="round" markerEnd="url(#rt-ah)" />
-      <text x="892" y="300" fontSize="13" fill="#157347" fontWeight="600" transform="rotate(90 892 300)" textAnchor="middle">RE-NUDGE LOOP — a fresh advice for the 7 who didn&apos;t act</text>
+      <text x="892" y="300" fontSize="13" fill="#157347" fontWeight="600" transform="rotate(90 892 300)" textAnchor="middle">RE-NUDGE LOOP — a fresh advice for the 14 who didn&apos;t act</text>
       <text x="24" y="560" fontSize="12.5" fill="#726A5C" textAnchor="start">The conversation is the diagram. Every service sits beside the message it touches.</text>
     </svg>
   );
