@@ -2,7 +2,7 @@ import Link from "next/link";
 import { HowItWorks } from "@/app/components/HowItWorks";
 import { TryDemoButton } from "@/app/components/TryDemoButton";
 import { OutturnMark } from "@/app/components/OutturnMark";
-import { ArchitectureLoop } from "@/app/components/ArchitectureLoop";
+import { ArchitectureGallery } from "@/app/components/architecture/ArchitectureGallery";
 
 const WA_LINK =
   "https://wa.me/4915120105731?text=Hi%20Outturn%2C%20show%20me%20the%20advisory%20demo";
@@ -37,11 +37,11 @@ function Eyebrow({ children, onDark }: { children: React.ReactNode; onDark?: boo
   return (
     <p
       style={{
-        fontSize: 12,
-        letterSpacing: "0.13em",
+        fontSize: 13.5,
+        letterSpacing: "0.1em",
         textTransform: "uppercase",
         color: onDark ? "#6EE7A8" : C.green,
-        fontWeight: 500,
+        fontWeight: 600,
         margin: 0,
       }}
     >
@@ -109,22 +109,26 @@ export default function LandingPage() {
       <section style={{ maxWidth: 1180, margin: "0 auto", padding: "40px 32px 64px" }}>
         <div className="hero-grid">
           <div>
-            <Eyebrow>Closed-loop farm advisory on WhatsApp</Eyebrow>
+            <Eyebrow>WhatsApp crop advisory · for agri NGOs &amp; input companies</Eyebrow>
             <h1
               style={{
                 fontFamily: SERIF,
                 fontSize: "clamp(44px, 7vw, 68px)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.015em",
-                margin: "18px 0 20px",
+                margin: "16px 0 18px",
                 fontWeight: 500,
               }}
             >
               From advice to action.
             </h1>
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: C.muted, maxWidth: 480, margin: "0 0 28px" }}>
-              A closed-loop engine nudges each farmer until they act. Outturn gives partners eyes on
-              follow-through across every district, and the lever to act where it slips.
+            <p style={{ fontSize: 19, lineHeight: 1.55, color: C.ink, maxWidth: 520, margin: "0 0 14px", fontWeight: 500 }}>
+              Outturn sends farmers timely, weather-based crop advice over WhatsApp — and shows
+              partners who actually acted on it, district by district.
+            </p>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: C.muted, maxWidth: 500, margin: "0 0 28px" }}>
+              So advice doesn&apos;t just go out — you can see it followed through, and re-send a reminder
+              to the few who haven&apos;t acted.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
               <TryDemoButton
@@ -165,15 +169,15 @@ export default function LandingPage() {
               </a>
             </div>
             <p style={{ fontSize: 12.5, color: C.faint, margin: "12px 0 0" }}>
-              Message our demo number and the engine replies like it would to a farmer: advice, then a
-              follow-up nudge.
+              Message our demo number and you&apos;ll get exactly what a farmer gets: the advice, then a
+              follow-up reminder.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 18, marginTop: 26, fontSize: 12.5, color: C.faint }}>
-              <span>Weather-timed</span>
+              <span>Weather-timed advice</span>
               <span>·</span>
-              <span>Tracked to done</span>
+              <span>Proof each farmer acted</span>
               <span>·</span>
-              <span>Rolled up per district</span>
+              <span>Results by district</span>
             </div>
           </div>
 
@@ -428,27 +432,23 @@ export default function LandingPage() {
       <section id="architecture" style={{ maxWidth: 1180, margin: "0 auto", padding: "62px 32px" }}>
         <Eyebrow>How it&apos;s built</Eyebrow>
         <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 8px", fontWeight: 500 }}>
-          One closed loop, across the whole stack.
+          Control plane, data plane, engine.
         </h2>
-        <p style={{ fontSize: 16, color: C.muted, maxWidth: 660, margin: "0 0 28px", lineHeight: 1.6 }}>
-          Four layers, one event flow: the Vercel control plane, the AWS engine, a single Amazon
-          DynamoDB table, and Meta&apos;s WhatsApp as the delivery channel. Follow the numbered path,
-          1 to 7. Not a dashboard bolted onto a database.
+        <p style={{ fontSize: 16, color: C.muted, maxWidth: 680, margin: "0 0 28px", lineHeight: 1.6 }}>
+          Three planes, one system. The AWS-and-WhatsApp engine sends nudges and captures replies,
+          a single Amazon DynamoDB table records and rolls up every outcome, and the Vercel control
+          plane reads those roll-ups and re-nudges the engine over keyless OIDC. Not a dashboard
+          bolted onto a database.
         </p>
-        {/* Animated event loop */}
-        <ArchitectureLoop />
-        <p style={{ fontSize: 12.5, color: C.muted, margin: "0 0 8px", lineHeight: 1.5, maxWidth: 760 }}>
-          The loop runs on an Amazon EventBridge schedule, or the moment a partner re-nudges from the
-          Vercel dashboard. Two DynamoDB Streams consumers keep the dashboard in sync: the
-          ResponseDetector flips a nudge to done, the OutcomesAggregator rolls it up.
-        </p>
+        {/* Three views of the same system: planes, teardown, receipt thread */}
+        <ArchitectureGallery />
         <p style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: C.faint, margin: "28px 0 12px" }}>
           Built on
         </p>
         <div className="arch-grid">
           {([
             ["Amazon Web Services", "The engine and data", ["DynamoDB single table + Streams", "Lambda: poller, sender, detector, aggregator", "Step Functions · EventBridge · Secrets Manager"]],
-            ["Vercel", "The control plane", ["Next.js dashboard + APIs, globally hosted", "Keyless AWS access via OIDC, no static keys", "Audit log to DynamoDB via the Vercel Marketplace integration"]],
+            ["Vercel", "The control plane", ["Next.js dashboard + APIs, globally hosted", "Keyless AWS access via OIDC, no static keys", "Audit log to DynamoDB, keyless via OIDC"]],
             ["Meta", "The farmer's channel", ["WhatsApp Business Cloud API", "Interactive Done / Not Yet replies", "Delivered in the farmer's own language"]],
           ] as [string, string, string[]][]).map(([name, sub, items]) => (
             <div key={name} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
@@ -465,11 +465,6 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
-        <p style={{ fontSize: 13, color: C.faint, marginTop: 16, maxWidth: 760, lineHeight: 1.5 }}>
-          One DynamoDB table is the source of truth. The Vercel control plane activates the engine and
-          reads pre-computed outcomes, reaches AWS keyless via OIDC, and writes an audit log of every
-          partner action through the Vercel Marketplace DynamoDB integration.
-        </p>
       </section>
 
       {/* Roadmap */}
