@@ -2,6 +2,7 @@ import Link from "next/link";
 import { HowItWorks } from "@/app/components/HowItWorks";
 import { TryDemoButton } from "@/app/components/TryDemoButton";
 import { OutturnMark } from "@/app/components/OutturnMark";
+import { PartnerLeadForm } from "@/app/components/PartnerLeadForm";
 import { ArchitectureGallery } from "@/app/components/architecture/ArchitectureGallery";
 
 const WA_LINK =
@@ -176,7 +177,7 @@ export default function LandingPage() {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 18, marginTop: 24, fontSize: 13, color: C.muted }}>
               <span>Weather-timed advice</span>
               <span>·</span>
-              <span>Proof each farmer acted</span>
+              <span>Confirmed by each farmer</span>
               <span>·</span>
               <span>Results by district</span>
             </div>
@@ -524,12 +525,7 @@ export default function LandingPage() {
               ))}
             </div>
             <div style={{ marginTop: 18, display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
-              <a
-                href="mailto:partners@outturn.app?subject=Outturn%20partner%20pilot"
-                style={{ background: C.green, color: C.white, fontSize: 14, fontWeight: 500, padding: "10px 18px", borderRadius: 10, textDecoration: "none" }}
-              >
-                Talk to us about a pilot
-              </a>
+              <PartnerLeadForm fallbackEmail="pilot@prasadtilloo.com" />
               <span style={{ fontSize: 12.5, color: C.faint }}>
                 Live prices come from Stripe checkout. Larger or government volumes: get in touch.
               </span>

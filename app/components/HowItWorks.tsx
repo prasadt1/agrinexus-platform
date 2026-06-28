@@ -278,7 +278,7 @@ function RollupStage() {
           fontWeight: 600,
         }}
       >
-        Response breakdown
+        Follow-through breakdown
       </div>
       <div style={{ height: 34, borderRadius: 8, overflow: "hidden", display: "flex", background: C.pageBg }}>
         <div style={{ width: `${(17 / total) * 100}%`, background: C.chart1 }} />
@@ -352,7 +352,7 @@ function ProofStage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <KpiMini label="Reminders sent" value="24" />
         <KpiMini label="Responses" value="17" />
-        <KpiMini label="Response rate" value="71%" highlight />
+        <KpiMini label="Follow-through" value="71%" highlight />
         <KpiMini label="Farmers" value="24" />
       </div>
     </BrowserFrame>

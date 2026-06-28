@@ -13,13 +13,13 @@ export const glossary: Record<string, string> = {
   "follow-through":
     "The share of nudged farmers who actually confirmed they acted — outcomes, not just messages delivered.",
   aggregate:
-    "Farmer replies rolled up across a whole cohort into a single response rate the partner can act on.",
+    "Farmer replies rolled up across a whole cohort into a single follow-through rate the partner can act on.",
   "farmers reached":
     "Unique farmers enrolled in this cohort who can receive WhatsApp advisories.",
   "farmers enrolled":
     "Total unique farmers across all your cohorts who can receive WhatsApp advisories.",
   responses:
-    "Reminders where the farmer confirmed they acted — the proof behind your response rate.",
+    "Reminders where the farmer confirmed they acted — what your follow-through rate is built on.",
   "reminders sent":
     "Total weather-timed WhatsApp reminders delivered to this cohort's farmers.",
   "response rate":

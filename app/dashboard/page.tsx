@@ -157,7 +157,7 @@ export default function OverviewPage() {
               </button>
             </div>
             <div className="px-6 pb-6 grid md:grid-cols-2 gap-6 items-start">
-              <MaharashtraMap highlight={activeDistricts} showLabels maxWidth={560} />
+              <MaharashtraMap highlight={activeDistricts} showLabels maxWidth={560} labelPx={14} />
               <div className="space-y-2">
                 {activeCohorts.map((c) => (
                   <Link
@@ -189,7 +189,7 @@ export default function OverviewPage() {
       {/* Primary KPI Cards */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <KPICard
-          label="Farmers Enrolled"
+          label="Farmers enrolled"
           term="farmers enrolled"
           value={totals?.farmers || 0}
           format="number"
@@ -213,7 +213,7 @@ export default function OverviewPage() {
           }
         />
         <KPICard
-          label="Responses"
+          label="Acted"
           term="responses"
           value={totals?.nudgesCompleted || 0}
           format="number"
@@ -225,8 +225,8 @@ export default function OverviewPage() {
           }
         />
         <KPICard
-          label="Response Rate"
-          term="response rate"
+          label="Follow-through"
+          term="follow-through"
           value={totals?.responseRate || 0}
           format="percent"
           loading={loading}
@@ -244,7 +244,7 @@ export default function OverviewPage() {
         <section className="mb-8">
           <Card>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-card-title">Response Breakdown</h2>
+              <h2 className="text-card-title">Follow-through breakdown</h2>
               <LineageBadge />
             </div>
             <div className="flex items-center gap-8">
@@ -309,7 +309,7 @@ export default function OverviewPage() {
                   {Math.round(totals.responseRate * 100)}%
                 </p>
                 <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  Overall Response Rate
+                  Overall follow-through
                 </p>
               </div>
             </div>
