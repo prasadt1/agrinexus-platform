@@ -437,10 +437,9 @@ export default function LandingPage() {
         {/* Animated event loop */}
         <ArchitectureLoop />
         <p style={{ fontSize: 12.5, color: C.muted, margin: "0 0 8px", lineHeight: 1.5, maxWidth: 760 }}>
-          The pulse traces the live event path. The loop runs on an EventBridge schedule, or the moment
-          a partner re-nudges from the Vercel dashboard. Two DynamoDB Streams consumers keep the
-          dashboard in sync: the ResponseDetector flips a nudge to done, the OutcomesAggregator rolls
-          it up.
+          The loop runs on an Amazon EventBridge schedule, or the moment a partner re-nudges from the
+          Vercel dashboard. Two DynamoDB Streams consumers keep the dashboard in sync: the
+          ResponseDetector flips a nudge to done, the OutcomesAggregator rolls it up.
         </p>
         <p style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: C.faint, margin: "28px 0 12px" }}>
           Built on
