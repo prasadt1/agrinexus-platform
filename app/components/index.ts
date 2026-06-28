@@ -13,4 +13,5 @@ export { CropIcon } from "./CropIcon";
 export { CropImage } from "./CropImage";
 export { LanguagePills } from "./LanguagePills";
 export { MaharashtraMap } from "./MaharashtraMap";
+export { PartnerLeadForm } from "./PartnerLeadForm";
 export { DistrictThumb } from "./DistrictThumb";
