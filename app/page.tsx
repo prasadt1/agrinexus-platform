@@ -160,6 +160,7 @@ export default function LandingPage() {
                   padding: "12px 18px",
                   borderRadius: 10,
                   border: `1px solid ${C.border}`,
+                  background: C.white,
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true">
@@ -168,11 +169,11 @@ export default function LandingPage() {
                 See it on WhatsApp
               </a>
             </div>
-            <p style={{ fontSize: 12.5, color: C.faint, margin: "12px 0 0" }}>
+            <p style={{ fontSize: 14, color: C.muted, margin: "14px 0 0", lineHeight: 1.5, maxWidth: 480 }}>
               Message our demo number and you&apos;ll get exactly what a farmer gets: the advice, then a
               follow-up reminder.
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 18, marginTop: 26, fontSize: 12.5, color: C.faint }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 18, marginTop: 24, fontSize: 13, color: C.muted }}>
               <span>Weather-timed advice</span>
               <span>·</span>
               <span>Proof each farmer acted</span>
@@ -243,12 +244,12 @@ export default function LandingPage() {
       {/* What it does — the accountability layer (the H0 contribution) */}
       <section style={{ maxWidth: 1180, margin: "0 auto", padding: "4px 32px 60px" }}>
         <Eyebrow>What it does</Eyebrow>
-        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(26px, 4vw, 38px)", lineHeight: 1.12, margin: "12px 0 10px", fontWeight: 500 }}>
+        <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 10px", fontWeight: 500 }}>
           The accountability layer for farm advice.
         </h2>
         <p style={{ fontSize: 16.5, color: C.ink, maxWidth: 705, margin: "0 0 30px", lineHeight: 1.6 }}>
-          Outturn runs on a multi-modal, closed-loop advisory engine — it reaches farmers by text,
-          voice and photo. The layer we built is what makes every piece of that advice{" "}
+          Outturn runs on a multi-modal, closed-loop advisory engine — it reaches farmers by text and
+          voice on WhatsApp. The layer we built is what makes every piece of that advice{" "}
           <strong style={{ fontWeight: 600 }}>accountable</strong>: tracked, rolled up, audited, and
           re-sent when it slips.
         </p>
@@ -258,25 +259,25 @@ export default function LandingPage() {
               [
                 <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M9 11l3 3L20 5M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" />,
                 "Tracked to the last farmer",
-                "Every nudge resolves to Done or not — per farmer, per cohort.",
+                "Every WhatsApp reply resolves to Done or not — per farmer, per cohort.",
                 false,
               ],
               [
                 <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M12 3l9 4.5-9 4.5-9-4.5L12 3zM3 12l9 4.5 9-4.5M3 16.5l9 4.5 9-4.5" />,
-                "Live roll-ups, no batch jobs",
+                "Live roll-ups on DynamoDB",
                 "DynamoDB Streams aggregate every reply into per-district follow-through summaries, in real time.",
-                true,
+                false,
+              ],
+              [
+                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM3 9h18M7 13h5" />,
+                "A control plane on Vercel",
+                "A Next.js dashboard where partners watch follow-through and re-nudge who slipped — keyless to AWS via OIDC.",
+                false,
               ],
               [
                 <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4" />,
                 "An audit trail",
-                "Every cohort, license and reminder cycle recorded — and not editable after the fact.",
-                false,
-              ],
-              [
-                <path key="p" strokeLinecap="round" strokeLinejoin="round" d="M20 12a8 8 0 11-2.3-5.6M20 4v4h-4" />,
-                "Act on what slips",
-                "Re-nudge the farmers who haven't acted — by hand or on a schedule.",
+                "Every cohort, license and reminder cycle recorded — not editable after the fact.",
                 false,
               ],
             ] as [React.ReactNode, string, string, boolean][]
@@ -308,7 +309,7 @@ export default function LandingPage() {
                 </svg>
               </div>
               <h3 style={{ fontFamily: SERIF, fontSize: 18, margin: "0 0 4px", fontWeight: 500 }}>{title}</h3>
-              <p style={{ fontSize: 13.5, color: C.muted, margin: 0, lineHeight: 1.5 }}>{desc}</p>
+              <p style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.55 }}>{desc}</p>
             </div>
           ))}
         </div>
@@ -392,7 +393,7 @@ export default function LandingPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 13, fontSize: 15, color: C.muted }}>
               <span style={{ display: "flex", gap: 9 }}><Check color="#B6AE9E" />WhatsApp-native advice</span>
               <span style={{ display: "flex", gap: 9 }}><Check color="#B6AE9E" />Local languages</span>
-              <span style={{ display: "flex", gap: 9 }}><Check color="#B6AE9E" />Photo and voice diagnosis</span>
+              <span style={{ display: "flex", gap: 9 }}><Check color="#B6AE9E" />Voice notes and two-way chat</span>
             </div>
           </div>
           <div style={{ background: C.white, border: `2px solid ${C.green}`, borderRadius: 14, padding: 22 }}>
@@ -446,7 +447,7 @@ export default function LandingPage() {
                 >
                   {n}
                 </span>
-                <h3 style={{ fontFamily: SERIF, fontSize: 19, margin: "0 0 6px", fontWeight: 500 }}>{title}</h3>
+                <h3 style={{ fontFamily: SERIF, fontSize: 18, margin: "0 0 6px", fontWeight: 500 }}>{title}</h3>
                 <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.55, margin: 0 }}>{body}</p>
               </div>
             ))}
@@ -520,7 +521,7 @@ export default function LandingPage() {
       <section id="why" style={{ background: C.dark }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "62px 32px" }}>
           <Eyebrow onDark>Why it matters</Eyebrow>
-          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 42px)", lineHeight: 1.1, margin: "12px 0 16px", fontWeight: 500, color: C.cream, maxWidth: 720 }}>
+          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, margin: "12px 0 16px", fontWeight: 500, color: C.cream, maxWidth: 720 }}>
             Information isn&apos;t the gap. Follow-through is.
           </h2>
           <p style={{ fontSize: 17, color: C.cream, maxWidth: 680, margin: "0 0 14px", lineHeight: 1.62 }}>
@@ -588,7 +589,7 @@ export default function LandingPage() {
             ["Meta", "The farmer's channel", ["WhatsApp Business Cloud API", "Interactive Done / Not Yet replies", "Delivered in the farmer's own language"]],
           ] as [string, string, string[]][]).map(([name, sub, items]) => (
             <div key={name} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-              <h3 style={{ fontFamily: SERIF, fontSize: 19, margin: "0 0 2px", fontWeight: 500 }}>{name}</h3>
+              <h3 style={{ fontFamily: SERIF, fontSize: 18, margin: "0 0 2px", fontWeight: 500 }}>{name}</h3>
               <p style={{ fontSize: 12.5, color: C.green, margin: "0 0 13px" }}>{sub}</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
                 {items.map((it) => (
