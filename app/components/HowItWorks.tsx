@@ -421,8 +421,8 @@ const STEPS: Step[] = [
     title: "1 · Watch the weather",
     plain:
       "Outturn watches each cohort's local weather for the right moment to act — like a safe, low-wind spraying window.",
-    tech: "A scheduled Step Functions workflow polls weather per cohort's district coordinates.",
-    services: ["AWS Step Functions", "Amazon EventBridge", "OpenWeatherMap API"],
+    tech: "Amazon EventBridge fires on a schedule; a WeatherPoller Lambda checks OpenWeatherMap and only starts the Step Functions workflow when conditions are favorable.",
+    services: ["Amazon EventBridge", "AWS Lambda · WeatherPoller", "OpenWeatherMap API", "AWS Step Functions"],
     stage: () => <WeatherStage />,
   },
   {
@@ -431,8 +431,8 @@ const STEPS: Step[] = [
     title: "2 · Send a WhatsApp reminder",
     plain:
       "When conditions are right, every farmer gets a plain-language WhatsApp reminder — in their own language, no app to install.",
-    tech: "A Lambda dispatches a templated nudge to each farmer via the WhatsApp Business API.",
-    services: ["AWS Lambda", "WhatsApp Business API"],
+    tech: "Step Functions invokes the NudgeSender Lambda, which sends an interactive WhatsApp message (Done / Not Yet) via the WhatsApp Cloud API.",
+    services: ["AWS Step Functions", "AWS Lambda · NudgeSender", "WhatsApp Cloud API"],
     stage: () => <NudgeStage />,
   },
   {
@@ -440,8 +440,8 @@ const STEPS: Step[] = [
     short: "Reply",
     title: "3 · Farmers reply",
     plain: "Farmers reply 'Done' right inside WhatsApp the moment they act — in the language they speak.",
-    tech: "Each reply is written to a tenant-scoped, single-table Amazon DynamoDB design.",
-    services: ["Amazon DynamoDB", "Single-table · tenant-scoped"],
+    tech: "The reply hits the WhatsApp webhook (API Gateway, then a WebhookHandler Lambda), which records it in the single-table, tenant-scoped DynamoDB design.",
+    services: ["WhatsApp Cloud API", "Amazon API Gateway", "AWS Lambda · WebhookHandler", "Amazon DynamoDB"],
     stage: () => <NudgeStage withReply />,
   },
   {
@@ -450,8 +450,8 @@ const STEPS: Step[] = [
     title: "4 · Roll up the cohort",
     plain:
       "Replies are tallied across the whole cohort, so follow-through is measured — not guessed.",
-    tech: "DynamoDB Streams trigger the OutcomesAggregator Lambda, which maintains a SUMMARY# record.",
-    services: ["DynamoDB Streams", "AWS Lambda · OutcomesAggregator"],
+    tech: "A ResponseDetector Lambda flips the nudge to done via DynamoDB Streams; the OutcomesAggregator Lambda then rolls outcomes into a SUMMARY# record.",
+    services: ["Amazon DynamoDB Streams", "AWS Lambda · ResponseDetector", "AWS Lambda · OutcomesAggregator"],
     stage: () => <RollupStage />,
   },
   {

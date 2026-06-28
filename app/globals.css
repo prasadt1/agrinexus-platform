@@ -583,6 +583,9 @@ body {
   .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .arch-grid { grid-template-columns: repeat(3, 1fr); }
 }
+.flow-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (min-width: 640px) { .flow-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1000px) { .flow-grid { grid-template-columns: repeat(6, 1fr); } }
 
 .hiw-phone {
   width: 188px;
