@@ -17,7 +17,7 @@ const SLIDES: Slide[] = [
     id: "planes",
     title: "Three planes, one system",
     caption:
-      "Control (Vercel), Data (one Amazon DynamoDB table), Engine (AWS + WhatsApp). The engine and its table pre-dated H0 — it's the AgriNexus accountability engine that won the AWS AIdeas award; H0 added the Vercel control plane and the reporting roll-ups.",
+      "Control (Vercel), Data (one Amazon DynamoDB table), Engine (AWS + WhatsApp). The engine and its table pre-dated H0 — it's the AgriNexus accountability engine that won the AWS AIdeas Innovation Award; H0 added the Vercel control plane and the reporting roll-ups.",
     node: <SlideThreePlanes />,
   },
   {
