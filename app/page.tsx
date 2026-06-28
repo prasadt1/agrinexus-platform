@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HowItWorks } from "@/app/components/HowItWorks";
 import { TryDemoButton } from "@/app/components/TryDemoButton";
+import { AgriNexusLogo } from "@/app/components/Logo";
 
 const WA_LINK =
   "https://wa.me/4915120105731?text=Hi%20Outturn%2C%20show%20me%20the%20advisory%20demo";
@@ -62,15 +63,15 @@ export default function LandingPage() {
           margin: "0 auto",
         }}
       >
-        <a
-          href="/"
-          style={{ textDecoration: "none", display: "inline-flex", flexDirection: "column", lineHeight: 1.1 }}
-        >
-          <span style={{ fontFamily: SERIF, fontSize: 24, color: C.ink, fontWeight: 500 }}>
-            Out<span style={{ color: C.green }}>turn</span>
-          </span>
-          <span style={{ fontSize: 11.5, color: C.faint, marginTop: 2, letterSpacing: "0.01em" }}>
-            Advice, followed through
+        <a href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 11 }}>
+          <AgriNexusLogo size={40} />
+          <span style={{ display: "inline-flex", flexDirection: "column", lineHeight: 1.1 }}>
+            <span style={{ fontFamily: SERIF, fontSize: 24, color: C.ink, fontWeight: 500 }}>
+              Out<span style={{ color: C.green }}>turn</span>
+            </span>
+            <span style={{ fontSize: 11.5, color: C.faint, marginTop: 2, letterSpacing: "0.01em" }}>
+              Advice, followed through
+            </span>
           </span>
         </a>
         <nav style={{ display: "flex", alignItems: "center", gap: 22, fontSize: 14, color: C.muted }}>
@@ -373,10 +374,10 @@ export default function LandingPage() {
             {([
               ["1", "Watch weather", "EventBridge · WeatherPoller λ", C.green],
               ["2", "Orchestrate", "Step Functions", C.green],
-              ["3", "Send nudge", "NudgeSender λ · WhatsApp Cloud API", C.green],
-              ["4", "Farmer replies", "API Gateway · WebhookHandler λ", C.teal],
+              ["3", "Send nudge", "NudgeSender λ · Meta WhatsApp Cloud API", C.green],
+              ["4", "Farmer replies", "Meta webhook · API Gateway · WebhookHandler λ", C.teal],
               ["5", "Detect + record", "ResponseDetector λ · DynamoDB Streams", C.teal],
-              ["6", "Roll up + show", "OutcomesAggregator λ · SUMMARY# · Dashboard", C.amber],
+              ["6", "Roll up + show", "OutcomesAggregator λ · SUMMARY# · Vercel dashboard", C.amber],
             ] as [string, string, string, string][]).map(([n, title, svc, color]) => (
               <div
                 key={n}
@@ -429,26 +430,33 @@ export default function LandingPage() {
             <span style={{ width: 9, height: 9, borderRadius: 2, background: C.amber }} />Control, partners monitor and act
           </span>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 20 }}>
-          {["Amazon DynamoDB", "AWS Lambda", "AWS Step Functions", "Amazon EventBridge", "AWS Secrets Manager", "Vercel OIDC", "WhatsApp Business API"].map((s) => (
-            <span
-              key={s}
-              style={{
-                fontSize: 12.5,
-                color: C.greenD,
-                background: C.greenTint,
-                border: `1px solid rgba(21,115,71,0.2)`,
-                padding: "5px 11px",
-                borderRadius: 8,
-              }}
-            >
-              {s}
-            </span>
+        <p style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: C.faint, margin: "28px 0 12px" }}>
+          Built on
+        </p>
+        <div className="arch-grid">
+          {([
+            ["Amazon Web Services", "The engine and data", ["DynamoDB single table + Streams", "Lambda: poller, sender, detector, aggregator", "Step Functions · EventBridge · Secrets Manager"]],
+            ["Vercel", "The control plane", ["Next.js dashboard + APIs, globally hosted", "Keyless AWS access via OIDC, no static keys", "Audit log to DynamoDB via the Vercel Marketplace integration"]],
+            ["Meta", "The farmer's channel", ["WhatsApp Business Cloud API", "Interactive Done / Not Yet replies", "Delivered in the farmer's own language"]],
+          ] as [string, string, string[]][]).map(([name, sub, items]) => (
+            <div key={name} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
+              <h3 style={{ fontFamily: SERIF, fontSize: 19, margin: "0 0 2px", fontWeight: 500 }}>{name}</h3>
+              <p style={{ fontSize: 12.5, color: C.green, margin: "0 0 13px" }}>{sub}</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                {items.map((it) => (
+                  <span key={it} style={{ display: "flex", gap: 8, fontSize: 13, color: C.muted, lineHeight: 1.4 }}>
+                    <Check color={C.green} />
+                    {it}
+                  </span>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
-        <p style={{ fontSize: 13, color: C.faint, marginTop: 16, maxWidth: 720, lineHeight: 1.5 }}>
-          One table is the source of truth. The control plane activates the engine and reads
-          pre-computed outcomes, and Vercel reaches AWS keyless via OIDC, no static credentials.
+        <p style={{ fontSize: 13, color: C.faint, marginTop: 16, maxWidth: 760, lineHeight: 1.5 }}>
+          One DynamoDB table is the source of truth. The Vercel control plane activates the engine and
+          reads pre-computed outcomes, reaches AWS keyless via OIDC, and writes an audit log of every
+          partner action through the Vercel Marketplace DynamoDB integration.
         </p>
       </section>
 
@@ -525,11 +533,14 @@ export default function LandingPage() {
             color: C.faint,
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
-            <span style={{ fontFamily: SERIF, fontSize: 17, color: C.ink, fontWeight: 500 }}>
-              Out<span style={{ color: C.green }}>turn</span>
-            </span>
-            <span style={{ fontSize: 12, color: C.faint, marginTop: 1 }}>Advice, followed through</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+            <AgriNexusLogo size={26} />
+            <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
+              <span style={{ fontFamily: SERIF, fontSize: 17, color: C.ink, fontWeight: 500 }}>
+                Out<span style={{ color: C.green }}>turn</span>
+              </span>
+              <span style={{ fontSize: 12, color: C.faint, marginTop: 1 }}>Advice, followed through</span>
+            </div>
           </div>
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
             <Link href="/judges" style={{ color: C.faint, textDecoration: "none" }}>

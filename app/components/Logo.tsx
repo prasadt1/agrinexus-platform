@@ -7,7 +7,7 @@ export function AgriNexusLogo({ size = 32 }: { size?: number }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/agrinexus-mark.png"
+      src="/outturn-mark.png"
       alt="Outturn"
       width={size}
       height={size}
