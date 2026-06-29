@@ -130,7 +130,8 @@ export default function LandingPage() {
               From advice to action.
             </h1>
             <p style={{ fontSize: 19, lineHeight: 1.55, color: C.ink, maxWidth: 520, margin: "0 0 14px", fontWeight: 500 }}>
-              Timely crop advice for farmers on WhatsApp — and, for the partners who serve them, a
+              Timely crop advice for farmers on WhatsApp — and, for{" "}
+              <strong style={{ color: C.green, fontWeight: 700 }}>the partners who serve them</strong>, a
               clear view of who&apos;s acting on it.
             </p>
             <p style={{ fontSize: 16, lineHeight: 1.6, color: C.muted, maxWidth: 515, margin: "0 0 28px" }}>
@@ -176,20 +177,20 @@ export default function LandingPage() {
                   </svg>
                   Watch how it works · 90s
                 </a>
-                <span style={{ fontSize: 12.5, color: C.faint, paddingLeft: 2 }}>
-                  the farmer side, on the AgriNexus engine.
+                <span style={{ fontSize: 12.5, color: C.muted, fontWeight: 500, paddingLeft: 2 }}>
+                  The farmer side — on the AgriNexus engine.
                 </span>
               </div>
             </div>
             <p style={{ fontSize: 14, color: C.muted, margin: "14px 0 0", lineHeight: 1.5, maxWidth: 480 }}>
-              Farmers get advice on WhatsApp — no app, no cost, it&apos;s already on their phone. The
-              dashboard is where partners watch who acted.
+              Farmers get advice on WhatsApp — no app, no cost, it&apos;s already on their phone.{" "}
+              <strong style={{ color: C.ink, fontWeight: 700 }}>The dashboard is where partners watch who acted.</strong>
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 18, marginTop: 24, fontSize: 13, color: C.muted }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 26, fontSize: 13.5, fontWeight: 600, color: C.ink }}>
               <span>Weather-timed advice</span>
-              <span>·</span>
+              <span style={{ color: C.border }}>·</span>
               <span>Confirmed by each farmer</span>
-              <span>·</span>
+              <span style={{ color: C.border }}>·</span>
               <span>Results by district</span>
             </div>
           </div>
