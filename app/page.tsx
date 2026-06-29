@@ -128,8 +128,9 @@ export default function LandingPage() {
                   rel="noopener noreferrer"
                   style={{ color: C.faint, textDecoration: "underline", textUnderlineOffset: "2px" }}
                 >
-                  <em>Nudge</em> (Thaler &amp; Sunstein, 2008)
-                </a>
+                  <em>Nudge</em>
+                </a>{" "}
+                (Thaler &amp; Sunstein, 2008)
               </p>
             </div>
 
@@ -741,6 +742,13 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer style={{ borderTop: `1px solid ${C.border}` }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "22px 32px 0" }}>
+          <p style={{ maxWidth: 660, margin: 0, fontSize: 12.5, color: C.faint, lineHeight: 1.55 }}>
+            <span style={{ color: C.muted, fontWeight: 500 }}>Why &ldquo;Outturn&rdquo;?</span> It&apos;s the trade term for a
+            crop&apos;s realized yield at delivery — the result, not the projection. We measure the same for advice: what
+            farmers actually do, not just what&apos;s sent.
+          </p>
+        </div>
         <div
           style={{
             maxWidth: 1180,
