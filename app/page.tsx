@@ -631,6 +631,17 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
+        <p style={{ fontSize: 14.5, color: C.muted, margin: "26px 0 0", lineHeight: 1.6, maxWidth: 680 }}>
+          Want to look under the hood?{" "}
+          <Link
+            href="/proof"
+            style={{ color: C.green, textDecoration: "underline", textUnderlineOffset: 2, fontWeight: 600 }}
+          >
+            See the full-resolution proof
+          </Link>{" "}
+          — the live AWS &amp; Vercel consoles, the single Amazon DynamoDB table, and every screen behind
+          the loop, at full quality.
+        </p>
       </section>
 
       {/* Roadmap */}
@@ -719,6 +730,9 @@ export default function LandingPage() {
             </div>
           </div>
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+            <Link href="/proof" style={{ color: C.faint, textDecoration: "none" }}>
+              Architecture proof
+            </Link>
             <Link href="/judges" style={{ color: C.faint, textDecoration: "none" }}>
               Technical write-up
             </Link>
