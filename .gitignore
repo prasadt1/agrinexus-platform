@@ -42,5 +42,5 @@ next-env.d.ts
 dist/
 public/logo/
 
-# private submission/working prep — for my eyes only, not public
-docs/devpost-assets/
+# private working/strategy/planning docs — for my eyes only, not public
+docs/
