@@ -5,8 +5,11 @@ import { OutturnMark } from "@/app/components/OutturnMark";
 import { PartnerLeadForm } from "@/app/components/PartnerLeadForm";
 import { ArchitectureGallery } from "@/app/components/architecture/ArchitectureGallery";
 
-const WA_LINK =
-  "https://wa.me/4915120105731?text=Hi%20Outturn%2C%20show%20me%20the%20advisory%20demo";
+// The farmer-side engine demo (pre-existing AgriNexus AI). Shown as a clearly
+// labeled video — not a live CTA — so the dashboard is the only thing a judge tries.
+const ENGINE_DEMO_URL = "https://www.youtube.com/watch?v=Hr9EcblzkwI";
+// Jump past onboarding to the nudge → "Done" moment. Adjust the seconds if the cut changes.
+const ENGINE_DEMO_AT = `${ENGINE_DEMO_URL}&t=45s`;
 
 const C = {
   cream: "#F6F2EA",
@@ -104,7 +107,7 @@ export default function LandingPage() {
               cursor: "pointer",
             }}
           >
-            Try the live demo
+            Try the live dashboard
           </TryDemoButton>
         </nav>
       </header>
@@ -134,7 +137,7 @@ export default function LandingPage() {
               Outturn sends weather-based guidance, sees who follows through by district, and helps
               partners follow up with the rest — so no farmer slips through the cracks.
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-start" }}>
               <TryDemoButton
                 style={{
                   background: C.green,
@@ -147,35 +150,40 @@ export default function LandingPage() {
                   cursor: "pointer",
                 }}
               >
-                Try the live demo
+                Try the live dashboard
               </TryDemoButton>
-              <a
-                href={WA_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  fontSize: 15,
-                  fontWeight: 500,
-                  color: C.ink,
-                  textDecoration: "none",
-                  padding: "12px 18px",
-                  borderRadius: 10,
-                  border: `1px solid ${C.border}`,
-                  background: C.white,
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true">
-                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.16c-.24.68-1.42 1.32-1.95 1.36-.5.05-.96.24-3.23-.67-2.74-1.08-4.46-3.88-4.6-4.06-.13-.18-1.1-1.46-1.1-2.79 0-1.32.7-1.97.94-2.24a1 1 0 01.72-.34c.18 0 .36.01.51.01.17 0 .39-.06.6.46.24.56.81 1.94.88 2.08.07.14.12.31.02.49-.09.18-.14.29-.27.45-.14.16-.29.36-.41.48-.14.14-.28.29-.12.57.16.27.71 1.17 1.53 1.9 1.05.93 1.94 1.23 2.21 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.55.73 1.81.86.27.14.45.2.51.31.07.12.07.66-.17 1.34z" />
-                </svg>
-                See it on WhatsApp
-              </a>
+              <div style={{ display: "inline-flex", flexDirection: "column", gap: 5 }}>
+                <a
+                  href={ENGINE_DEMO_AT}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 15,
+                    fontWeight: 500,
+                    color: C.ink,
+                    textDecoration: "none",
+                    padding: "12px 18px",
+                    borderRadius: 10,
+                    border: `1px solid ${C.border}`,
+                    background: C.white,
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={C.green} aria-hidden="true">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  Watch how it works · 90s
+                </a>
+                <span style={{ fontSize: 12.5, color: C.faint, paddingLeft: 2 }}>
+                  the farmer side, on the AgriNexus engine.
+                </span>
+              </div>
             </div>
             <p style={{ fontSize: 14, color: C.muted, margin: "14px 0 0", lineHeight: 1.5, maxWidth: 480 }}>
-              Message our demo number and you&apos;ll get exactly what a farmer gets: the advice, then a
-              follow-up reminder.
+              Farmers get advice on WhatsApp — no app, no cost, it&apos;s already on their phone. The
+              dashboard is where partners watch who acted.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 18, marginTop: 24, fontSize: 13, color: C.muted }}>
               <span>Weather-timed advice</span>
@@ -347,7 +355,7 @@ export default function LandingPage() {
           <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 16, marginLeft: "auto", fontSize: 13, fontWeight: 500 }}>
             {(
               [
-                ["▶ Demo", "https://www.youtube.com/watch?v=Hr9EcblzkwI"],
+                ["▶ Demo", ENGINE_DEMO_URL],
                 ["Code", "https://github.com/prasadt1/agrinexus-ai"],
                 ["Write-up", "https://builder.aws.com/content/3C8hBRTcsRuQrHzE3Pq243yhXTF/aideas-finalist-agrinexus-ai"],
               ] as [string, string][]
@@ -657,10 +665,10 @@ export default function LandingPage() {
               cursor: "pointer",
             }}
           >
-            Try the live demo
+            Try the live dashboard
           </TryDemoButton>
           <a
-            href={WA_LINK}
+            href={ENGINE_DEMO_AT}
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -676,7 +684,10 @@ export default function LandingPage() {
               border: `1px solid ${C.border}`,
             }}
           >
-            See it on WhatsApp
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={C.green} aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Watch how it works · 90s
           </a>
         </div>
       </section>
