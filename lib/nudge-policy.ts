@@ -34,7 +34,13 @@ export function buildNudgePayload(cohort: CohortForPayload, weather: Weather) {
     programId: "default-spray" as const,
     location: cohort.district,
     activity: "spray" as const,
-    weather,
+    // Clean the farmer-facing wind speed: the raw m/s→km/h conversion yields
+    // floats like 23.508000000000003. We round to ONE decimal (not a whole
+    // number) because the deployed engine prints `float(wind_speed)` directly —
+    // an integer would render as "24.0 km/h", whereas 23.5 renders cleanly as
+    // "23.5 km/h". The gate (isFavorable) already ran on the precise value
+    // upstream, so this only cleans what's printed, never what's decided.
+    weather: { ...weather, wind_speed: Math.round(weather.wind_speed * 10) / 10 },
     rules: { sprayConditions: rules.sprayConditions, ...cadence },
   };
 }
