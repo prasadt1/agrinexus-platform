@@ -107,7 +107,7 @@ export default function LandingPage() {
               cursor: "pointer",
             }}
           >
-            Try the live dashboard
+            Drive the live demo
           </TryDemoButton>
         </nav>
       </header>
@@ -116,81 +116,116 @@ export default function LandingPage() {
       <section style={{ maxWidth: 1180, margin: "0 auto", padding: "40px 32px 64px" }}>
         <div className="hero-grid">
           <div>
-            <Eyebrow>WhatsApp crop advisory, built for follow-through</Eyebrow>
+            <div style={{ borderLeft: "2px solid #D8D1C2", paddingLeft: 14, margin: "0 0 22px" }}>
+              <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: C.ink, lineHeight: 1.4, margin: 0 }}>
+                &ldquo;Information alone rarely changes behavior.&rdquo;
+              </p>
+              <p style={{ fontSize: 12, color: C.faint, margin: "4px 0 0" }}>
+                The insight behind{" "}
+                <a
+                  href="https://en.wikipedia.org/wiki/Nudge_theory"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: C.faint, textDecoration: "underline", textUnderlineOffset: "2px" }}
+                >
+                  <em>Nudge</em> (Thaler &amp; Sunstein, 2008)
+                </a>
+              </p>
+            </div>
+
+            <Eyebrow>The control room for farm advisory</Eyebrow>
             <h1
               style={{
                 fontFamily: SERIF,
-                fontSize: "clamp(44px, 7vw, 68px)",
-                lineHeight: 1.05,
+                fontSize: "clamp(42px, 6.5vw, 62px)",
+                lineHeight: 1.04,
                 letterSpacing: "-0.015em",
-                margin: "16px 0 18px",
+                margin: "16px 0 8px",
                 fontWeight: 500,
               }}
             >
               From advice to action.
             </h1>
-            <p style={{ fontSize: 19, lineHeight: 1.55, color: C.ink, maxWidth: 520, margin: "0 0 14px", fontWeight: 500 }}>
-              Timely crop advice for farmers on WhatsApp — and, for{" "}
-              <strong style={{ color: C.green, fontWeight: 700 }}>the partners who serve them</strong>, a
-              clear view of who&apos;s acting on it.
+            <p style={{ fontSize: 21, lineHeight: 1.3, color: C.ink, fontWeight: 500, margin: "0 0 20px" }}>
+              See who acted. Reach who didn&apos;t.
             </p>
-            <p style={{ fontSize: 16, lineHeight: 1.6, color: C.muted, maxWidth: 515, margin: "0 0 28px" }}>
-              Outturn sends weather-based guidance, sees who follows through by district, and helps
-              partners follow up with the rest — so no farmer slips through the cracks.
+            <p style={{ fontSize: 17, lineHeight: 1.55, color: C.ink, maxWidth: 560, margin: "0 0 14px", fontWeight: 500 }}>
+              Outturn is where advisory partners —{" "}
+              <strong style={{ color: C.green, fontWeight: 700 }}>NGOs, agri-input companies, government programs</strong> — run
+              their farmer programs: send weather-timed WhatsApp nudges, watch follow-through by district, and re-nudge the rest.
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-start" }}>
+            <p style={{ fontSize: 16, lineHeight: 1.5, color: C.muted, maxWidth: 560, margin: "0 0 24px" }}>
+              Not a passive dashboard — <strong style={{ color: C.ink, fontWeight: 700 }}>the room where you see and act.</strong>
+            </p>
+
+            <div style={{ margin: "0 0 16px" }}>
               <TryDemoButton
                 style={{
                   background: C.green,
                   color: C.white,
-                  fontSize: 15,
-                  fontWeight: 500,
-                  padding: "12px 22px",
-                  borderRadius: 10,
+                  fontSize: 16.5,
+                  fontWeight: 600,
+                  padding: "15px 30px",
+                  borderRadius: 11,
                   border: "none",
                   cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 9,
                 }}
               >
-                Try the live dashboard
+                Drive the live demo
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h13M12 5l7 7-7 7" />
+                </svg>
               </TryDemoButton>
-              <div style={{ display: "inline-flex", flexDirection: "column", gap: 5 }}>
-                <a
-                  href={ENGINE_DEMO_AT}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontSize: 15,
-                    fontWeight: 500,
-                    color: C.ink,
-                    textDecoration: "none",
-                    padding: "12px 18px",
-                    borderRadius: 10,
-                    border: `1px solid ${C.border}`,
-                    background: C.white,
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill={C.green} aria-hidden="true">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  Watch how it works · 90s
-                </a>
-                <span style={{ fontSize: 12.5, color: C.muted, fontWeight: 500, paddingLeft: 2 }}>
-                  The farmer side — on the AgriNexus engine.
+            </div>
+
+            <div
+              style={{
+                display: "inline-block",
+                background: C.white,
+                border: `1px solid ${C.border}`,
+                borderRadius: 12,
+                padding: "12px 15px",
+                width: 320,
+                maxWidth: "100%",
+                margin: "0 0 26px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0, marginTop: 1 }}>
+                  <circle cx="12" cy="8" r="5" />
+                  <path d="M8.5 12.5 7 21l5-3 5 3-1.5-8.5" />
+                </svg>
+                <span style={{ fontSize: 13, color: C.ink, lineHeight: 1.4 }}>
+                  Powered by <strong style={{ fontWeight: 700 }}>AgriNexus</strong> — AWS AIdeas{" "}
+                  <strong style={{ fontWeight: 700 }}>Innovation Award</strong> winner.
                 </span>
               </div>
+              <a
+                href={ENGINE_DEMO_AT}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", borderTop: "1px solid #EFEAE0", paddingTop: 8 }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill={C.green} aria-hidden="true" style={{ flexShrink: 0 }}>
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span style={{ fontSize: 13, color: C.green, fontWeight: 600, lineHeight: 1.4, display: "inline-flex", alignItems: "center", gap: 5 }}>
+                  See a farmer receive a nudge · 90s
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M5 12h13M12 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </a>
             </div>
-            <p style={{ fontSize: 14, color: C.muted, margin: "14px 0 0", lineHeight: 1.5, maxWidth: 480 }}>
-              Farmers get advice on WhatsApp — no app, no cost, it&apos;s already on their phone.{" "}
-              <strong style={{ color: C.ink, fontWeight: 700 }}>The dashboard is where partners watch who acted.</strong>
-            </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 26, fontSize: 13.5, fontWeight: 600, color: C.ink }}>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, fontSize: 13.5, fontWeight: 600, color: C.ink, borderTop: `1px solid ${C.border}`, paddingTop: 18 }}>
               <span>Weather-timed advice</span>
-              <span style={{ color: C.border }}>·</span>
+              <span style={{ color: "#C9C1B0" }}>·</span>
               <span>Confirmed by each farmer</span>
-              <span style={{ color: C.border }}>·</span>
+              <span style={{ color: "#C9C1B0" }}>·</span>
               <span>Results by district</span>
             </div>
           </div>
