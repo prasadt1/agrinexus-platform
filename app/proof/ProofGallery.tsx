@@ -119,7 +119,13 @@ export function ProofGallery({ sections }: { sections: ProofSection[] }) {
               src={active.src}
               alt={active.title}
               className="rounded-lg"
-              style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", boxShadow: "0 20px 60px rgba(0,0,0,.5)" }}
+              style={{
+                maxWidth: "100%",
+                maxHeight: "100%",
+                objectFit: "contain",
+                background: "var(--color-surface-muted, #EFEADD)",
+                boxShadow: "0 20px 60px rgba(0,0,0,.5)",
+              }}
             />
           </div>
 
