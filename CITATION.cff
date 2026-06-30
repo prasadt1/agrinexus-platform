@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+title: "Outturn: A Monetizable B2B Control Plane for Closed-Loop Agricultural Advisory"
+message: "If you use or reference this work, please cite it using this metadata."
+type: software
+authors:
+  - family-names: Tilloo
+    given-names: Prasad
+    affiliation: Independent
+date-released: 2026-06-29
+version: 1.0.0
+repository-code: "https://github.com/prasadt1/agrinexus-platform"
+url: "https://outturn.vercel.app"
+license: "Proprietary (Source-Available)"
+keywords:
+  - agriculture
+  - advisory
+  - dynamodb
+  - vercel
+  - multi-tenant
+  - b2b

@@ -44,3 +44,17 @@ public/logo/
 
 # private working/strategy/planning docs — for my eyes only, not public
 docs/
+
+# heavy media — never check video/audio/archives/design sources into the public repo.
+# Article/README images live (tracked) under public/; raw drafts live under docs/ (ignored).
+*.mp4
+*.mov
+*.m4a
+*.wav
+*.mp3
+*.aac
+*.zip
+*.psd
+*.ai
+*.sketch
+*.fig
