@@ -187,7 +187,7 @@ export default function CohortDetailPage({
 
   if (loading) {
     return (
-      <div className="py-10 px-8">
+      <div className="py-6 px-4 sm:py-10 sm:px-8">
         <div className="animate-pulse">
           <div className="h-8 w-48 rounded" style={{ background: "var(--color-border)" }} />
           <div className="h-4 w-64 mt-3 rounded" style={{ background: "var(--color-border)" }} />
@@ -203,7 +203,7 @@ export default function CohortDetailPage({
 
   if (error || !cohort) {
     return (
-      <div className="py-10 px-8">
+      <div className="py-6 px-4 sm:py-10 sm:px-8">
         <Card>
           <EmptyState
             title={error || "Cohort not found"}
@@ -246,7 +246,7 @@ export default function CohortDetailPage({
       : `${totalNudgesSent} reminder${totalNudgesSent === 1 ? "" : "s"} sent to ${farmersReached} farmer${farmersReached === 1 ? "" : "s"}. ${totalNudgesCompleted} confirmed they acted, a ${Math.round(overallResponseRate * 100)}% follow-through.`;
 
   return (
-    <div className="py-10 px-8">
+    <div className="py-6 px-4 sm:py-10 sm:px-8">
       {/* Breadcrumb + partner */}
       <div className="flex items-center justify-between gap-4 mb-5">
         <nav>

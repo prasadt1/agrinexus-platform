@@ -55,7 +55,7 @@ export default function NewCohortPage() {
 
   if (!isAdmin) {
     return (
-      <div className="py-10 px-8">
+      <div className="py-6 px-4 sm:py-10 sm:px-8">
         <Card>
           <p className="font-medium">Admin access required</p>
           <p className="mt-2 text-sm" style={{ color: "var(--color-text-muted)" }}>
@@ -125,7 +125,7 @@ export default function NewCohortPage() {
   }
 
   return (
-    <div className="py-10 px-8 max-w-2xl">
+    <div className="py-6 px-4 sm:py-10 sm:px-8 max-w-2xl">
       <PageHeader
         title="New cohort"
         description="Set up a group of farmers in one district for WhatsApp advisory."

@@ -114,7 +114,7 @@ export default function ReportsPage() {
   const scopeLabel = district === "all" ? "All districts" : district;
 
   return (
-    <div className="py-10 px-8">
+    <div className="py-6 px-4 sm:py-10 sm:px-8">
       <div className="no-print">
         <PageHeader
           title="Reports"

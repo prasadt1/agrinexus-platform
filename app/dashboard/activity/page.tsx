@@ -63,7 +63,7 @@ export default function ActivityPage() {
   }, [fetchActivity]);
 
   return (
-    <div className="py-10 px-8">
+    <div className="py-6 px-4 sm:py-10 sm:px-8">
       <PageHeader
         title="Activity"
         description="A running record of everything that's happened — cohorts created and activated, licenses, and reminder cycles."

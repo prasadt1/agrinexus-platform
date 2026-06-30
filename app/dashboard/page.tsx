@@ -87,7 +87,7 @@ export default function OverviewPage() {
   // instead of a dashboard full of zeros.
   if (!loading && cohorts.length === 0) {
     return (
-      <div className="py-10 px-8">
+      <div className="py-6 px-4 sm:py-10 sm:px-8">
         <header className="mb-8">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -119,7 +119,7 @@ export default function OverviewPage() {
   }
 
   return (
-    <div className="py-10 px-8">
+    <div className="py-6 px-4 sm:py-10 sm:px-8">
       <AdvisoryLoopHero onHowItWorks={() => setShowHowItWorks(true)} />
 
       {/* Header with Tenant Identity */}

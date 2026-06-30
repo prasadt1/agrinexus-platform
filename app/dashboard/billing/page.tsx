@@ -62,7 +62,7 @@ export default function BillingPage() {
   const mrr = activeLicenses.reduce((sum, l) => sum + (PLAN_PRICE[l.plan] ?? 0), 0);
 
   return (
-    <div className="py-10 px-8">
+    <div className="py-6 px-4 sm:py-10 sm:px-8">
       <PageHeader
         title="Billing"
         description="Your cohort licenses and renewal dates."

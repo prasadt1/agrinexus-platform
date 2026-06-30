@@ -56,14 +56,16 @@ function Eyebrow({ children, onDark }: { children: React.ReactNode; onDark?: boo
 
 export default function LandingPage() {
   return (
-    <div style={{ background: C.cream, color: C.ink, fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
+    <div style={{ background: C.cream, color: C.ink, fontFamily: "var(--font-inter), system-ui, sans-serif", overflowX: "hidden" }}>
       {/* Nav */}
       <header
+        className="site-header"
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "18px 32px",
+          flexWrap: "wrap",
+          gap: 12,
           maxWidth: 1180,
           margin: "0 auto",
         }}
@@ -74,7 +76,7 @@ export default function LandingPage() {
             <span style={{ fontFamily: SERIF, fontSize: 24, color: C.ink, fontWeight: 500 }}>
               Out<span style={{ color: C.green }}>turn</span>
             </span>
-            <span style={{ fontSize: 11.5, color: C.faint, marginTop: 2, letterSpacing: "0.01em" }}>
+            <span className="hidden sm:block" style={{ fontSize: 11.5, color: C.faint, marginTop: 2, letterSpacing: "0.01em" }}>
               Advice that closes the loop
             </span>
           </span>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import { AuthProvider } from "@/lib/context/AuthProvider";
 import { ToastProvider } from "@/app/components/Toast";
@@ -27,6 +27,12 @@ export const metadata: Metadata = {
     description: "WhatsApp crop advisory that closes the loop — advice tracked all the way to done.",
     type: "website",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

@@ -51,6 +51,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const { tenantId, tenantName, role, loading, logout, switchTenant, authHeaders } = useAuth();
   const [tenantInfo, setTenantInfo] = useState<{ plan?: string } | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close the mobile drawer whenever the route changes.
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   // A guided tour exists on the overview and on a cohort-detail page only.
   const tourAvailable =
@@ -75,7 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (loading) {
     return (
       <div className="h-screen flex overflow-hidden" role="status" aria-label="Loading dashboard">
-        <aside className="w-64 sidebar flex flex-col shrink-0">
+        <aside className="w-64 sidebar hidden md:flex flex-col shrink-0">
           <div className="p-5" style={{ borderBottom: "1px solid var(--color-sidebar-border)" }}>
             <div className="skeleton" style={{ width: 124, height: 30, opacity: 0.22 }} />
           </div>
@@ -85,7 +91,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ))}
           </div>
         </aside>
-        <main className="flex-1 p-8" style={{ background: "var(--color-page-bg)" }}>
+        <main className="flex-1 p-4 md:p-8" style={{ background: "var(--color-page-bg)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto" }}>
             <div className="skeleton" style={{ width: 240, height: 28, marginBottom: 12 }} />
             <div className="skeleton" style={{ width: 360, height: 16, marginBottom: 32 }} />
@@ -102,11 +108,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="h-screen flex overflow-hidden" style={themeVars}>
-      <aside className="w-64 sidebar flex flex-col shrink-0 h-full">
-        <div className="p-5" style={{ borderBottom: "1px solid var(--color-sidebar-border)" }}>
+      {/* Mobile drawer scrim */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden
+        />
+      )}
+
+      <aside
+        className={`w-64 sidebar flex flex-col shrink-0 h-full fixed inset-y-0 left-0 z-50 transform transition-transform duration-200 ease-out md:static md:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="p-5 flex items-center justify-between" style={{ borderBottom: "1px solid var(--color-sidebar-border)" }}>
           <Link href="/" aria-label="Outturn home" title="Back to home">
             <AgriNexusWordmark light />
           </Link>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation menu"
+            className="md:hidden p-1 -mr-1 rounded-lg"
+            style={{ color: "var(--color-sidebar-text)" }}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         <nav className="flex-1 p-3 overflow-y-auto">
@@ -200,9 +230,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto" style={{ background: "var(--color-page-bg)" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>{children}</div>
-      </main>
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Mobile top bar with hamburger */}
+        <header
+          className="md:hidden flex items-center gap-3 px-4 h-14 shrink-0"
+          style={{ background: "var(--color-page-bg)", borderBottom: "1px solid var(--color-border)" }}
+        >
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open navigation menu"
+            className="p-2 -ml-2 rounded-lg"
+            style={{ color: "var(--color-text-primary)" }}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <AgriNexusWordmark />
+        </header>
+
+        <main className="flex-1 overflow-auto" style={{ background: "var(--color-page-bg)" }}>
+          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

@@ -41,7 +41,8 @@ function BrowserFrame({ url, children }: { url: string; children: React.ReactNod
   return (
     <div
       style={{
-        width: 326,
+        width: "100%",
+        maxWidth: 326,
         background: "#fff",
         borderRadius: 12,
         overflow: "hidden",
@@ -90,7 +91,8 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        width: 220,
+        width: "100%",
+        maxWidth: 220,
         background: "#000",
         borderRadius: 26,
         padding: 6,
